@@ -57,6 +57,19 @@ export function isValidationFailure<TData>(
 }
 
 /**
+ * Build a human-readable 400 message from a validation failure, naming the
+ * first offending field instead of the generic "Invalid request" (#10849).
+ * Intended for routes that reply with a single message string (e.g.
+ * `errorResponse()`) rather than the full `{ message, details }` envelope
+ * returned by `validatedJsonBody()`.
+ */
+export function formatValidationMessage(error: ValidationErrorPayload): string {
+  const [first] = error.details;
+  if (!first) return error.message;
+  return first.field ? `${first.field}: ${first.message}` : first.message;
+}
+
+/**
  * Result of attempting to parse and validate a JSON body against a Zod schema.
  *
  * On failure, `response` is a fully-prepared `NextResponse` (with the standard

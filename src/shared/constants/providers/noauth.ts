@@ -175,6 +175,25 @@ export const NOAUTH_PROVIDERS = {
       text: "ZCode runs locally through its native app-server. OmniRoute never receives or stores the Z.ai credential.",
     },
   },
+  uncloseai: {
+    id: "uncloseai",
+    alias: "unc",
+    name: "UncloseAI",
+    icon: "auto_awesome",
+    color: "#8B5CF6",
+    textIcon: "UN",
+    website: "https://uncloseai.com",
+    noAuth: true,
+    hasFree: true,
+    passthroughModels: true,
+    serviceKinds: ["llm"],
+    authHint:
+      "No auth required. API accepts any non-empty string as key for identification. If older built-in models return 404, use Available Models → Import from /models or Auto-Sync; verified live model: solidrust/Hermes-3-Llama-3.1-8B-AWQ.",
+    freeNote: "Free forever — no signup, no credit card. OpenAI-compatible endpoints.",
+    notice: {
+      text: "UncloseAI needs no API key. API accepts any non-empty string as key for identification. If older built-in models return 404, use Available Models → Import from /models or Auto-Sync.",
+    },
+  },
   aihorde: {
     id: "aihorde",
     alias: "horde",

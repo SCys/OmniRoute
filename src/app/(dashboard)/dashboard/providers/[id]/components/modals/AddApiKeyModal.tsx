@@ -31,6 +31,7 @@ import {
 import { getWebSessionCredentialRequirement } from "../../webSessionCredentials";
 import { useOpenRouterPresetControl } from "../OpenRouterPresetInput";
 import WebSessionCredentialGuide from "../WebSessionCredentialGuide";
+import HarImportButton from "../HarImportButton";
 import CcCompatibleRequestDefaultsFields from "./CcCompatibleRequestDefaultsFields";
 import { buildAddProviderSpecificData } from "./connectionProviderSpecificData";
 import { getCommandCodeAuthPhaseLabel } from "./commandCodeAuthPhase";
@@ -88,6 +89,7 @@ export default function AddApiKeyModal({
   const isModal = provider === "modal";
   const isGlm = isGlmProvider(provider);
   const isQoder = provider === "qoder";
+  const isFreebuff = provider === "freebuff";
   const openRouterPreset = useOpenRouterPresetControl(provider, t);
   const isCloudflare = provider === "cloudflare-ai";
   const localProviderMetadata = getLocalProviderMetadata(provider);
@@ -154,7 +156,7 @@ export default function AddApiKeyModal({
     if (!isOpen || wasOpen) return;
     // On open, reset baseUrl and assign a unique default name so a second API key
     // for the same provider doesn't reuse "main" and trigger the backend
-    // name-based upsert that would silently overwrite the first connection (#6499).
+    // name-based upsert that would silently overwrite the first connection (#6499, #11033).
     setFormData((current) => ({
       ...current,
       name: computeConnectionDefaultName(existingConnectionCount),
@@ -191,9 +193,11 @@ export default function AddApiKeyModal({
         ? webSessionCredential.placeholder
         : isQoder
           ? t("qoderPatPlaceholder")
-          : apiKeyOptional
-            ? t("optional")
-            : undefined;
+          : isFreebuff
+            ? "Enter Freebuff / Codebuff Auth Token (e.g. 038fcdf9-...)"
+            : apiKeyOptional
+              ? t("optional")
+              : undefined;
   const apiCredentialHint = isModal
     ? providerText(
         t,
@@ -202,15 +206,17 @@ export default function AddApiKeyModal({
       )
     : isQoder
       ? t("qoderPatHint")
-      : isWebSessionCredential
-        ? getWebSessionCredentialHint(t, webSessionCredential, providerDisplayName, false)
-        : isLocalSelfHostedProvider
-          ? t("localProviderApiKeyOptionalHint", {
-              provider: localProviderMetadata?.name || providerName || provider || "",
-            })
-          : apiKeyOptional
-            ? t("apiKeyOptionalHint")
-            : undefined;
+      : isFreebuff
+        ? "Freebuff uses an authentic CLI auth token obtained via codebuff CLI login or automated harvester."
+        : isWebSessionCredential
+          ? getWebSessionCredentialHint(t, webSessionCredential, providerDisplayName, false)
+          : isLocalSelfHostedProvider
+            ? t("localProviderApiKeyOptionalHint", {
+                provider: localProviderMetadata?.name || providerName || provider || "",
+              })
+            : apiKeyOptional
+              ? t("apiKeyOptionalHint")
+              : undefined;
   const credentialValidationFailedMessage = isWebSessionCredential
     ? providerText(
         t,
@@ -745,6 +751,12 @@ export default function AddApiKeyModal({
                 t={t}
               />
             )}
+            {provider && (
+              <HarImportButton
+                provider={provider}
+                onImport={(apiKey) => setFormData({ ...formData, apiKey })}
+              />
+            )}
             {!isNoAuthWebSessionCredential && (
               <div className="flex gap-2">
                 <Input
@@ -752,6 +764,12 @@ export default function AddApiKeyModal({
                   type="password"
                   value={formData.apiKey}
                   onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !validating && !saving) {
+                      e.preventDefault();
+                      handleValidate();
+                    }
+                  }}
                   className="flex-1"
                   placeholder={apiCredentialPlaceholder}
                   hint={apiCredentialHint}

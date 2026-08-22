@@ -53,11 +53,13 @@ export type ProviderErrorRuleMatch = {
 // every model on the same provider until the 5h window resets.
 //
 // Scope note: `scope: "connection"` (not "provider") is correct because the
-// upstream quota is per-account, and a single OmniRoute provider entry maps to
-// one user account. Multiple OmniRoute connections under the same provider
-// name mean the user has multiple upstream accounts — locking at the provider
-// level would disable every one of them when only one is exhausted. See
-// Issue #2 (Monthly quota exhausted treated as transient 429).
+// upstream quota is per egress IP for the free tier (the opencode free tier
+// is IP-bucketed, not account-bucketed — see #9611) and per account for paid
+// plans; a single OmniRoute provider entry maps to one user account. Multiple
+// OmniRoute connections under the same provider name mean the user has
+// multiple upstream accounts — locking at the provider level would disable
+// every one of them when only one is exhausted. See Issue #2 (Monthly quota
+// exhausted treated as transient 429) and #10880 (egress-bucketed cooldown).
 function buildOpencodeRules(): ProviderErrorRule[] {
   return [
     {
@@ -275,6 +277,36 @@ const HONORS_RULE_LOCK_SCOPE_PROVIDERS = new Set(["agentrouter"]);
 
 export function honorsRuleLockScope(provider: string | null | undefined): boolean {
   return !!provider && HONORS_RULE_LOCK_SCOPE_PROVIDERS.has(provider.toLowerCase());
+}
+
+/**
+ * Providers whose upstream quota is bucketed by EGRESS IP, not by account —
+ * the opencode free tier is IP-bucketed, not account-bucketed (see #9611).
+ * When such a provider answers 429 quota_exhausted or
+ * rate_limit_exceeded (see the markAccountUnavailable branch comment — the
+ * real opencode 429 arrives as rate_limit_exceeded on that path), every
+ * connection egressing through that IP shares the exhausted budget, so the
+ * lock is applied at egress-IP scope (see markAccountUnavailable /
+ * applyEgressIpLockout). EXCLUSIVE allowlist by design — same pattern as
+ * HONORS_RULE_LOCK_SCOPE_PROVIDERS (#10334): a provider must opt in, and any
+ * widening is an explicit owner decision.
+ */
+const EGRESS_BUCKETED_LOCK_PROVIDERS = new Set(["opencode", "opencode-go", "opencode-cli"]);
+
+export function isEgressBucketedLockScope(provider: string | null | undefined): boolean {
+  return !!provider && EGRESS_BUCKETED_LOCK_PROVIDERS.has(provider.toLowerCase());
+}
+
+/**
+ * The same allowlist as a sorted array, for callers that must express it as
+ * data rather than a predicate (the sibling lookup in `applyEgressIpLockout`
+ * binds it into a SQL `IN (...)`). Single source of truth on purpose: a
+ * literal provider list duplicated in a query would silently NOT follow a
+ * widening of `EGRESS_BUCKETED_LOCK_PROVIDERS`, leaving the opt-in half
+ * applied.
+ */
+export function egressBucketedLockProviders(): string[] {
+  return [...EGRESS_BUCKETED_LOCK_PROVIDERS].sort();
 }
 
 /**

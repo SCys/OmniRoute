@@ -147,6 +147,19 @@ export const SEARCH_VALIDATOR_CONFIGS: Record<
       body: JSON.stringify({ query: "test", max_results: 1 }),
     },
   }),
+  "x-search": (apiKey) => ({
+    url: "https://api.x.ai/v1/responses",
+    init: {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "grok-4.6",
+        stream: false,
+        input: "test",
+        tools: [{ type: "x_search" }],
+      }),
+    },
+  }),
   "zai-search": (apiKey, providerSpecificData = {}) => {
     const baseUrl =
       typeof providerSpecificData?.baseUrl === "string" && providerSpecificData.baseUrl.trim()

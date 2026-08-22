@@ -24,8 +24,24 @@ export const ollama_cloudProvider: RegistryEntry = {
       supportsReasoning: true,
       supportedThinkingEfforts: ["low", "medium", "high"],
     },
-    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", supportsReasoning: true },
-    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", supportsReasoning: true },
+    // #10788: Ollama Cloud accepts low|medium|high|max|none uniformly across
+    // its reasoning-capable models (see supportsMaxEffortForProvider's
+    // isOllamaCloud comment in open-sse/executors/base/reasoningEffort.ts) —
+    // declare supportedThinkingEfforts so appendSyncedEffortVariants() (which
+    // runs before static-model capability enrichment) can synthesize the
+    // catalog's selectable -low/-high/-max variant ids for these models.
+    {
+      id: "deepseek-v4-pro",
+      name: "DeepSeek V4 Pro",
+      supportsReasoning: true,
+      supportedThinkingEfforts: ["low", "medium", "high", "max"],
+    },
+    {
+      id: "deepseek-v4-flash",
+      name: "DeepSeek V4 Flash",
+      supportsReasoning: true,
+      supportedThinkingEfforts: ["low", "medium", "high", "max"],
+    },
     { id: "kimi-k2.6", name: "Kimi K2.6" },
     // Ollama Cloud accepts low|medium|high|max|none and rejects xhigh, so the
     // explicit supportsXHighEffort:false makes the sanitizer map xhigh → max.
@@ -34,12 +50,14 @@ export const ollama_cloudProvider: RegistryEntry = {
       name: "GLM 5.1",
       supportsReasoning: true,
       supportsXHighEffort: false,
+      supportedThinkingEfforts: ["low", "medium", "high", "max"],
     },
     {
       id: "glm-5.2",
       name: "GLM 5.2",
       supportsReasoning: true,
       supportsXHighEffort: false,
+      supportedThinkingEfforts: ["low", "medium", "high", "max"],
     },
     // #3110: MiniMax M3 via Ollama
     { id: "minimax-m3", name: "MiniMax M3", contextLength: 1048576, supportsVision: true },

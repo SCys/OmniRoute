@@ -49,6 +49,7 @@ import {
 import { getWebSessionCredentialRequirement } from "../../webSessionCredentials";
 import { useOpenRouterPresetControl } from "../OpenRouterPresetInput";
 import WebSessionCredentialGuide from "../WebSessionCredentialGuide";
+import HarImportButton from "../HarImportButton";
 import CcCompatibleRequestDefaultsFields from "./CcCompatibleRequestDefaultsFields";
 import { CodexConnectionFields } from "./CodexFingerprintFields";
 import { assignEditApiKeyProviderSpecificData } from "./connectionProviderSpecificData";
@@ -208,6 +209,7 @@ export default function EditConnectionModal({
       (provider.startsWith("openai-compatible-responses-") ||
         connectionProviderSpecificData?.apiType === "responses" ||
         formData.targetFormat === "openai-responses"));
+  const isCustomResponsesConnection = isResponsesConnection && !isCodex && provider !== "openai";
   const isClaude = provider === "claude";
   const isAntigravityFamily = provider === "antigravity" || provider === "agy";
   const localProviderMetadata = getLocalProviderMetadata(provider);
@@ -667,8 +669,12 @@ export default function EditConnectionModal({
         }
       }
       if (isResponsesConnection && updates.providerSpecificData) {
-        updates.providerSpecificData.preserveEncryptedReasoning =
-          formData.preserveEncryptedReasoning === true;
+        if (isCustomResponsesConnection) {
+          updates.providerSpecificData.preserveEncryptedReasoning =
+            formData.preserveEncryptedReasoning === true;
+        } else {
+          delete updates.providerSpecificData.preserveEncryptedReasoning;
+        }
         updates.providerSpecificData.openaiStoreEnabled =
           formData.openaiResponsesStoreEnabled === true;
       }
@@ -701,7 +707,7 @@ export default function EditConnectionModal({
     !testResult?.valid && testResult?.diagnosis?.type
       ? ERROR_TYPE_LABELS[testResult.diagnosis.type] || null
       : null;
-  const preserveEncryptedReasoningToggle = isResponsesConnection ? (
+  const preserveEncryptedReasoningToggle = isCustomResponsesConnection ? (
     <Toggle
       checked={formData.preserveEncryptedReasoning}
       onChange={(checked) => setFormData({ ...formData, preserveEncryptedReasoning: checked })}
@@ -902,6 +908,12 @@ export default function EditConnectionModal({
                 providerName={providerDisplayName}
                 providerWebsite={providerWebsite}
                 t={t}
+              />
+            )}
+            {provider && (
+              <HarImportButton
+                provider={provider}
+                onImport={(apiKey) => setFormData({ ...formData, apiKey })}
               />
             )}
             {!isNoAuthWebSessionCredential && (

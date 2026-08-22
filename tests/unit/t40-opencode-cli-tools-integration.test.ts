@@ -158,7 +158,13 @@ test("T40: OpenCode merge preserves unrelated config and updates only provider.o
     github: { command: "npx", args: ["-y", "@modelcontextprotocol/server-github"] },
   });
   assert.deepEqual(mergedConfig.provider.omniroute.models, {
-    "cx/gpt-5.6-sol": { name: "GPT-5.6 Sol" },
+    "cx/gpt-5.6-sol": {
+      name: "GPT-5.6 Sol",
+      limit: {
+        context: 128_000,
+        output: 8_192,
+      },
+    },
   });
 });
 

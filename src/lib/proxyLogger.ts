@@ -110,9 +110,14 @@ loadFromDb();
 // neither IPs nor the account prefix. Deliberately NOT coupled to debugMode
 // (src/lib/db/settings.ts defaults debugMode to true) — this verbosity is opt-in only.
 // Storage (in-memory ring buffer + SQLite) is untouched and always keeps full IPs.
-const PROXY_LOG_INCLUDE_IPS =
-  process.env.PROXY_LOG_INCLUDE_IPS === "true" ||
-  process.env.PROXY_LOG_INCLUDE_IPS === "1";
+
+/** Read at call time so tests can toggle it between imports. */
+export function isProxyLogIncludeIps(): boolean {
+  return (
+    process.env.PROXY_LOG_INCLUDE_IPS === "true" ||
+    process.env.PROXY_LOG_INCLUDE_IPS === "1"
+  );
+}
 
 /**
  * Pure formatter for the [ProxyEgress] process-log line (#10348). At the default level it
@@ -178,7 +183,7 @@ export function logProxyEvent(entry: ProxyLogInput) {
         level: log.level,
         proxyHost: log.proxy?.host,
         status: log.status,
-        includeDetails: PROXY_LOG_INCLUDE_IPS,
+        includeDetails: isProxyLogIncludeIps(),
       })
     );
   }

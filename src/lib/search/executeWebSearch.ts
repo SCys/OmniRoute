@@ -7,7 +7,7 @@ import {
   resolveSearchProvider,
   selectProvider,
   supportsSearchType,
-  SEARCH_CREDENTIAL_FALLBACKS,
+  getSearchCredentialFallbacks,
   SEARCH_PROVIDERS,
   type SearchProviderConfig,
 } from "@omniroute/open-sse/config/searchRegistry.ts";
@@ -25,7 +25,7 @@ export interface ExecuteWebSearchInput {
   provider?: string;
   max_results?: number;
   limit?: number;
-  search_type?: "web" | "news";
+  search_type?: "web" | "news" | "x";
   offset?: number;
   country?: string;
   language?: string;
@@ -64,8 +64,10 @@ export class WebSearchExecutionError extends Error {
 async function resolveSearchCredentials(providerId: string) {
   const creds = await getProviderCredentials(providerId).catch(() => null);
   if (creds) return creds;
-  const fallbackId = SEARCH_CREDENTIAL_FALLBACKS[providerId];
-  if (fallbackId) return getProviderCredentials(fallbackId).catch(() => null);
+  for (const fallbackId of getSearchCredentialFallbacks(providerId)) {
+    const fallback = await getProviderCredentials(fallbackId).catch(() => null);
+    if (fallback) return fallback;
+  }
   return null;
 }
 
@@ -108,7 +110,12 @@ function assertValidSearchInput(input: ExecuteWebSearchInput) {
   if (input.query.trim().length > 500) {
     throw new WebSearchExecutionError("Query must be 500 characters or fewer", 400);
   }
-  if (input.search_type && input.search_type !== "web" && input.search_type !== "news") {
+  if (
+    input.search_type &&
+    input.search_type !== "web" &&
+    input.search_type !== "news" &&
+    input.search_type !== "x"
+  ) {
     throw new WebSearchExecutionError(`Unsupported search_type: ${String(input.search_type)}`, 400);
   }
 }
@@ -119,6 +126,8 @@ export async function executeWebSearch(
   assertValidSearchInput(input);
 
   const log = input.log || defaultLog;
+  if (input.provider === "x_search") input.provider = "x-search";
+  if (input.provider === "x-search") input.search_type = "x";
   const searchType = input.search_type || "web";
 
   if (input.provider) {

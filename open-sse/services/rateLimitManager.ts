@@ -9,10 +9,7 @@
  */
 
 import Bottleneck from "bottleneck";
-import {
-  applyBottleneckDoExpirePatch,
-  applyBottleneckHeartbeatPatch,
-} from "./bottleneckPatch.ts";
+import { applyBottleneckDoExpirePatch, applyBottleneckHeartbeatPatch } from "./bottleneckPatch.ts";
 import { parseRetryAfterFromBody } from "./accountFallback.ts";
 import { getAntigravityQuotaFamily } from "./antigravityQuotaFamily.ts";
 import { getProviderCategory } from "../config/providerRegistry.ts";
@@ -550,12 +547,7 @@ export async function withRateLimit(provider, connectionId, model, fn, signal = 
   // Proactive sliding-window fallback for header-less providers with a declared cap
   // (Fase 8.2). No-op unless PROVIDER_DEFAULT_RATE_LIMITS has an entry for `provider`.
   const maxWaitMs = resolveRequestQueueMaxWaitMs(provider);
-  await awaitProviderDefaultSlot(
-    provider,
-    connectionId,
-    signal,
-    maxWaitMs
-  );
+  await awaitProviderDefaultSlot(provider, connectionId, signal, maxWaitMs);
 
   const limiter = getLimiter(provider, connectionId, model);
   // Bottleneck's `expiration` starts only after a job leaves QUEUED. The
@@ -607,7 +599,14 @@ export async function withRateLimit(provider, connectionId, model, fn, signal = 
       }
 
       try {
-        return await Promise.race([limiter.schedule(scheduleOpts, fn), abortPromise]);
+        // Race the work against the abort signal. When abort wins, fn is still
+        // running inside Bottleneck's limiter — its eventual rejection must not
+        // surface as an unhandledRejection. The .catch(noop) silences only the
+        // orphaned branch; the real rejection comes from abortPromise.
+        const scheduled = limiter.schedule(scheduleOpts, fn);
+        scheduled.catch(() => {}); // prevent unhandledRejection when abort wins
+        abortPromise.catch(() => {}); // prevent unhandledRejection when scheduled wins
+        return await Promise.race([scheduled, abortPromise]);
       } finally {
         if (abortListener) {
           signal.removeEventListener("abort", abortListener);

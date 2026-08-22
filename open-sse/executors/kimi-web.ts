@@ -29,6 +29,7 @@ import {
   sanitizeErrorMessage,
 } from "../utils/error.ts";
 import { extractKimiAccessToken } from "@/lib/providers/webCookieAuth";
+import { exchangeKimiRefreshToken } from "@/lib/kimi/tokenRefresh";
 import {
   type KimiWebModelConfig,
   resolveKimiWebContextLength,
@@ -38,7 +39,23 @@ import {
 
 export { extractKimiAccessToken };
 
-const BASE_URL = "https://www.kimi.com";
+export function getKimiWebBaseUrl(): string {
+  const envUrl = process.env.KIMI_WEB_BASE_URL?.trim();
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, "");
+  }
+  return "https://www.kimi.ai";
+}
+
+export function getKimiWebChatUrl(): string {
+  const envChat = process.env.KIMI_WEB_CHAT_URL?.trim();
+  if (envChat) {
+    return envChat;
+  }
+  return `${getKimiWebBaseUrl()}/apiv2/kimi.gateway.chat.v1.ChatService/Chat`;
+}
+
+const BASE_URL = "https://www.kimi.ai";
 const CHAT_URL = `${BASE_URL}/apiv2/kimi.gateway.chat.v1.ChatService/Chat`;
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36";
@@ -305,7 +322,7 @@ export class KimiWebExecutor extends BaseExecutor {
     const bodyObj = (body || {}) as Record<string, unknown>;
 
     const rawCredential = String(credentials?.accessToken || credentials?.apiKey || "").trim();
-    const accessToken = extractKimiAccessToken(rawCredential);
+    let accessToken = extractKimiAccessToken(rawCredential);
     if (!accessToken) {
       return makeErrorResult(
         400,
@@ -387,6 +404,29 @@ export class KimiWebExecutor extends BaseExecutor {
         body,
         CHAT_URL
       );
+    }
+
+    if (upstream.status === 401) {
+      const refreshToken =
+        credentials?.refreshToken || credentials?.providerSpecificData?.refreshToken;
+      if (refreshToken && typeof refreshToken === "string") {
+        const refreshRes = await exchangeKimiRefreshToken(
+          refreshToken,
+          getKimiWebBaseUrl()
+        );
+        if (refreshRes.success && refreshRes.accessToken) {
+          accessToken = refreshRes.accessToken;
+          const retryHeaders = this.buildKimiHeaders(accessToken);
+          try {
+            upstream = await fetch(CHAT_URL, {
+              method: "POST",
+              headers: retryHeaders,
+              body: new Uint8Array(framedBody),
+              signal,
+            });
+          } catch {}
+        }
+      }
     }
 
     if (!upstream.ok) {

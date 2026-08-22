@@ -186,6 +186,7 @@ export const comboRuntimeConfigSchema = z
     nestedComboMode: z.enum(["flatten", "execute"]).optional(),
     trackMetrics: z.boolean().optional(),
     reasoningTokenBufferEnabled: z.boolean().optional(),
+    reasoningTransportFallback: z.enum(["skip", "drop"]).optional(),
     compressionMode: compressionModeSchema.optional(),
     failoverBeforeRetry: z.boolean().optional(),
     maxSetRetries: z.coerce.number().int().min(0).max(10).optional(),
@@ -379,7 +380,12 @@ export const updateComboSchema = z
   .object({
     name: comboNameSchema.optional(),
     description: z.string().max(2000).optional().nullable(),
-    models: z.array(comboModelEntry).optional(),
+    // Creation may leave `models` empty (`omniroute combo create` drafts one
+    // that way); an update may not, or a working combo loses every target.
+    models: z
+      .array(comboModelEntry)
+      .min(1, "an update cannot remove every model from a combo")
+      .optional(),
     strategy: comboStrategySchema.optional(),
     config: comboRuntimeConfigSchema.optional(),
     isActive: z.boolean().optional(),
@@ -437,4 +443,11 @@ export const reorderCombosSchema = z
 
 export const testComboSchema = z.object({
   comboName: z.string().trim().min(1, "comboName is required"),
+});
+
+// POST /api/combos/duplicate - Resolve an auto-combo template (e.g. "auto/best-coding")
+// into a static, editable combo snapshot.
+export const duplicateAutoComboSchema = z.object({
+  name: z.string().trim().min(1, 'Missing required field: "name" (e.g. auto/best-coding)'),
+  strategy: comboStrategySchema.optional(),
 });

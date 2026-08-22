@@ -57,10 +57,19 @@ export const buildOpenCodeProviderConfig = ({
       ? normalizedModels
       : [...new Set([normalizedModel, ...OPENCODE_DEFAULT_MODELS].filter(Boolean))];
 
-  const modelsRecord: Record<string, { name: string }> = {};
+  const modelsRecord: Record<
+    string,
+    { name: string; limit: { context: number; output: number } }
+  > = {};
   for (const m of uniqueModels) {
     if (m) {
-      modelsRecord[m] = { name: getModelEntryName(m, normalizedLabels) };
+      modelsRecord[m] = {
+        name: getModelEntryName(m, normalizedLabels),
+        limit: {
+          context: 128_000,
+          output: 8_192,
+        },
+      };
     }
   }
 
@@ -91,11 +100,23 @@ export const mergeOpenCodeConfig = (
       ? existingConfig
       : {};
 
+  // Same guard as the root above, one level down. Spreading a non-object here
+  // does not throw, it splays the value into index keys: an existing
+  // `"provider": ["a", "b"]` merged to `{"0": "a", "1": "b", omniroute: ... }`
+  // and a string was exploded one character per key. mergeOpenCodeConfigText
+  // refuses the same input outright, so the two disagreed on what to do with a
+  // malformed config.
+  const existingProvider = (safeConfig as Record<string, unknown>).provider;
+  const safeProvider =
+    existingProvider && typeof existingProvider === "object" && !Array.isArray(existingProvider)
+      ? (existingProvider as Record<string, unknown>)
+      : {};
+
   return {
     ...safeConfig,
     $schema: safeConfig.$schema || "https://opencode.ai/config.json",
     provider: {
-      ...((safeConfig as any).provider || {}),
+      ...safeProvider,
       omniroute: buildOpenCodeProviderConfig(input),
     },
   };

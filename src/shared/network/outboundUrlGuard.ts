@@ -44,6 +44,9 @@ export function isPrivateHost(hostname: string) {
   if (
     normalized === "localhost" ||
     normalized === "0.0.0.0" ||
+    // `::` is the IPv6 twin of `0.0.0.0`: connecting to it reaches a service bound
+    // to the IPv6 loopback, so it has to be refused alongside its IPv4 spelling.
+    normalized === "::" ||
     normalized === "127.0.0.1" ||
     normalized === "::1" ||
     normalized.endsWith(".localhost") ||
@@ -81,6 +84,24 @@ export function isPrivateHost(hostname: string) {
   return false;
 }
 
+// WHATWG URL serialises an IPv4-mapped IPv6 address as hextets, so
+// `http://[::ffff:169.254.169.254]/` reaches these helpers as `::ffff:a9fe:a9fe`.
+// Matching the dotted spelling alone therefore misses every mapped address that
+// arrives through a parsed URL. Fold the embedded IPv4 back out before deciding.
+function mappedIpv4Host(hostname: string): string | null {
+  const normalized = normalizeHost(hostname);
+  if (!normalized.startsWith("::ffff:")) return null;
+  const embedded = normalized.slice("::ffff:".length);
+  if (isIP(embedded) === 4) return embedded;
+  const hextets = embedded.split(":");
+  if (hextets.length !== 2) return null;
+  const [high, low] = hextets.map((part) =>
+    /^[0-9a-f]{1,4}$/.test(part) ? parseInt(part, 16) : Number.NaN
+  );
+  if (Number.isNaN(high) || Number.isNaN(low)) return null;
+  return `${high >> 8}.${high & 0xff}.${low >> 8}.${low & 0xff}`;
+}
+
 const CLOUD_METADATA_HOSTNAMES = new Set([
   "169.254.169.254", // AWS / GCP / Azure / Oracle IMDS
   "metadata.google.internal", // GCP
@@ -88,6 +109,11 @@ const CLOUD_METADATA_HOSTNAMES = new Set([
   "100.100.100.200", // Alibaba Cloud
   "fd00:ec2::254", // AWS IPv6 IMDS
 ]);
+
+function isCloudMetadataIpv4(host: string): boolean {
+  if (CLOUD_METADATA_HOSTNAMES.has(host)) return true;
+  return host.startsWith("169.254."); // IPv4 link-local /16
+}
 
 /**
  * Cloud-metadata and IPv4 link-local (169.254.0.0/16) endpoints are the classic
@@ -97,9 +123,11 @@ const CLOUD_METADATA_HOSTNAMES = new Set([
 export function isCloudMetadataHost(hostname: string): boolean {
   const host = normalizeHost(hostname);
   if (!host) return false;
-  if (CLOUD_METADATA_HOSTNAMES.has(host)) return true;
-  if (host.startsWith("169.254.")) return true; // IPv4 link-local /16
-  return false;
+  if (isCloudMetadataIpv4(host)) return true;
+  // An IPv4-mapped IPv6 literal routes to the embedded IPv4 address, so the same
+  // verdict has to apply to it — otherwise this block is spelling-sensitive.
+  const mapped = mappedIpv4Host(host);
+  return mapped !== null && isCloudMetadataIpv4(mapped);
 }
 
 export function parseOutboundUrl(input: string | URL) {

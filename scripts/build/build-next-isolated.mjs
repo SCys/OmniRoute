@@ -131,12 +131,12 @@ function runNextBuild() {
 }
 
 export function resolveNextBuildBundlerFlag(baseEnv = process.env) {
-  // Turbopack is the default production bundler (Next 16 stable). Benchmarked on
-  // this codebase: 2-3x faster than the single-threaded webpack pass (17min -> 9min
-  // on a 32-core box; ~20min -> 7min on ubuntu-latest), artifact validated
-  // end-to-end (standalone smoke + e2e/package/electron CI jobs). Webpack stays as
-  // the explicit escape hatch (=0) for bundler-compat regressions.
-  return baseEnv.OMNIROUTE_USE_TURBOPACK === "0" ? "--webpack" : "--turbopack";
+  // Turbopack is the default on Node.js; on Bun or when explicitly disabled (=0),
+  // use Webpack (--webpack) to avoid Turbopack V8 internal worker API mismatches.
+  if (process.versions.bun || baseEnv.OMNIROUTE_USE_TURBOPACK === "0") {
+    return "--webpack";
+  }
+  return "--turbopack";
 }
 
 /**

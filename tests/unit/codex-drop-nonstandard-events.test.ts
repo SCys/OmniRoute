@@ -3,9 +3,12 @@
 // (no `data:` line). That frame breaks the OpenAI SDK's responses.stream() with
 // HTTP 502 "Controller is already closed". filterNonstandardCodexSse() strips
 // every `codex.*` event block from the byte stream while preserving standard ones.
-import { describe, it } from "node:test";
+import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { filterNonstandardCodexSse } from "../../open-sse/executors/codex.ts";
+import {
+  filterNonstandardCodexSse,
+  codexDropNonstandardEvents,
+} from "../../open-sse/executors/codex.ts";
 
 function sseResponse(body: string): Response {
   return new Response(body, {
@@ -17,6 +20,43 @@ function sseResponse(body: string): Response {
 async function readAll(res: Response): Promise<string> {
   return await res.text();
 }
+
+describe("codexDropNonstandardEvents (#11014)", () => {
+  const KEY = "OMNIROUTE_CODEX_DROP_NONSTANDARD_EVENTS";
+  let saved: string | undefined;
+
+  beforeEach(() => {
+    saved = process.env[KEY];
+  });
+
+  afterEach(() => {
+    if (saved === undefined) delete process.env[KEY];
+    else process.env[KEY] = saved;
+  });
+
+  it("defaults ON so OpenAI-strict /v1/responses clients are not 502'd", () => {
+    delete process.env[KEY];
+    assert.equal(codexDropNonstandardEvents(), true);
+    process.env[KEY] = "";
+    assert.equal(codexDropNonstandardEvents(), true);
+    process.env[KEY] = "   ";
+    assert.equal(codexDropNonstandardEvents(), true);
+  });
+
+  it("opts out on 0/false/no/off", () => {
+    for (const v of ["0", "false", "FALSE", "no", "off"]) {
+      process.env[KEY] = v;
+      assert.equal(codexDropNonstandardEvents(), false, v);
+    }
+  });
+
+  it("stays on for true/1/yes/on", () => {
+    for (const v of ["true", "1", "yes", "on", "TRUE"]) {
+      process.env[KEY] = v;
+      assert.equal(codexDropNonstandardEvents(), true, v);
+    }
+  });
+});
 
 describe("filterNonstandardCodexSse (#4715)", () => {
   it("drops codex.* event blocks but keeps standard response.* events", async () => {

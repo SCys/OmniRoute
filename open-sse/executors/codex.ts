@@ -20,6 +20,7 @@ import {
 import { FETCH_BODY_TIMEOUT_MS, HTTP_STATUS, PROVIDERS } from "../config/constants.ts";
 import { readCodexPeekChunk, buildCodexTimeoutSafePassthroughBody } from "./codex/bodyTimeout.ts";
 import {
+  CODEX_CLI_RS_ORIGINATOR,
   getCodexClientVersion,
   getCodexUserAgent,
   normalizeCodexSessionId,
@@ -33,7 +34,7 @@ import {
 } from "../config/codexIdentity.ts";
 import { getAccessToken } from "../services/tokenRefresh.ts";
 import { sanitizeResponsesInputItems } from "../services/responsesInputSanitizer.ts";
-import { applyResponsesInputPolicy } from "../services/responsesInputPolicy.ts";
+import { applyReasoningInputPolicy } from "../services/reasoningInputPolicy.ts";
 import { normalizeCodexVerbosity } from "../services/codexVerbosity.ts";
 import { getThinkingBudgetConfig, ThinkingMode } from "../services/thinkingBudget.ts";
 import { CORS_HEADERS } from "../utils/cors.ts";
@@ -41,8 +42,8 @@ import { errorResponse } from "../utils/error.ts";
 import { normalizeCodexResponsesInput } from "../utils/responsesInputNormalization.ts";
 import * as prl from "../utils/providerRequestLogging.ts";
 import { createRequire } from "module";
-// Quota parsing/scheduling extracted to a pure leaf; re-exported for external
-// importers (handlers/chatCore/codexQuota.ts + tests).
+// Quota parsing/scheduling extracted to a pure leaf; re-exported for the
+// Codex account module and tests.
 export {
   type CodexQuotaSnapshot,
   parseCodexQuotaHeaders,
@@ -224,7 +225,6 @@ function convertSystemToDeveloperRole(body: Record<string, unknown>): void {
     }
   }
 }
-
 
 function stripOrphanedCodexFunctionCallOutputs(body: Record<string, unknown>): void {
   if (!Array.isArray(body.input)) return;
@@ -481,15 +481,18 @@ function toCodexResponseFailedEvent(parsed: Record<string, unknown>): Record<str
   };
 }
 
-// Env-gated kill-switch: drop ALL non-standard `codex.*` SSE events (notably
-// `codex.rate_limits`) from the Responses stream. These events are NOT part of
-// the OpenAI Responses API — strict clients (e.g. the OpenAI SDK's
-// `responses.stream()`) choke on the unknown event type / empty data field and
-// tear the stream down, surfacing as "Invalid state: Controller is already
-// closed". Opt-in so the default still forwards them for clients that want them.
-function codexDropNonstandardEvents(): boolean {
+// Drop non-standard `codex.*` SSE events (notably `codex.rate_limits`) from
+// the Responses stream. These events are NOT part of the OpenAI Responses API
+// — strict clients (e.g. the OpenAI SDK's `responses.stream()`) choke on the
+// unknown event type / empty data field and tear the stream down, surfacing as
+// 502 "Unknown error" / "Invalid state: Controller is already closed".
+// Default ON (#11014). Opt out with 0/false/no/off if a client consumes them.
+export function codexDropNonstandardEvents(): boolean {
   const v = process.env.OMNIROUTE_CODEX_DROP_NONSTANDARD_EVENTS;
-  return v === "true" || v === "1" || v === "yes";
+  if (v === undefined || v.trim() === "") return true;
+  const n = v.trim().toLowerCase();
+  if (n === "0" || n === "false" || n === "no" || n === "off") return false;
+  return true;
 }
 
 // SSE block filter for the HTTP Responses path (super.execute). The HTTP
@@ -498,7 +501,7 @@ function codexDropNonstandardEvents(): boolean {
 // encodeResponseSseEvent never runs for it. When the kill-switch is on, strip
 // every `codex.*` event block from the byte stream before it reaches the client.
 // Exported for unit testing (#4715). Strips `codex.*` SSE event blocks from a
-// streaming Response when the OMNIROUTE_CODEX_DROP_NONSTANDARD_EVENTS kill-switch is on.
+// streaming Response when `codexDropNonstandardEvents()` is on (default, #11014).
 export function filterNonstandardCodexSse(response: Response): Response {
   const contentType = response.headers.get("content-type") || "";
   if (!response.body || !contentType.includes("text/event-stream")) {
@@ -701,8 +704,8 @@ export function encodeResponseSseEvent(raw: string): { sse: string; terminal: bo
   // "Invalid state: Controller is already closed". The earlier empty-payload
   // check below never caught codex.rate_limits — over WS the frame carries a
   // non-empty JSON payload (`{"type":"codex.rate_limits", ...}`), so
-  // `!payload.trim()` is false. Match by event type instead. Opt-in via
-  // OMNIROUTE_CODEX_DROP_NONSTANDARD_EVENTS (the HTTP transport is handled
+  // `!payload.trim()` is false. Match by event type instead. Default ON via
+  // OMNIROUTE_CODEX_DROP_NONSTANDARD_EVENTS (#11014); the HTTP transport is handled
   // separately by filterNonstandardCodexSse, since super.execute forwards the
   // upstream stream verbatim and never runs this function).
   if (eventType.startsWith("codex.") && codexDropNonstandardEvents()) {
@@ -1045,10 +1048,11 @@ export class CodexExecutor extends BaseExecutor {
       CodexClientIdentity | null | undefined;
     const originalIdentityHeaders = credentials?.providerSpecificData
       ?.codexOriginalIdentityHeaders as Record<string, string> | null | undefined;
+    const turnStateEcho = credentials?.providerSpecificData?.codexTurnStateEcho;
 
     // Originator header — identifies the client type to the Codex backend.
     // Ref: openai/codex login/src/auth/default_client.rs DEFAULT_ORIGINATOR = "codex_cli_rs"
-    headers["originator"] = "codex_cli_rs";
+    headers["originator"] = CODEX_CLI_RS_ORIGINATOR;
 
     // session_id header — enables prompt cache affinity on the Codex backend.
     // The official Codex client sets this to conversation_id (a stable UUID per session).
@@ -1059,6 +1063,13 @@ export class CodexExecutor extends BaseExecutor {
     }
     applyCodexOriginalIdentityHeaders(headers, originalIdentityHeaders);
     applyCodexClientIdentityHeaders(headers, clientIdentity);
+
+    // x-codex-turn-state: forward the client's echo when the provenance guard
+    // (in withCodexFingerprintCredentials) cleared it as same-account. The
+    // blob is account-bound; a stripped (absent) value must stay absent.
+    if (typeof turnStateEcho === "string" && turnStateEcho) {
+      headers["x-codex-turn-state"] = turnStateEcho;
+    }
 
     return headers;
   }
@@ -1381,10 +1392,12 @@ export class CodexExecutor extends BaseExecutor {
     delete body.session_id;
     delete body.conversation_id;
 
-    applyResponsesInputPolicy(
-      body,
-      credentials?.providerSpecificData?.preserveEncryptedReasoning === true
-    );
+    applyReasoningInputPolicy(body, "responses", {
+      provider: "codex",
+      preserveEncryptedReasoning:
+        credentials?.providerSpecificData?.preserveEncryptedReasoning === true,
+      onIncompatibleReasoning: "drop",
+    });
 
     if (nativeCodexPassthrough) {
       return body;

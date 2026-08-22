@@ -40,6 +40,15 @@ export interface RotatableAccount {
   cooldownUntil: number;
   consecutiveFails: number;
   proxy: AccountProxyConfig["proxy"];
+  evictedAt?: number | null;
+}
+
+export type CooldownKind = "transient" | "terminal";
+
+const EVICT_AFTER_TERMINAL = 3;
+
+export function isAccountEvicted(account: RotatableAccount): boolean {
+  return account.evictedAt != null;
 }
 
 const COOLDOWN_BASE_MS = TRANSIENT_COOLDOWN_MS;
@@ -74,17 +83,21 @@ export function pickAccount<T extends RotatableAccount>(
   return accounts[fallbackIdx];
 }
 
-export function markCooldown(account: RotatableAccount): void {
+export function markCooldown(account: RotatableAccount, kind: CooldownKind = "transient"): void {
   account.consecutiveFails++;
   const backoff = Math.min(
     COOLDOWN_BASE_MS * Math.pow(2, account.consecutiveFails - 1),
     COOLDOWN_MAX_MS
   );
   account.cooldownUntil = Date.now() + backoff + Math.random() * 1000;
+  if (kind === "terminal" && account.consecutiveFails >= EVICT_AFTER_TERMINAL) {
+    account.evictedAt = Date.now();
+  }
 }
 
 export function markSuccess(account: RotatableAccount): void {
   account.consecutiveFails = 0;
+  account.evictedAt = null;
 }
 
 /** Mask an account id for logs (UI calls it a fingerprint). */

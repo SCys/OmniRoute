@@ -9,6 +9,7 @@ import {
 } from "@/lib/localDb";
 import { getCachedSettings } from "@/lib/localDb";
 import { getActiveSyncedCatalog } from "@/lib/db/models/activeSyncedCatalog";
+import { getModelCompatOverrides } from "@/lib/db/models/compat";
 import {
   parseModel,
   getModelInfoCore,
@@ -206,18 +207,54 @@ function findSyncedModelMeta(models: unknown, modelId: string): any {
   return Array.isArray(models) ? models.find((model: any) => model.id === modelId) : undefined;
 }
 
-function resolveRuntimeFormats(customMatch: any, syncedMatch: any): RuntimeModelMeta {
+function findLiveCatalogModelMeta(
+  providerId: string,
+  requestedModelId: string,
+  resolvedModelId: string,
+  syncedModels: unknown
+): any {
+  const directMatch = findSyncedModelMeta(syncedModels, resolvedModelId);
+  if (directMatch || !Array.isArray(syncedModels)) return directMatch;
+
+  const registryModel = findRegistryModel(providerId, requestedModelId);
+  const liveCatalogIds = registryModel?.liveCatalogIds;
+  if (!Array.isArray(liveCatalogIds) || liveCatalogIds.length === 0) return undefined;
+
+  return syncedModels.find(
+    (model: any) => typeof model?.id === "string" && liveCatalogIds.includes(model.id)
+  );
+}
+
+function resolveRuntimeFormats(
+  customMatch: any,
+  syncedMatch: any,
+  compatOverrideMatch: any
+): RuntimeModelMeta {
   const apiFormat =
-    customMatch?.apiFormat === "responses" || syncedMatch?.apiFormat === "responses"
-      ? "responses"
-      : undefined;
+    (typeof customMatch?.apiFormat === "string" ? customMatch.apiFormat : undefined) ||
+    (typeof compatOverrideMatch?.apiFormat === "string" ? compatOverrideMatch.apiFormat : undefined) ||
+    (syncedMatch?.apiFormat === "responses" ? "responses" : undefined);
   const targetFormat =
     typeof customMatch?.targetFormat === "string"
       ? customMatch.targetFormat
-      : typeof syncedMatch?.targetFormat === "string"
-        ? syncedMatch.targetFormat
-        : undefined;
-  return { ...(apiFormat ? { apiFormat } : {}), ...(targetFormat ? { targetFormat } : {}) };
+      : typeof compatOverrideMatch?.targetFormat === "string"
+        ? compatOverrideMatch.targetFormat
+        : typeof syncedMatch?.targetFormat === "string"
+          ? syncedMatch.targetFormat
+          : undefined;
+  const supportsVision =
+    typeof customMatch?.supportsVision === "boolean"
+      ? customMatch.supportsVision
+      : typeof compatOverrideMatch?.supportsVision === "boolean"
+        ? compatOverrideMatch.supportsVision
+        : typeof syncedMatch?.supportsVision === "boolean"
+          ? syncedMatch.supportsVision
+          : undefined;
+  return {
+    ...(apiFormat ? { apiFormat } : {}),
+    ...(targetFormat ? { targetFormat } : {}),
+    ...(supportsVision !== undefined ? { supportsVision } : {}),
+  };
 }
 
 function copySyncedThinkingMetadata(metadata: RuntimeModelMeta, syncedMatch: any): void {
@@ -228,8 +265,10 @@ function copySyncedThinkingMetadata(metadata: RuntimeModelMeta, syncedMatch: any
   // Only let a non-empty synced effort list override the static registry fallback;
   // an empty array from an incomplete synced discovery must not erase registry-declared
   // tiers (#9485 review).
-  if (Array.isArray(syncedMatch?.supportedThinkingEfforts) &&
-    syncedMatch.supportedThinkingEfforts.length > 0) {
+  if (
+    Array.isArray(syncedMatch?.supportedThinkingEfforts) &&
+    syncedMatch.supportedThinkingEfforts.length > 0
+  ) {
     metadata.supportedThinkingEfforts = syncedMatch.supportedThinkingEfforts;
   }
   if (typeof syncedMatch?.defaultThinkingEffort === "string") {
@@ -249,9 +288,10 @@ function copyRegistryThinkingMetadata(metadata: RuntimeModelMeta, registryMatch:
 function buildRuntimeModelMeta(
   customMatch: any,
   syncedMatch: any,
-  registryMatch: any
+  registryMatch: any,
+  compatOverrideMatch: any
 ): RuntimeModelMeta {
-  const metadata = resolveRuntimeFormats(customMatch, syncedMatch);
+  const metadata = resolveRuntimeFormats(customMatch, syncedMatch, compatOverrideMatch);
   copyRegistryThinkingMetadata(metadata, registryMatch);
   copySyncedThinkingMetadata(metadata, syncedMatch);
   return metadata;
@@ -266,9 +306,10 @@ async function lookupModelMeta(
   available: boolean;
 }> {
   try {
-    const [customModels, liveCatalog] = await Promise.all([
+    const [customModels, liveCatalog, compatOverrides] = await Promise.all([
       getCustomModels(providerId),
       getActiveSyncedCatalog(providerId),
+      Promise.resolve(getModelCompatOverrides(providerId)),
     ]);
     const syncedModels = liveCatalog.models;
 
@@ -300,8 +341,16 @@ async function lookupModelMeta(
     // Custom models remain explicit operator overrides even when live discovery
     // is authoritative for the provider.
     const customMatch = findCustomModelMeta(customModels, resolvedModelId);
-    const syncedMatch = findSyncedModelMeta(syncedModels, resolvedModelId);
+    const syncedMatch = findLiveCatalogModelMeta(
+      providerId,
+      modelId,
+      resolvedModelId,
+      syncedModels
+    );
     const registryMatch = findRegistryModel(providerId, resolvedModelId);
+    const compatOverrideMatch = Array.isArray(compatOverrides)
+      ? compatOverrides.find((m) => m.id === resolvedModelId || m.id === modelId)
+      : undefined;
     const effortBaseModelId = getRegisteredProviderEffortBaseModelId(providerId, modelId);
 
     const liveBackedEffortVariant =
@@ -310,7 +359,7 @@ async function lookupModelMeta(
     const available =
       !liveCatalog.authoritative || Boolean(customMatch || syncedMatch || liveBackedEffortVariant);
 
-    const metadata = buildRuntimeModelMeta(customMatch, syncedMatch, registryMatch);
+    const metadata = buildRuntimeModelMeta(customMatch, syncedMatch, registryMatch, compatOverrideMatch);
     if (effort) metadata.resolvedThinkingEffort = effort;
 
     return { modelId: resolvedModelId, metadata, available };

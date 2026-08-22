@@ -1,6 +1,7 @@
 /** db/models/compat.ts — model-compat overrides (normalizeToolCallId, per-protocol flags, upstream headers). */
 
 import { getDbInstance } from "../core";
+import { resolveProviderAlias } from "@omniroute/open-sse/services/model.ts";
 import {
   MODEL_COMPAT_PROTOCOL_KEYS,
   type ModelCompatProtocolKey,
@@ -114,13 +115,17 @@ export type ModelCompatOverride = {
   compatByProtocol?: CompatByProtocolMap;
   upstreamHeaders?: Record<string, string>;
   isHidden?: boolean;
+  apiFormat?: string;
+  targetFormat?: string;
+  supportsVision?: boolean;
 };
 
 export function readCompatList(providerId: string): ModelCompatOverride[] {
+  const canonicalId = resolveProviderAlias(providerId) || providerId;
   const db = getDbInstance();
   const row = db
     .prepare("SELECT value FROM key_value WHERE namespace = ? AND key = ?")
-    .get(MODEL_COMPAT_NAMESPACE, providerId);
+    .get(MODEL_COMPAT_NAMESPACE, canonicalId);
   const value = getKeyValue(row).value;
   if (!value) return [];
   try {
@@ -140,16 +145,17 @@ export function readCompatList(providerId: string): ModelCompatOverride[] {
 }
 
 export function writeCompatList(providerId: string, list: ModelCompatOverride[]) {
+  const canonicalId = resolveProviderAlias(providerId) || providerId;
   const db = getDbInstance();
   if (list.length === 0) {
     db.prepare("DELETE FROM key_value WHERE namespace = ? AND key = ?").run(
       MODEL_COMPAT_NAMESPACE,
-      providerId
+      canonicalId
     );
   } else {
     db.prepare("INSERT OR REPLACE INTO key_value (namespace, key, value) VALUES (?, ?, ?)").run(
       MODEL_COMPAT_NAMESPACE,
-      providerId,
+      canonicalId,
       JSON.stringify(list)
     );
   }
@@ -168,6 +174,9 @@ export type ModelCompatPatch = {
   /** Replace top-level extra headers for override-only rows; omit to leave unchanged. */
   upstreamHeaders?: Record<string, string> | null;
   isHidden?: boolean | null;
+  apiFormat?: string | null;
+  targetFormat?: string | null;
+  supportsVision?: boolean | null;
 };
 
 export function compatByProtocolHasEntries(map: CompatByProtocolMap | undefined): boolean {
@@ -230,12 +239,39 @@ export function mergeModelCompatOverride(
       next.isHidden = Boolean(patch.isHidden);
     }
   }
+  if ("apiFormat" in patch) {
+    if (!patch.apiFormat) {
+      delete next.apiFormat;
+    } else {
+      next.apiFormat = patch.apiFormat;
+    }
+  }
+  if ("targetFormat" in patch) {
+    if (!patch.targetFormat) {
+      delete next.targetFormat;
+    } else {
+      next.targetFormat = patch.targetFormat;
+    }
+  }
+  if ("supportsVision" in patch) {
+    if (patch.supportsVision === null) {
+      delete next.supportsVision;
+    } else {
+      next.supportsVision = Boolean(patch.supportsVision);
+    }
+  }
   const hasHiddenFlag = Object.prototype.hasOwnProperty.call(next, "isHidden");
+  const hasApiFormat = Object.prototype.hasOwnProperty.call(next, "apiFormat");
+  const hasTargetFormat = Object.prototype.hasOwnProperty.call(next, "targetFormat");
+  const hasVisionFlag = Object.prototype.hasOwnProperty.call(next, "supportsVision");
   if (
     next.normalizeToolCallId ||
     hasPreserveFlag ||
     hasVideoUrlFlag ||
     hasHiddenFlag ||
+    hasApiFormat ||
+    hasTargetFormat ||
+    hasVisionFlag ||
     compatByProtocolHasEntries(next.compatByProtocol) ||
     hasTopUpstream
   ) {

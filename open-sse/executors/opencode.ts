@@ -1,6 +1,6 @@
 import { BaseExecutor, type ExecuteInput, type ProviderCredentials } from "./base.ts";
 import { PROVIDERS } from "../config/constants.ts";
-import { getModelTargetFormat } from "../config/providerModels.ts";
+import { getModelTargetFormat, PROVIDER_ID_TO_ALIAS } from "../config/providerModels.ts";
 import {
   injectReasoningContentForThinkingModel,
   isThinkingMessageModel,
@@ -71,7 +71,8 @@ const OPENCODE_FREE_MODELS = new Set([
  *   `opencode models opencode-go --verbose`; MiniMax M3 excluded — different
  *   thinking-mode mapping):
  *   grok-4.5 low/medium/high; hy3 none/low/high; kimi-k3 max;
- *   qwen3.6-plus / qwen3.7-max / qwen3.7-plus high/max
+ *   qwen3.6-plus / qwen3.7-max / qwen3.7-plus high/max;
+ *   muse-spark-1.2-contributor minimal/low/medium/high/xhigh (no max)
  */
 const EFFORT_TIERS: Record<string, readonly string[]> = {
   "deepseek-v4-pro": EFFORT_LEVELS,
@@ -84,6 +85,7 @@ const EFFORT_TIERS: Record<string, readonly string[]> = {
   "qwen3.6-plus": ["high", "max"],
   "qwen3.7-max": ["high", "max"],
   "qwen3.7-plus": ["high", "max"],
+  "muse-spark-1.2-contributor": ["minimal", "low", "medium", "high", "xhigh"],
 };
 
 /**
@@ -121,6 +123,24 @@ export function isPremiumOpencodeModel(model: string, provider: string): boolean
 
   // Check the known free model catalog.
   return !OPENCODE_FREE_MODELS.has(model);
+}
+
+/**
+ * Resolves the registry `targetFormat` for a model, aliasing `provider` first.
+ *
+ * `PROVIDER_MODELS` is keyed by the provider's public ALIAS (e.g. `"oc"`), not its
+ * raw registry id (e.g. `"opencode"`) — mirrors `resolveChatCoreTargetFormat()`
+ * (`handlers/chatCore/targetFormat.ts`), which already aliases before calling
+ * `getModelTargetFormat()`. Calling it with the raw id here made every entry miss
+ * silently (fell through to `"openai"`), while chatCore's own request-body
+ * translation (correctly aliased) still switched to the Responses API shape for
+ * `targetFormat:"openai-responses"` models — sending a Responses-shaped body to
+ * the `/chat/completions` URL this executor's own `buildUrl()` kept selecting.
+ * Exported for testability.
+ */
+export function resolveOpencodeTargetFormat(provider: string, model: string): string {
+  const alias = PROVIDER_ID_TO_ALIAS[provider] || provider;
+  return getModelTargetFormat(alias, model) || "openai";
 }
 
 export class OpencodeExecutor extends BaseExecutor {
@@ -191,8 +211,11 @@ export class OpencodeExecutor extends BaseExecutor {
     return pickRotatableAccount(this.accounts, this);
   }
 
-  private markCooldown(account: OpencodeAccountState): void {
-    markAccountCooldown(account);
+  private markCooldown(
+    account: OpencodeAccountState,
+    kind: "transient" | "terminal" = "transient"
+  ): void {
+    markAccountCooldown(account, kind);
   }
 
   private markSuccess(account: OpencodeAccountState): void {
@@ -200,7 +223,7 @@ export class OpencodeExecutor extends BaseExecutor {
   }
 
   async execute(input: ExecuteInput) {
-    this._requestFormat = getModelTargetFormat(this.provider, input.model) || "openai";
+    this._requestFormat = resolveOpencodeTargetFormat(this.provider, input.model);
 
     // #8681: Gate premium opencode models behind a usable API key.
     // When the connection is keyless (no apiKey, no accessToken) and the model

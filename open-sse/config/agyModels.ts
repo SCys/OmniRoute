@@ -41,6 +41,15 @@ export const AGY_PUBLIC_MODELS = Object.freeze([
     supportsVision: true,
     toolCalling: true,
   },
+  {
+    id: "gemini-3.7-flash-tiered",
+    name: "Gemini 3.7 Flash (Tiered)",
+    contextLength: 1048576,
+    maxOutputTokens: 65536,
+    supportsReasoning: true,
+    supportsVision: true,
+    toolCalling: true,
+  },
   // Gemini 3.1 Pro
   {
     id: "gemini-pro-agent",

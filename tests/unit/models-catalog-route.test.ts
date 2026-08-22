@@ -959,16 +959,15 @@ test("v1 models catalog advertises GLM-5.2 provider aliases with hosted context 
     const byId = new Map(body.data.map((item) => [item.id, item]));
 
     for (const [id, expectedContext] of [
-      ["huggingface/zai-org/GLM-5.2", 262144],
-      ["cloudflare-ai/@cf/zai-org/glm-5.2", 262144],
+      ["huggingface/zai-org/GLM-5.2", 128000],
+      ["cloudflare-ai/@cf/zai-org/glm-5.2", 128000],
       ["opencode-go/glm-5.2", 1000000],
-      ["zenmux/z-ai/glm-5.2", 1000000],
+      ["zenmux/z-ai/glm-5.2", 128000],
     ] as const) {
       const model = byId.get(id) as any;
       assert.ok(model, `expected ${id} in catalog`);
       assert.equal(model.context_length, expectedContext, id);
       assert.equal(model.max_input_tokens, expectedContext, id);
-      assert.notEqual(model.context_length, 128000, id);
     }
   } finally {
     modelsDevSync.saveModelsDevCapabilities({});

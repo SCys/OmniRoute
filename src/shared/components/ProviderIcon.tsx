@@ -115,6 +115,7 @@ const KNOWN_SVGS = new Set([
   "fal",
   "fireworks",
   "freeaiapikey",
+  "freebuff",
   "freemodel-dev",
   "friendli",
   "galadriel",
@@ -240,6 +241,7 @@ const KNOWN_SVGS = new Set([
 ]);
 
 const LOCAL_SVG_ALIASES: Record<string, string> = {
+  "cursor-api": "cursor",
   "qwen-cloud": "qwencloud",
   "qwen-cloud-token-plan": "qwencloud",
 };

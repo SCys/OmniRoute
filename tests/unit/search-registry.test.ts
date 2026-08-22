@@ -35,7 +35,8 @@ test("SEARCH_PROVIDERS has all registered providers", () => {
   assert.ok(SEARCH_PROVIDERS["zai-search"], "zai should exist");
   assert.ok(SEARCH_PROVIDERS["jina-search"], "jina-search should exist");
   assert.ok(SEARCH_PROVIDERS["duckduckgo-free"], "duckduckgo-free should exist");
-  assert.equal(Object.keys(SEARCH_PROVIDERS).length, 15);
+  assert.ok(SEARCH_PROVIDERS["x-search"], "x-search should exist");
+  assert.equal(Object.keys(SEARCH_PROVIDERS).length, 16);
 });
 
 test("duckduckgo-free config is a no-key, fallback-only provider", () => {
@@ -169,9 +170,10 @@ test("zai-search config is correct", () => {
 
 test("getAllSearchProviders returns flat list", () => {
   const all = getAllSearchProviders();
-  assert.equal(all.length, 15);
+  assert.equal(all.length, 16);
   assert.ok(all.some((p) => p.id === "duckduckgo-free"));
   assert.ok(all.some((p) => p.id === "jina-search"));
+  assert.ok(all.some((p) => p.id === "x-search"));
   assert.ok(all.some((p) => p.id === "serper-search"));
   assert.ok(all.some((p) => p.id === "brave-search"));
   assert.ok(all.some((p) => p.id === "perplexity-search"));
@@ -381,11 +383,17 @@ test("v1SearchSchema rejects query over 500 chars", async () => {
   assert.ok(!result.success);
 });
 
-test("v1SearchSchema rejects invalid provider", async () => {
+test("v1SearchSchema accepts any non-empty provider string; the catalog rejects unknown ids (#10849)", async () => {
   const { v1SearchSchema } = await import("../../src/shared/validation/schemas.ts");
+  const { resolveSearchProvider } = await import("../../open-sse/config/searchRegistry.ts");
 
+  // provider is a free-form string at the schema layer — resolveSearchProvider() (backing
+  // POST /v1/search) is the runtime source of truth, and returns null for unknown ids so
+  // the route can reply with a named "Unknown search provider: <id>" error instead of an
+  // opaque schema-level 400.
   const result = v1SearchSchema.safeParse({ query: "test", provider: "google" });
-  assert.ok(!result.success);
+  assert.ok(result.success);
+  assert.equal(resolveSearchProvider("google"), null);
 });
 
 test("v1SearchSchema accepts tavily provider", async () => {
@@ -408,6 +416,7 @@ test("v1SearchSchema accepts new search providers", async () => {
     "ollama-search",
     "duckduckgo-free",
     "firecrawl",
+    "x-search",
   ] as const;
 
   for (const provider of providers) {

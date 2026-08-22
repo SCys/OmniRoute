@@ -29,6 +29,15 @@ export const ANTIGRAVITY_PUBLIC_MODELS = Object.freeze([
     supportsVision: true,
     toolCalling: true,
   },
+  {
+    id: "gemini-3.7-flash-tiered",
+    name: "Gemini 3.7 Flash (Tiered)",
+    contextLength: 1048576,
+    maxOutputTokens: 65536,
+    supportsReasoning: true,
+    supportsVision: true,
+    toolCalling: true,
+  },
   // Gemini 3.1 Pro budget tiers. Live streamGenerateContent validation uses
   // `gemini-pro-agent` for High; the separately advertised `gemini-3.1-pro-high`
   // discovery slot currently returns HTTP 400 and is intentionally not public.
@@ -91,6 +100,13 @@ export const ANTIGRAVITY_PUBLIC_MODELS = Object.freeze([
 ]);
 
 export const ANTIGRAVITY_MODEL_ALIASES = Object.freeze({
+  // Gemini 3.7 Flash tiers map to the upstream tiered endpoint model; the thinking
+  // budget is steered via generationConfig.thinkingConfig.thinkingBudget.
+  "gemini-3.7-flash": "gemini-3.7-flash-tiered",
+  "gemini-3.7-flash-high": "gemini-3.7-flash-tiered",
+  "gemini-3.7-flash-medium": "gemini-3.7-flash-tiered",
+  "gemini-3.7-flash-low": "gemini-3.7-flash-tiered",
+  "gpt-oss-120b": "gpt-oss-120b-medium",
   // gemini-3.1-pro-low is not aliased: the upstream accepts it verbatim.
   // gemini-3.1-pro-high: the discovery slot returns HTTP 400 on v1internal;
   // the live upstream id is gemini-pro-agent (see ANTIGRAVITY_PUBLIC_MODELS).

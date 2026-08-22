@@ -20,12 +20,16 @@ import {
   type AutoCategory,
   type AutoTier,
 } from "./suffixComposition";
+import { classifyTier } from "../tierResolver";
 import type { AutoVariant } from "./autoPrefix";
 import { buildFamilyCandidateFilter, type ModelFamily } from "./modelFamily";
 import { getHiddenModelsByProvider } from "@/models";
 import { getSyncedAvailableModelsByConnection, getCustomModels } from "@/lib/db/models";
 import { filterPaidOnlyCandidates } from "./paidModelFilter";
+import { filterStrictZeroCostCandidates, filterTosAvoidCandidates } from "./strictZeroCostFilter";
+import { resolveFreeAccessState } from "./freeAccessQuota";
 import { isModelExcludedByConnection } from "@/domain/connectionModelRules";
+import { resolveProviderAlias } from "../model.ts";
 import { filterExcludedCandidates } from "./candidateOverrides";
 import { getExcludedConnectionIds } from "@/lib/db/autoCandidateOverrides";
 import {
@@ -44,21 +48,19 @@ export interface AutoComboSpec {
   family?: ModelFamily;
 }
 
-/** Rate-limit empty-pool AUTO warns (same label can be resolved many times/min). */
-const emptyPoolWarnAt = new Map<string, number>();
-export const EMPTY_POOL_WARN_INTERVAL_MS = 60_000;
+/** Once-per-process empty-pool AUTO warns (steady empty is not a metronome). */
+const emptyPoolWarned = new Set<string>();
 
-export function warnEmptyAutoPoolOnce(label: string, message: string, now = Date.now()): boolean {
-  const last = emptyPoolWarnAt.get(label) ?? 0;
-  if (now - last < EMPTY_POOL_WARN_INTERVAL_MS) return false;
-  emptyPoolWarnAt.set(label, now);
+export function warnEmptyAutoPoolOnce(label: string, message: string, _now = Date.now()): boolean {
+  if (emptyPoolWarned.has(label)) return false;
+  emptyPoolWarned.add(label);
   log.warn("AUTO", message);
   return true;
 }
 
-/** Test-only: reset the debounce map. */
+/** Test-only: reset the once-per-label set (also models emptiness reappearing). */
 export function resetEmptyAutoPoolWarnStateForTests(): void {
-  emptyPoolWarnAt.clear();
+  emptyPoolWarned.clear();
 }
 
 /** Minimal connection shape needed for virtual auto-combo factory */
@@ -274,9 +276,19 @@ function getNoAuthCandidates(
     // modelCompatOverrides/customModels key_value namespaces) the same way the
     // credentialed-connection loop below does, so a hidden no-auth model never
     // enters the auto-combo/fusion candidate pool either.
-    const hiddenModels =
-      hiddenModelsMap.get(providerId) ??
-      (typeof providerDef.alias === "string" ? hiddenModelsMap.get(providerDef.alias) : undefined);
+    const hiddenLookupIds = [
+      providerId,
+      typeof providerDef.alias === "string" ? providerDef.alias : null,
+      registryAlias,
+      routingPrefix,
+      resolveProviderAlias(providerId),
+      resolveProviderAlias(routingPrefix),
+    ];
+    const hiddenModels = new Set<string>();
+    for (const id of hiddenLookupIds) {
+      if (!id) continue;
+      for (const modelId of hiddenModelsMap.get(id) ?? []) hiddenModels.add(modelId);
+    }
 
     for (const model of registryModels) {
       const modelId = typeof model?.id === "string" && model.id.trim().length > 0 ? model.id : null;
@@ -580,6 +592,29 @@ export async function prepareVirtualAutoComboInputs(
     // exclude paid-only backends from EVERY `auto/*` candidate pool.
     const paidFilteredPool = filterPaidOnlyCandidates(pool, settings.hidePaidModels === true);
     if (paidFilteredPool !== pool) pool = paidFilteredPool;
+
+    // STRICT_ZERO_COST: opt-in, off by default (`settings.freeAccessPolicy !== "strict"`
+    // leaves `pool` byte-identical, same contract as `hidePaidModels`). See
+    // `strictZeroCostFilter.ts` for why this is stricter than `hidePaidModels` alone —
+    // including the connection-safety invariant it enforces per-connection, not just
+    // per-candidate: `resolveFreeAccessState` here is a raw pass-through of the real
+    // per-(provider,connectionId) resolver; the filter itself decides which connection(s)
+    // on each candidate to check and rewrites `allowedConnectionIds` to the SAFE subset.
+    const strictFilteredPool = filterStrictZeroCostCandidates(pool, {
+      enabled: settings.freeAccessPolicy === "strict",
+      resolveFreeAccessState,
+      // 1 percentage point of headroom, not 0: `freeAccessQuota.ts` reports
+      // remaining allowance as a percentage, and a raw ">0" comparison would
+      // let a reading of e.g. 0.3% (rounding noise, not real headroom) pass.
+      minRemainingAllowance: 1,
+      maxStateAgeMs: (Number(settings.autoRefreshProviderQuotaInterval) || 180) * 1000,
+    });
+    if (strictFilteredPool !== pool) pool = strictFilteredPool;
+
+    // Separate, optional ToS guard — independent of economic safety on purpose.
+    const tosFilteredPool = filterTosAvoidCandidates(pool, settings.excludeTosAvoid === true);
+    if (tosFilteredPool !== pool) pool = tosFilteredPool;
+
     return pool;
   };
 
@@ -602,6 +637,61 @@ export async function prepareVirtualAutoComboInputs(
     regularCandidates: await attachPreparedCapabilityValues(regularCandidates, capabilityState),
     familyCandidates: await attachPreparedCapabilityValues(familyCandidates, capabilityState),
   };
+}
+
+/**
+ * Score candidates at snapshot time using available data (capabilities, tier)
+ * and the mode-pack's dominant factors. Runtime telemetry (p95 latency, quota
+ * remaining) is not available during combo creation — this uses static signals only.
+ *
+ * Returns a map from modelStr → normalized weight score [0, 1].
+ */
+export function computeSnapshotWeights(
+  candidates: readonly VirtualAutoComboCandidate[],
+  weights: ScoringWeights
+): Map<string, number> {
+  const scores = new Map<string, number>();
+  for (const c of candidates) {
+    let score = 0;
+
+    // taskFit: reasoning + vision capable models score higher when taskFit is weighted
+    if (weights.taskFit > 0) {
+      if (c.resolvedReasoning || c.resolvedSupportsThinking) score += weights.taskFit * 0.6;
+      if (c.resolvedSupportsVision) score += weights.taskFit * 0.3;
+    }
+
+    // stability: models with richer capabilities are assumed more stable
+    if (weights.stability > 0) {
+      const capabilityCount =
+        Number(c.resolvedReasoning ?? false) +
+        Number(c.resolvedSupportsThinking ?? false) +
+        Number(c.resolvedSupportsVision ?? false);
+      score += weights.stability * Math.min(capabilityCount / 2, 1);
+    }
+
+    // Tier-based scoring (single classifyTier call covers both checks)
+    let tierInfo: { tier: string } | null = null;
+    if (weights.tierPriority > 0 || weights.costInv > 0) {
+      try {
+        tierInfo = classifyTier(c.provider, c.model);
+      } catch {
+        // fall through with zero
+      }
+    }
+    if (tierInfo && weights.tierPriority > 0 && tierInfo.tier === "premium")
+      score += weights.tierPriority;
+    if (tierInfo && weights.costInv > 0 && tierInfo.tier === "free") score += weights.costInv;
+
+    // latencyInv: all candidates get a base score when latency matters
+    // (no runtime data at snapshot time, so equal baseline)
+    if (weights.latencyInv > 0) score += weights.latencyInv * 0.5;
+
+    // health + quota: no runtime telemetry at snapshot time → neutral baseline
+    score += (weights.health + weights.quota) * 0.5;
+
+    scores.set(c.modelStr, Math.min(score, 1));
+  }
+  return scores;
 }
 
 function clonePreparedCandidates(
@@ -772,6 +862,7 @@ export async function createVirtualAutoComboFromPrepared(
   }
 
   const providerPool = [...new Set(effectivePool.map((c) => c.provider))];
+  const snapshotScores = computeSnapshotWeights(effectivePool, weights);
   const models = effectivePool.map((candidate, index) => ({
     id: `virtual-auto-${variant || "default"}-${index + 1}-${candidate.provider}`,
     kind: "model" as const,
@@ -781,7 +872,7 @@ export async function createVirtualAutoComboFromPrepared(
     ...(candidate.allowedConnectionIds
       ? { allowedConnectionIds: candidate.allowedConnectionIds }
       : {}),
-    weight: 1,
+    weight: snapshotScores.get(candidate.modelStr) ?? 1,
     label: candidate.provider,
   }));
   const autoConfig = {

@@ -6,6 +6,7 @@ import {
   supportsClaudeMaxEffort,
   supportsXHighEffort,
   getProviderModel,
+  getProviderModels,
 } from "../../config/providerModels.ts";
 
 /**
@@ -274,6 +275,21 @@ export function sanitizeReasoningEffortForProvider(
     return stripEffortValue(b, c);
   }
 
+  // `minimal` is a sub-`low` reasoning tier some catalogs advertise (e.g.
+  // Muse Spark via models.dev) and the Codex provider accepts natively — but
+  // Command Code rejects it outright:
+  //   Validation error: Invalid option: expected one of
+  //   "low"|"medium"|"high"|"xhigh"|"max" at "params.reasoning_effort"
+  // Map it to the closest supported value (`low`) for command-code only;
+  // other providers (codex etc.) keep their native `minimal` handling.
+  if (provider === "command-code" && effortStr === "minimal") {
+    log?.info?.(
+      "REASONING_SANITIZE",
+      `${provider}/${modelStr}: mapped reasoning_effort minimal → low`
+    );
+    return writeEffortValue(b, "low", c);
+  }
+
   // Command Code accepts the literal top-tier value `max`, while the shared
   // standardization stage may have already represented the client's `max` as
   // OmniRoute's internal `xhigh`. Convert it back before the upstream request.
@@ -351,6 +367,31 @@ export function sanitizeReasoningEffortForProvider(
   // new models from being unusable for weeks until they're whitelisted (#8057).
   if (effortStr === "max") {
     if (supportsMax) return body; // explicitly known to accept max
+
+    // A model that explicitly advertises its accepted tiers is safe to normalize.
+    // Keep the default pass-through for absent metadata: an unlisted model might
+    // support literal `max`, and #8057 deliberately avoids blocking such models.
+    const providerModelId = modelStr.startsWith(`${provider}/`)
+      ? modelStr.slice(provider.length + 1)
+      : modelStr;
+    // Do not fall back to a globally registered model here. Identical ids can
+    // have different upstream contracts across providers (for example, OpenCode
+    // and SenseNova both expose deepseek-v4-flash with different max support).
+    const explicitEfforts = getProviderModels(provider).find(
+      (entry) => entry.id === providerModelId || entry.aliases?.includes(providerModelId)
+    )?.supportedThinkingEfforts;
+    const maxFallback =
+      Array.isArray(explicitEfforts) && !explicitEfforts.includes("max")
+        ? ["xhigh", "high", "medium", "low"].find((tier) => explicitEfforts.includes(tier))
+        : undefined;
+    if (maxFallback) {
+      log?.info?.(
+        "REASONING_SANITIZE",
+        `${provider}/${modelStr}: downgraded reasoning_effort max → ${maxFallback} (explicit model capability)`
+      );
+      return writeEffortValue(b, maxFallback, c);
+    }
+
     if (!supportsXHigh) {
       // Model is explicitly flagged as rejecting xhigh (and not in supportsMax) —
       // it likely only accepts standard tiers. Degrade to its highest: high.
@@ -360,7 +401,6 @@ export function sanitizeReasoningEffortForProvider(
       );
       return writeEffortValue(b, "high", c);
     }
-    // Default: pass max through unchanged — trust the upstream
     return body;
   }
 

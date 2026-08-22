@@ -244,8 +244,16 @@ test("#6205: probeBeforeSpawn adopts a healthy existing instance (no spawn)", as
 // healthy, running service as untrustworthy/stale. This asserts the resolved
 // pid on adoption matches the real process actually holding the port.
 test("adopted service resolves and records the real pid of the process holding the port", async () => {
-  const healthServer = startHealthServer(29996);
-  const cfg = { ...tickConfig("test-adopt", 29996), probeBeforeSpawn: true };
+  // Use a distinct port from the other probeBeforeSpawn adoption test above.
+  // Both originally shared 29996, and Node's undici fetch() keep-alive pool
+  // (used by isHealthy() in portProbe.ts) caches a socket keyed only by
+  // host:port, so the second test's fetch could be replayed over a stale
+  // connection from the first test's health server instance, failing the
+  // probe and flipping the adoption into a spurious "error" state. A separate
+  // port keeps each probe isolated from the other test's pooled connection
+  // (#10523).
+  const healthServer = startHealthServer(29995);
+  const cfg = { ...tickConfig("test-adopt", 29995), probeBeforeSpawn: true };
   const sup = new ServiceSupervisor(cfg);
 
   try {

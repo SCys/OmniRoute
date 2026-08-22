@@ -1,4 +1,5 @@
 import type { RegistryEntry } from "../../../shared.ts";
+import { OPENCODE_ZEN_GO_SHARED_MODELS } from "../../../shared.ts";
 
 export const opencode_zenProvider: RegistryEntry = {
   id: "opencode-zen",
@@ -15,6 +16,8 @@ export const opencode_zenProvider: RegistryEntry = {
   // from the live API response so new models work without a code deploy.
   passthroughModels: true,
   models: [
+    ...OPENCODE_ZEN_GO_SHARED_MODELS,
+
     // ── Chat / Coding ──────────────────────────────────────────
     // #2900: big-pickle's upstream runs DeepSeek thinking mode — declare the
     // interleaved reasoning_content contract so follow-up/tool-use turns replay
@@ -51,7 +54,25 @@ export const opencode_zenProvider: RegistryEntry = {
     { id: "grok-4.6", name: "Grok 4.6" },
 
     // ── Muse ───────────────────────────────────────────────────
-    { id: "muse-spark-1.2", name: "Muse Spark 1.2" },
+    // Muse Spark is served by OpenCode Zen only on the OpenAI Responses API
+    // endpoint, not /chat/completions (see the opencode provider's own
+    // muse-spark entries, #10874/#10867) — this provider is a separate
+    // registry entry for the same upstream and never got the same
+    // targetFormat declaration, so requests routed here still hit
+    // /chat/completions with a mismatched or unanswerable body and the
+    // upstream returns an empty message.
+    {
+      id: "muse-spark-1.2",
+      name: "Muse Spark 1.2",
+      supportsReasoning: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-free",
+      name: "Muse Spark 1.2 Contributor Free",
+      supportsReasoning: true,
+      targetFormat: "openai-responses",
+    },
 
     // ── DeepSeek ────────────────────────────────────────────────
     { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
@@ -66,7 +87,7 @@ export const opencode_zenProvider: RegistryEntry = {
 
     // ── Kimi / Moonshot ────────────────────────────────────────
     { id: "kimi-k3", name: "Kimi K3" },
-    { id: "kimi-k2.7-code", name: "Kimi K2.7 Code" },
+    // kimi-k2.7-code declared identically on opencode-go — see OPENCODE_ZEN_GO_SHARED_MODELS.
 
     // ── Qwen ───────────────────────────────────────────────────
     // Issue #2292: Qwen models return Claude-format SSE bodies even
@@ -74,8 +95,8 @@ export const opencode_zenProvider: RegistryEntry = {
     // through /messages and the Claude translator.
     // Issue #2822: These models are text-only — supportsVision: false
     // ensures combo routing skips them on image-bearing requests.
-    { id: "qwen3.5-plus", name: "Qwen3.5 Plus", targetFormat: "claude", supportsVision: false },
-    { id: "qwen3.6-plus", name: "Qwen3.6 Plus", targetFormat: "claude", supportsVision: false },
+    // qwen3.5-plus / qwen3.6-plus declared identically on opencode-go — see
+    // OPENCODE_ZEN_GO_SHARED_MODELS.
 
     // ── Free Tier ──────────────────────────────────────────────
     // #6998 (2026-07-14): upstream free tier rotated — minimax-m2.5-free,

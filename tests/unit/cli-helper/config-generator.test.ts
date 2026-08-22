@@ -603,12 +603,15 @@ describe("config-generator", () => {
           input: 100000,
           output: 32768,
         });
-        assert.strictEqual(models["no-metadata"].limit, undefined);
+        // #10940: `limit.output` is REQUIRED by OpenCode's v1 provider schema,
+        // so even a model with zero catalog metadata still gets a `limit`
+        // block carrying the fallback output value; `context`/`input` stay
+        // omitted since neither the catalog nor the user knows them.
+        assert.deepStrictEqual(models["no-metadata"].limit, { output: 8192 });
 
         for (const model of Object.values(models) as Array<{ limit?: { output?: number } }>) {
           assert.ok(
-            model.limit === undefined ||
-              (typeof model.limit.output === "number" && model.limit.output > 0),
+            typeof model.limit?.output === "number" && model.limit.output > 0,
             "every emitted limit must contain a positive output"
           );
         }

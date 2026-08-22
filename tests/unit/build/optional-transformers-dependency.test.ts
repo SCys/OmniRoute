@@ -38,13 +38,20 @@ test("transformers + onnxruntime-node are regular dependencies (not optional)", 
 
   assert.equal(
     pkg.dependencies?.["onnxruntime-node"],
-    "~1.24.3",
+    "1.24.3",
     "onnxruntime-node is a regular dep (napi prebuilds, installable on Node 24/26)"
   );
   assert.equal(pkg.optionalDependencies?.["onnxruntime-node"], undefined);
 
   const lock = readJson<{
-    packages: Record<string, { optional?: boolean; dependencies?: Record<string, string>; optionalDependencies?: Record<string, string> }>;
+    packages: Record<
+      string,
+      {
+        optional?: boolean;
+        dependencies?: Record<string, string>;
+        optionalDependencies?: Record<string, string>;
+      }
+    >;
   }>("package-lock.json");
 
   assert.equal(
@@ -54,7 +61,16 @@ test("transformers + onnxruntime-node are regular dependencies (not optional)", 
   );
   // Optional flag is only written `true` for genuinely optional packages;
   // regular deps leave it absent/null. Assert each is NOT optional.
-  assert.ok(!lock.packages["node_modules/@huggingface/transformers"]?.optional, "transformers must not be marked optional in the lockfile");
-  assert.ok(!lock.packages["node_modules/onnxruntime-node"]?.optional, "onnxruntime-node must not be marked optional in the lockfile");
-  assert.ok(!lock.packages["node_modules/onnxruntime-common"]?.optional, "onnxruntime-common must not be marked optional in the lockfile");
+  assert.ok(
+    !lock.packages["node_modules/@huggingface/transformers"]?.optional,
+    "transformers must not be marked optional in the lockfile"
+  );
+  assert.ok(
+    !lock.packages["node_modules/onnxruntime-node"]?.optional,
+    "onnxruntime-node must not be marked optional in the lockfile"
+  );
+  assert.ok(
+    !lock.packages["node_modules/onnxruntime-common"]?.optional,
+    "onnxruntime-common must not be marked optional in the lockfile"
+  );
 });

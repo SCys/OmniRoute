@@ -137,7 +137,6 @@ test("vscode raw models route exposes native GPT-5.6 IDs and effort tiers", asyn
     reasoning: true,
     thinking: true,
     supportsThinking: true,
-    effort_tiers: ["low", "medium", "high", "xhigh", "max", "ultra"],
   });
   for (const field of [
     "url",

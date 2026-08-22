@@ -22,6 +22,7 @@ lastUpdated: 2026-06-28
 - [Docker Compose with Caddy (HTTPS)](#docker-compose-with-caddy-https-auto-tls)
 - [Cloudflare Quick Tunnel](#cloudflare-quick-tunnel)
 - [Image Tags](#image-tags)
+- [Availability: default SQLite is single-replica](#availability-default-sqlite-is-single-replica)
 - [Important Notes](#important-notes)
 
 ---
@@ -259,7 +260,28 @@ Memory behavior in Docker:
 - The image sets `OMNIROUTE_MEMORY_MB=1024` and derives `NODE_OPTIONS=--max-old-space-size=1024` from it.
 - The actual server process is started by the standalone launcher, which reads `OMNIROUTE_MEMORY_MB` and appends `--max-old-space-size=<OMNIROUTE_MEMORY_MB>`.
 - Node uses the last repeated `--max-old-space-size` value, so setting `OMNIROUTE_MEMORY_MB` controls the effective Docker heap limit.
-- Because the image always sets it, the launcher's own RAM-calibrated fallback never applies under Docker. Raise it explicitly (`-e OMNIROUTE_MEMORY_MB=2048`) on a host with headroom.
+- Because the image always sets it, the launcher's own RAM-calibrated fallback never applies under Docker. Raise it explicitly for the workload (table below). `2048` is still too small for coding-agent `/v1/responses`.
+
+### Runtime RAM for coding agents
+
+The 1 GiB Docker default is a dashboard/light-chat floor, not a production size. Long `POST /v1/responses` bodies (hundreds of messages, tens of tools) retain multiple in-memory graphs during compression. Two overlapping ~3 MiB / ~750k-token requests have aborted V8 at a **12 GiB** old-space (`FATAL ERROR: Reached heap limit`) and also hit a 16 GiB cgroup OOM. See [#7849](https://github.com/diegosouzapw/OmniRoute/issues/7849).
+
+Size **cgroup `--memory` above the heap** — native buffers, SQLite, and compression intermediates sit outside V8.
+
+| Workload | `OMNIROUTE_MEMORY_MB` | Container / cgroup | Notes |
+| --- | --- | --- | --- |
+| Dashboard, one light chat | `1024` (image default) | ≥2 GiB | |
+| One coding agent (Claude/Codex/Grok) | `8192` | ≥10 GiB | Typical single-session `/v1/responses` |
+| Two concurrent long `/v1/responses` | `10240`–`12288` | ≥12–16 GiB | Measured V8 abort at ~12 GiB heap |
+| Three+ concurrent long contexts | do not on one process | serialize / more RAM | Default heavyweight admission is 1 in-flight; raising it without RAM reintroduces the abort |
+
+`omniroute serve` on bare metal calibrates ~35% of RAM (clamped `[512, 4096]`) when `OMNIROUTE_MEMORY_MB` is **unset**. Docker always sets `1024`, so that calibration never runs in the official image.
+
+```bash
+docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 \
+  -e OMNIROUTE_MEMORY_MB=8192 --memory=10g \
+  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data diegosouzapw/omniroute:latest
+```
 
 ## Critical Environment Variables
 
@@ -272,7 +294,7 @@ Beyond the defaults documented in [ENVIRONMENT.md](../reference/ENVIRONMENT.md),
 | `REDIS_PORT`                  | Host-side port for the bundled Redis container                                                      | `6379`                   |
 | `REDIS_BIND_HOST`             | Host interface the bundled Redis port is published on (loopback unless you add AUTH)                | `127.0.0.1`              |
 | `AUTO_UPDATE_HOST_REPO_DIR`   | Host path mounted into `cli` profile at `/workspace/omniroute` for self-update workflows            | `.` (current directory)  |
-| `OMNIROUTE_MEMORY_MB`         | Runtime Node heap ceiling for the Docker standalone server; overrides the image default above       | `1024`                   |
+| `OMNIROUTE_MEMORY_MB`         | Runtime Node heap ceiling for the Docker standalone server; overrides the image default above. Coding agents: `8192`+ (see [runtime RAM](#runtime-ram-for-coding-agents)). | `1024`                   |
 | `DASHBOARD_PORT` / `API_PORT` | Override exposed ports for dashboard (20128) and API (20129)                                        | `20128` / `20129`        |
 | `OMNIROUTE_BASE_PATH`         | URL subpath when the app is published behind a reverse proxy (e.g. `/omniroute`)                    | _(empty = root)_         |
 | `NEXT_PUBLIC_BASE_URL`        | Public browser origin including the subpath (e.g. `https://host/omniroute`)                         | unset                    |
@@ -341,13 +363,15 @@ For orchestrators (Kubernetes, Nomad, etc.):
 
 | Probe | Prefer | Avoid |
 | --- | --- | --- |
-| Liveness | TCP on the main port (`PORT`, default `20128`), or soft HTTP `/healthz` | `/api/monitoring/health` as liveness |
+| Liveness | HTTP `GET /livez`, or TCP on the main port (`PORT`, default `20128`) | `/api/monitoring/health` as liveness |
 | Readiness | HTTP `GET /healthz` | Tight timeouts that treat event-loop busy as dead |
 | Deep / blackbox | `/api/monitoring/health` | — |
 
-`/healthz` only reports process lifecycle (`ok` / `starting` / `stopping`). It still
-runs on the same Node event loop as request handling, so CPU-bound catalog or
-compression work can delay it — busy ≠ dead. Full probe guidance:
+`/healthz` reports process lifecycle (`ok` / `starting` / `stopping`). `/livez` is
+process-alive only (200 whenever the handler can run; it does not wait for
+readiness). Both still run on the same Node event loop as request handling, so
+CPU-bound catalog or compression work can delay them — busy ≠ dead. Prefer TCP
+liveness if HTTP probes time out. Full probe guidance:
 [Monitoring guide — Kubernetes probe recommendations](../ops/MONITORING_GUIDE.md#kubernetes-probe-recommendations).
 
 ## Docker Compose with Caddy (HTTPS Auto-TLS)
@@ -409,8 +433,8 @@ Endpoint tunnel panels (Cloudflare, Tailscale, ngrok) can be shown or hidden fro
 
 | Image                    | Tag      | Size   | Description           |
 | ------------------------ | -------- | ------ | --------------------- |
-| `diegosouzapw/omniroute` | `latest` | ~250MB | Latest stable release |
-| `diegosouzapw/omniroute` | `3.8.0`  | ~250MB | Current version       |
+| `diegosouzapw/omniroute` | `latest` | ~250MB | Highest **published** stable SemVer (not git `main`) |
+| `diegosouzapw/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps |
 
 Multi-platform manifest: `linux/amd64` + `linux/arm64` native (Apple Silicon, AWS Graviton, Raspberry Pi). Docker selects the matching architecture automatically; pass `--platform linux/amd64` if you need to force AMD64 emulation on ARM hosts.
 
@@ -421,7 +445,7 @@ OmniRoute publishes separate Docker channels for stable releases, active release
 | Channel                         | Source                              | Mutability                  | Recommended use                                                                                 |
 | ------------------------------- | ----------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
 | `:<version>` / `:<version>-web` | Signed/versioned release            | Immutable                   | Production deployments that pin an exact release                                                |
-| `:latest` / `:latest-web`       | Highest stable release              | Mutable stable pointer      | Production deployments that intentionally follow stable releases                                |
+| `:latest` / `:latest-web`       | Highest **published** stable SemVer | Mutable stable pointer      | Follows stable releases **after** a SemVer publish job — does **not** track `main` or unreleased `release/v*` commits |
 | `:next` / `:next-web`           | Current default `release/v*` branch | Mutable pre-release pointer | Testing fixes that have landed on the active release branch but are not yet in a stable release |
 | `:main` / `:main-web`           | `main` branch                       | Mutable development pointer | Development and integration testing only                                                        |
 
@@ -464,6 +488,82 @@ docker compose up -d
 ```
 
 A release-branch build can never move `latest`; only an eligible stable semantic version may promote the stable pointer. The `next` images retain the release image inspection and blocking CRITICAL-vulnerability gate.
+
+**`latest` is not a currency guarantee for git.** Merged fixes on `main` or on the active `release/v*` branch are **not** in `:latest` until a stable SemVer image is published and the publish job promotes `:latest` (same digest as that SemVer). If `latest` looks frozen while GitHub already shows the fix, pull `:next` to test the release branch or wait for the SemVer tag.
+
+| You want | Use |
+| --- | --- |
+| GitOps / production that must not drift | Pin `:X.Y.Z` (or the image digest) |
+| Follow published stables and accept a recreate on each release | `:latest` |
+| Test unreleased `release/v*` commits | `:next` (not production) |
+| Test `main` | `:main` (not production) |
+
+## Availability: default SQLite is single-replica
+
+Stock Docker / Kubernetes OmniRoute is **one Node process + one SQLite writer**. High availability is **not supported** on that topology.
+
+| Constraint | Consequence |
+| --- | --- |
+| Single writer | Do **not** run multiple replicas against the same SQLite file. That corrupts the DB. |
+| Recreate / restart / HEALTHCHECK kill | **Full outage** of in-flight SSE, dashboard sessions, and in-memory state. Every connected client drops. |
+| Same event loop as `/healthz` | A busy catalog or compression tick can delay probes; a short timeout then restarts the **only** replica. |
+
+**Probe matrix** (see also [Kubernetes probe recommendations](../ops/MONITORING_GUIDE.md#kubernetes-probe-recommendations)):
+
+| Probe | Target | Do not use |
+| --- | --- | --- |
+| Liveness | TCP on `PORT` (default `20128`), or soft HTTP `/healthz` | `/api/monitoring/health` |
+| Readiness | HTTP `GET /healthz` | Tight timeouts that treat event-loop busy as dead |
+| Deep / humans | `/api/monitoring/health` | Automated kubelet liveness |
+
+**Upgrades:** expect every session to drop. Drain clients if you can; there is no rolling update on default SQLite. Compose `restart: unless-stopped` plus Docker `HEALTHCHECK` will also replace the only process when the container is Unhealthy — same blast radius.
+
+External Postgres / multi-writer HA is **not** a documented stock path. If you need HA, keep a single replica or run a topology the project has tested and documented separately. The Postgres/MySQL work lives in [#8075](https://github.com/diegosouzapw/OmniRoute/issues/8075). Until that ships, the only supported way to multiply **large** `/v1/responses` capacity is N independent processes (next section), not `replicas > 1` on one volume.
+
+## Scale-out: N independent processes
+
+One Node process is **one V8 heap**. Two overlapping ~3 MiB / ~750k-token coding-agent `POST /v1/responses` (RTK + Caveman) abort that heap at ~12 Gi (`FATAL ERROR: Reached heap limit`) and can OOM a 16 Gi cgroup. See [#7849](https://github.com/diegosouzapw/OmniRoute/issues/7849). Raising `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT` on that process reintroduces the abort. Small chats, `/healthz`, `/v1/models`, and MCP are **not** in that cap.
+
+To go beyond two concurrent **large** jobs **today**:
+
+| Do | Do not |
+| --- | --- |
+| Run **N containers/pods**, each with its **own** `DATA_DIR` / volume | Set `replicas > 1` against one SQLite file |
+| Keep each instance at 1–2 heavy in-flight and 12–16 Gi cgroup | Give one process 8× RAM and `max=8` |
+| Optional: `QUOTA_STORE_DRIVER=redis` + `QUOTA_STORE_REDIS_URL` for **shared quota counters** | Treat Redis as shared SQLite — it is not |
+| Duplicate provider secrets into each instance (or accept partitioned dashboards) | Expect one dashboard / one call-log across instances |
+| Front with any load balancer; sticky by API key or session is enough | Require a vendor-specific size-aware middleware |
+
+Hardware: `concurrent_large ≈ N × 2` at ~8–12 Gi heap / ~12–16 Gi cgroup **per instance**. Host RAM must cover `N × cgroup`, not “one 16 Gi pod with N=8.”
+
+Compose sketch (two heaps, two volumes — not `deploy.replicas: 2`):
+
+```yaml
+services:
+  omniroute-a:
+    image: diegosouzapw/omniroute:3.8.49
+    environment:
+      DATA_DIR: /app/data
+      OMNIROUTE_MEMORY_MB: "12288"
+      QUOTA_STORE_DRIVER: redis
+      QUOTA_STORE_REDIS_URL: redis://redis:6379
+    volumes: [omniroute-a-data:/app/data]
+    ports: ["20128:20128"]
+  omniroute-b:
+    image: diegosouzapw/omniroute:3.8.49
+    environment:
+      DATA_DIR: /app/data
+      OMNIROUTE_MEMORY_MB: "12288"
+      QUOTA_STORE_DRIVER: redis
+      QUOTA_STORE_REDIS_URL: redis://redis:6379
+    volumes: [omniroute-b-data:/app/data]
+    ports: ["20138:20128"]
+volumes:
+  omniroute-a-data:
+  omniroute-b-data:
+```
+
+In-process density (compression off the HTTP isolate) is [#11023](https://github.com/diegosouzapw/OmniRoute/issues/11023). One logical cluster on shared durable state is [#8075](https://github.com/diegosouzapw/OmniRoute/issues/8075).
 
 ## Important Notes
 

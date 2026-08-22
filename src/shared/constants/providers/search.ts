@@ -128,6 +128,18 @@ export const SEARCH_PROVIDERS = {
     authHint:
       "API key is optional. Set your SearXNG base URL. Some instances may require a bearer token for access.",
   },
+  "x-search": {
+    id: "x-search",
+    alias: "x_search",
+    name: "X Search (Grok)",
+    icon: "tag",
+    color: "#000000",
+    textIcon: "X",
+    website: "https://docs.x.ai/developers/tools/x-search",
+    authHint:
+      "SuperGrok OAuth (xai-oauth) or xAI API key. This is Grok X Search, not the X Developer MCP.",
+    serviceKinds: ["webSearch"],
+  },
   "ollama-search": {
     id: "ollama-search",
     alias: "ollama-search",

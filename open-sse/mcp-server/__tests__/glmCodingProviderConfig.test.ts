@@ -87,6 +87,9 @@ describe("GLM Coding provider registry surfaces", () => {
     expect(PROVIDER_ID_TO_ALIAS.glm).toBe("glm");
     expect(byProviderId).toEqual(byAlias);
     expect(byProviderId.map((model) => model.id)).toEqual([
+      "glm-5.3",
+      "glm-5.3-high",
+      "glm-5.3-low",
       "glm-5.2",
       "glm-5.2-high",
       "glm-5.2-max",

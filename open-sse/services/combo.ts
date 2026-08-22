@@ -34,8 +34,10 @@ import {
   recordComboFailure,
 } from "./combo/failureTracker.ts";
 import { buildNoUpstreamResponseDiagnostics, buildRecoveryHint } from "./combo/pinRecovery.ts";
+import { formatExhaustedConnectionKey } from "./combo/comboDiagFormat.ts";
 import { buildTargetTimeoutRunner } from "./combo/targetTimeoutRunner.ts";
 import { recordComboRequest, recordComboShadowRequest, getComboMetrics } from "./comboMetrics.ts";
+import { qualityScoreFor } from "./routing/index.ts";
 import {
   expandComboSystemPromptIfPresent,
   resolveTargetFingerprint,
@@ -45,6 +47,7 @@ import {
   getDefaultComboConfig,
   resolveComboQueueDepth,
   isComboCooldownWaitEligible,
+  resolveComboTargetTimeoutMsForCombo,
 } from "./comboConfig.ts";
 import {
   maybeGenerateHandoff,
@@ -63,6 +66,7 @@ import { getHiddenModelsByProvider } from "@/models";
 import { resolveModelLockoutSettings } from "../../src/lib/resilience/modelLockoutSettings";
 import { fetchCodexQuota } from "./codexQuotaFetcher.ts";
 import { evaluateQuotaCutoff, getQuotaFetcher, type QuotaInfo } from "./quotaPreflight.ts";
+import { resolveProviderId } from "../../src/shared/constants/providers.ts";
 import * as semaphore from "./rateLimitSemaphore.ts";
 import { getCircuitBreaker } from "../../src/shared/utils/circuitBreaker";
 import { parseModel } from "./model.ts";
@@ -80,6 +84,7 @@ import {
   normalizeStickinessMessages,
   recordStickyBinding,
   clearStickyBinding,
+  clearStickyBindingsForCombo,
   peekStickyConnectionId,
   resolveDisableSessionStickiness,
 } from "./combo/sessionStickiness.ts";
@@ -87,7 +92,8 @@ import { selectQuotaShareTarget } from "./combo/quotaShareStrategy.ts";
 import { makeConnectionConcurrencyResolver, lookupPositiveCap } from "./combo/concurrencyCaps.ts";
 import { acquireQuotaShareConcurrencySlot } from "./combo/quotaShareConcurrency.ts";
 import { canAffordRequest } from "../../src/lib/quota/quotaScheduler.ts";
-import { getCachedProviderConnectionById } from "../../src/lib/localDb.ts";
+import { resolveConnectionTimeoutMs } from "../handlers/chatCore/upstreamTimeouts.ts";
+import { getCachedProviderConnectionById } from "../../src/lib/db/readCache.ts";
 import { orderTargetsByEvalScores } from "./evalRouting.ts";
 
 /**
@@ -96,11 +102,13 @@ import { orderTargetsByEvalScores } from "./evalRouting.ts";
  * keeps the previously recorded limit (or 0 for a fresh row, meaning "no
  * budget enforced").
  */
-function resolveTargetTokenLimit(target: { connectionId?: string | null }): number | undefined {
+async function resolveTargetTokenLimit(target: {
+  connectionId?: string | null;
+}): Promise<number | undefined> {
   const connectionId = target?.connectionId;
   if (!connectionId) return undefined;
   try {
-    const connection = getCachedProviderConnectionById(connectionId);
+    const connection = await getCachedProviderConnectionById(connectionId);
     const overrides = (connection as { rateLimitOverrides?: Record<string, number> | null } | null)
       ?.rateLimitOverrides;
     const tpm = overrides?.tpm;
@@ -129,6 +137,7 @@ import { isProviderInCooldown, recordProviderCooldown } from "./providerCooldown
 import {
   resolveResilienceSettings,
   type ResilienceSettings,
+  type ComboCooldownWaitSettings,
 } from "../../src/lib/resilience/settings";
 import { resolveReasoningBufferedMaxTokens, toPositiveInteger } from "./reasoningTokenBuffer.ts";
 import { RESET_WINDOW_NAMES } from "./combo/types.ts";
@@ -137,6 +146,7 @@ import type {
   ComboRetryAfter,
   ComboErrorBody,
   SingleModelTarget,
+  ComboLogger,
   HandleComboChatOptions,
   HandleRoundRobinOptions,
   ResolvedComboTarget,
@@ -175,6 +185,8 @@ import {
   TRANSIENT_FOR_SEMAPHORE,
   MAX_FALLBACK_WAIT_MS,
   MAX_GLOBAL_ATTEMPTS,
+  COMBO_LOOP_SAFETY_TIMEOUT_MS,
+  COMBO_SAFETY_DRAIN_MS,
   isAllAccountsRateLimitedResponse,
   clampComboDepth,
   shouldSkipForPredictedTtft,
@@ -234,7 +246,14 @@ import {
   resolveComboRuntimeUnits,
   resolveComboTargets,
 } from "./combo/comboStructure.ts";
-import { getKnownContextOverflow } from "./combo/knownContextOverflow.ts";
+import {
+  createInvocationId,
+  finalizeComboTrace,
+  finishComboTrace,
+  getComboTrace,
+  recordComboDecision,
+  startComboTrace,
+} from "./combo/decisionTrace.ts";
 import {
   QUOTA_SOFT_DEPRIORITIZE_FACTOR,
   setCandidateQuotaSoftPenalty,
@@ -276,12 +295,7 @@ export {
 };
 export { resolveShadowTargets, scheduleShadowRouting };
 export { preScreenTargets };
-export {
-  resolveComboRuntimeUnits,
-  resolveComboTargets,
-  filterTargetsByRequestCompatibility,
-  getKnownContextOverflow,
-};
+export { resolveComboRuntimeUnits, resolveComboTargets, filterTargetsByRequestCompatibility };
 export {
   getComboFromData,
   getComboModelsFromData,
@@ -486,7 +500,10 @@ export async function buildAutoCandidates(
       let quotaRemaining = 100;
       let quotaCutoffBlocked = false;
       let quotaCutoffReason: string | undefined;
-      const fetcher = getQuotaFetcher(provider);
+      // #10877: `provider` here may be a legacy/user-facing alias spelling
+      // (target.provider/parseModel output); canonicalize before the fetcher
+      // registry lookup so aliased combo members still hit quota-aware scoring.
+      const fetcher = getQuotaFetcher(resolveProviderId(provider));
       const connection = target.connectionId ? connectionById.get(target.connectionId) : undefined;
       const authType = typeof connection?.authType === "string" ? connection.authType : null;
       const sessionAvailability =
@@ -574,6 +591,9 @@ export async function buildAutoCandidates(
         connectionPoolSize: connectionPoolCounts.get(provider) ?? 1,
         connectionId: target.connectionId ?? undefined,
         authType,
+        // Feedback-driven quality signal (routing quality tracker). Neutral 1.0
+        // before enough samples accumulate — a cold model is never penalized.
+        quality: qualityScoreFor(provider, model),
       };
     })
   );
@@ -607,7 +627,59 @@ export { pinIsDurablyUnhealthy };
 /** @param {string} errorText */
 
 /** @param {object} options */
-export async function handleComboChat({
+/**
+ * Resolves the per-target timeout ceiling for a combo target: when the target's
+ * connection carries `providerSpecificData.timeoutMs`, re-runs
+ * resolveComboTargetTimeoutMsForCombo with that timeout as the ceiling so the
+ * combo's per-target timer follows the selected connection.
+ * Returns undefined when the connection or its timeout is absent — the runner
+ * then falls back to the setup-time comboTargetTimeoutMs.
+ */
+export async function resolveTargetTimeoutMsForTarget(
+  config: Record<string, unknown> | null | undefined,
+  strategy: string,
+  comboCooldownWait: Pick<ComboCooldownWaitSettings, "enabled" | "budgetMs">,
+  target?: SingleModelTarget,
+  log?: Pick<ComboLogger, "debug"> | null
+): Promise<number | undefined> {
+  const connectionId = target && "connectionId" in target ? target.connectionId : null;
+  if (!connectionId) return undefined;
+  try {
+    const connection = await getCachedProviderConnectionById(connectionId);
+    if (!connection) return undefined;
+    const timeoutMs = resolveConnectionTimeoutMs(connection.providerSpecificData);
+    if (timeoutMs === undefined) return undefined;
+    return resolveComboTargetTimeoutMsForCombo(config, timeoutMs, strategy, comboCooldownWait);
+  } catch (err) {
+    log?.debug?.(
+      "COMBO",
+      `resolveTargetTimeoutMsForTarget connection lookup failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+    return undefined;
+  }
+}
+
+/**
+ * #10681 egress: every combo response carries the opaque trace id in an
+ * `X-OmniRoute-Combo-Trace` header so a post-incident lookup of the ordered
+ * per-target decisions is possible; the finalized summary is also emitted as
+ * one metadata-only log line for durability across restarts.
+ */
+export async function handleComboChat(options: HandleComboChatOptions): Promise<Response> {
+  const traceInvocationId = options.invocationId ?? createInvocationId();
+  const response = await handleComboChatInner({ ...options, invocationId: traceInvocationId });
+  response.headers.set("X-OmniRoute-Combo-Trace", traceInvocationId);
+  const trace = getComboTrace(traceInvocationId);
+  options.log.info(
+    "COMBO",
+    `combo trace ${traceInvocationId} terminal=${JSON.stringify(trace?.terminal ?? null)} decisions=${trace?.decisions.length ?? 0}`
+  );
+  return response;
+}
+
+async function handleComboChatInner({
   body,
   combo,
   handleSingleModel,
@@ -627,6 +699,7 @@ export async function handleComboChat({
   sourceFormat = null,
   endpointPath = null,
   requestHeaders = null,
+  invocationId,
 }: HandleComboChatOptions): Promise<Response> {
   const comboCtx = createComboContext({ body, combo, settings, relayOptions, log });
   const {
@@ -643,9 +716,21 @@ export async function handleComboChat({
   } = phaseComboSetup(comboCtx);
   body = comboCtx.body;
 
+  // #10681: opaque per-invocation decision trace (safe routing metadata only).
+  const traceInvocationId = invocationId ?? createInvocationId();
+  startComboTrace(traceInvocationId, { strategy, comboName: combo.name });
+
   const handleSingleModelWithTimeout = buildTargetTimeoutRunner({
     handleSingleModel,
     comboTargetTimeoutMs,
+    resolveTargetTimeoutMs: (target) =>
+      resolveTargetTimeoutMsForTarget(
+        config,
+        strategy,
+        resilienceSettings.comboCooldownWait,
+        target,
+        log
+      ),
     log,
   });
 
@@ -804,12 +889,6 @@ export async function handleComboChat({
     handleSingleModelWithTimeout,
     buildAutoCandidates,
     hiddenModelsByProvider,
-    clientManagedResponsesContext,
-    deferContextOverflowWhenCompressible,
-    compressionExclusions,
-    sourceFormat,
-    endpointPath,
-    requestHeaders,
   });
   if ("earlyResponse" in targetResolution) return targetResolution.earlyResponse;
   const { stickyWeightedLimit, getWeightedStepKeyForTarget, preScreenMap } = targetResolution;
@@ -1003,10 +1082,7 @@ export async function handleComboChat({
         attempted: recordedAttempts,
         excluded: [
           ...[...exhaustedProviders].map((p) => ({ provider: p, reason: "exhausted" })),
-          ...[...exhaustedConnections].map((c) => ({
-            provider: "unknown",
-            reason: `exhausted_connection:${String(c).slice(0, 8)}`,
-          })),
+          ...[...exhaustedConnections].map((c) => formatExhaustedConnectionKey(String(c))),
         ],
         attemptOrder: comboAttemptOrder,
         terminalReason,
@@ -1017,8 +1093,54 @@ export async function handleComboChat({
       const globalPromise = new Promise<Response>((res) => {
         globalResolve = res;
       });
+
+      // G1 (silent-stop fix): the speculative loop's `Promise.race` waits on
+      // `globalPromise`, which is ONLY resolved from inside a task (success or
+      // fatal error). If a target hangs — e.g. the operator disabled the per-model
+      // timeout (`targetTimeoutMs: 0`) and the upstream never settles — the race
+      // never resolves and the request hangs forever with no response. This safety
+      // promise force-resolves after the combo budget (comboTimeoutMs when set,
+      // otherwise a hard ceiling) so the request ALWAYS terminates with an
+      // actionable 504 instead of dying silently. `comboExpired` is flipped so the
+      // target loop stops launching new work; the existing comboExpired branch
+      // returns the aggregated 504.
+      const loopSafetyMs =
+        comboTimeoutMs > 0 ? comboTimeoutMs : COMBO_LOOP_SAFETY_TIMEOUT_MS;
+      let loopSafetyFired = false;
+      let loopSafetyTimer: ReturnType<typeof setTimeout> | null = null;
+      const loopSafetyPromise = new Promise<Response>((resolve) => {
+        loopSafetyTimer = setTimeout(() => {
+          loopSafetyFired = true;
+          log.warn(
+            "COMBO",
+            `Combo loop safety timeout (${loopSafetyMs}ms) reached without a terminal response — force-terminating`
+          );
+          resolve(
+            errorResponseWithComboDiagnostics(
+              504,
+              `Combo global timeout (${loopSafetyMs}ms) without a terminal response`,
+              buildComboDiag("combo_timeout"),
+              { code: "COMBO_TIMEOUT", type: "server_error" }
+            )
+          );
+        }, loopSafetyMs);
+        loopSafetyTimer.unref?.();
+      });
       const runningTasks = new Set<Promise<void>>();
       let anySuccess = false;
+      // #10681: steps already recorded as dispatched (so per-target retries do not
+      // duplicate the decision).
+      const dispatchedTargets = new Set<string>();
+      // G1: flip comboExpired as soon as the safety timer fires so the next loop
+      // iteration breaks instead of launching more targets after the budget, and
+      // abort every in-flight target so a hung upstream actually gets cancelled
+      // (not just "response stops").
+      const markLoopExpiredIfSafetyFired = () => {
+        if (loopSafetyFired) {
+          comboExpired = true;
+          for (const [, ac] of abortControllers.entries()) ac.abort();
+        }
+      };
       const abortControllers = new Map<number, AbortController>();
       const zeroLatencyOptimizationsEnabled = config.zeroLatencyOptimizationsEnabled === true;
       const hasProtectedPriorityTarget =
@@ -1044,6 +1166,12 @@ export async function handleComboChat({
         const cb = getCircuitBreaker(provider);
         if (cb.getStatus().state === "OPEN") {
           log.info("COMBO", `Skipping ${modelStr} — circuit breaker OPEN for ${provider}`);
+          recordComboDecision(traceInvocationId, {
+            step: target.executionKey,
+            target: modelStr,
+            decision: "skipped_before_dispatch",
+            reason: "circuit_open",
+          });
           if (i > 0) fallbackCount++;
           return stopProtectedPriorityTarget(`Provider ${provider} circuit breaker is open`);
         }
@@ -1054,6 +1182,12 @@ export async function handleComboChat({
           isProviderInCooldown(provider, target.connectionId ?? undefined, resilienceSettings)
         ) {
           log.info("COMBO", `Skipping ${modelStr} — provider ${provider} in global cooldown`);
+          recordComboDecision(traceInvocationId, {
+            step: target.executionKey,
+            target: modelStr,
+            decision: "skipped_before_dispatch",
+            reason: "provider_cooldown",
+          });
           if (i > 0) fallbackCount++;
           return stopProtectedPriorityTarget(`Provider ${provider} is in cooldown`);
         }
@@ -1081,6 +1215,12 @@ export async function handleComboChat({
         );
         if (exhaustedSkip) {
           log.info("COMBO", exhaustedSkip);
+          recordComboDecision(traceInvocationId, {
+            step: target.executionKey,
+            target: modelStr,
+            decision: "skipped_before_dispatch",
+            reason: "request_exhaustion",
+          });
           if (i > 0) fallbackCount++;
           return stopProtectedPriorityTarget(`Target ${modelStr} is unavailable`);
         }
@@ -1088,6 +1228,12 @@ export async function handleComboChat({
         // Pre-check: skip models locked by the resilience system (model-level lockout)
         if (provider && rawModel && isModelLocked(provider, target.connectionId || "", rawModel)) {
           log.info("COMBO", `Skipping ${modelStr} — model locked by resilience (cooldown active)`);
+          recordComboDecision(traceInvocationId, {
+            step: target.executionKey,
+            target: modelStr,
+            decision: "skipped_before_dispatch",
+            reason: "model_lockout",
+          });
           if (i > 0) fallbackCount++;
           return stopProtectedPriorityTarget(`Model ${modelStr} is locked`);
         }
@@ -1114,6 +1260,12 @@ export async function handleComboChat({
               "COMBO",
               `Skipping ${modelStr} — quota exhaustion cutoff (${quotaCutoff.reason || "quota_exhausted"})`
             );
+            recordComboDecision(traceInvocationId, {
+              step: target.executionKey,
+              target: modelStr,
+              decision: "skipped_before_dispatch",
+              reason: "quota_cutoff",
+            });
             if (i > 0) fallbackCount++;
             observeFailure(true, target.executionKey);
             if (protectedPriorityTarget) {
@@ -1162,6 +1314,12 @@ export async function handleComboChat({
               "COMBO",
               `Skipping ${modelStr} — no credentials available or model excluded`
             );
+            recordComboDecision(traceInvocationId, {
+              step: target.executionKey,
+              target: modelStr,
+              decision: "skipped_before_dispatch",
+              reason: "availability",
+            });
             if (i > 0) fallbackCount++;
             return stopProtectedPriorityTarget(`Model ${modelStr} is unavailable`);
           }
@@ -1173,6 +1331,12 @@ export async function handleComboChat({
           const gateResult = checkCredentialGate(connectionId, provider, modelStr);
           if (gateResult.allowed === false) {
             logCredentialSkip(log, modelStr, gateResult.reason || "Credential gate blocked");
+            recordComboDecision(traceInvocationId, {
+              step: target.executionKey,
+              target: modelStr,
+              decision: "skipped_before_dispatch",
+              reason: "credential_gate",
+            });
             if (i > 0) fallbackCount++;
             return stopProtectedPriorityTarget(`Credential gate blocked ${modelStr}`);
           }
@@ -1187,6 +1351,12 @@ export async function handleComboChat({
               "COMBO",
               `Skipping ${modelStr} — connection ${connectionId} is at max concurrency cap (${maxConcurrentCap})`
             );
+            recordComboDecision(traceInvocationId, {
+              step: target.executionKey,
+              target: modelStr,
+              decision: "skipped_before_dispatch",
+              reason: "concurrency_cap",
+            });
             if (i > 0) fallbackCount++;
             return stopProtectedPriorityTarget(`Connection capacity reached for ${modelStr}`);
           }
@@ -1202,6 +1372,12 @@ export async function handleComboChat({
           !(await perTargetAdmission({ modelStr, executionKey: target.executionKey, body }))
         ) {
           log.info("COMBO", `Skipping ${modelStr} — admission lane full (#9654)`);
+          recordComboDecision(traceInvocationId, {
+            step: target.executionKey,
+            target: modelStr,
+            decision: "skipped_before_dispatch",
+            reason: "admission_lane",
+          });
           if (i > 0) fallbackCount++;
           return null;
         }
@@ -1257,6 +1433,12 @@ export async function handleComboChat({
                   "COMBO",
                   `Predictive TTFT Circuit Breaker: skipping ${modelStr} (avg ${m.avgLatencyMs}ms > max ${config.predictiveTtftMs}ms)`
                 );
+                recordComboDecision(traceInvocationId, {
+                  step: target.executionKey,
+                  target: modelStr,
+                  decision: "skipped_before_dispatch",
+                  reason: "predictive_ttft",
+                });
                 return stopProtectedPriorityTarget(`Predictive latency check rejected ${modelStr}`);
               }
             }
@@ -1386,6 +1568,15 @@ export async function handleComboChat({
                 : "",
             fingerprint: resolveTargetFingerprint(target) ?? "",
           });
+          // #10681: record dispatch once per target (retries keep the first decision).
+          if (!dispatchedTargets.has(target.executionKey)) {
+            dispatchedTargets.add(target.executionKey);
+            recordComboDecision(traceInvocationId, {
+              step: target.executionKey,
+              target: modelStr,
+              decision: "dispatched",
+            });
+          }
           const result = await handleSingleModelWithTimeout(attemptBody, modelStr, {
             ...targetForAttempt,
             effectiveComboStrategy: strategy,
@@ -2178,7 +2369,10 @@ export async function handleComboChat({
               );
             }
           }
-          log.warn("COMBO", `Model ${modelStr} failed, trying next`, { status: result.status });
+          log.warn("COMBO", `Model ${modelStr} failed, trying next`, {
+            status: result.status,
+            errorBody: redactConnectionLabel(errorText),
+          });
 
           // #5976: per-model-quota providers (Gemini, GitHub, etc.) multiplex models
           // behind one connection. A model-level 500 or 429 (RPM) must NOT cool down
@@ -2259,6 +2453,17 @@ export async function handleComboChat({
         })().catch((err) => {
           const logError = log.error ?? log.warn;
           logError("COMBO", `Speculative task error for target ${i}`, err);
+          // G2 (silent-stop fix): never leave the speculative loop waiting on an
+          // unresolved globalPromise. If a task throws unexpectedly (outside
+          // executeTarget's error handling) and no other task succeeds, the post-loop
+          // `Promise.race([globalPromise, ...])` would hang forever. Resolve with a
+          // 502 so the request terminates with an actionable error.
+          if (!anySuccess && globalResolve) {
+            anySuccess = true;
+            globalResolve(
+              errorResponse(502, `Combo target ${i} failed with an unexpected error`)
+            );
+          }
         });
 
         runningTasks.add(task);
@@ -2276,10 +2481,11 @@ export async function handleComboChat({
             timeoutResolve = r;
             setTimeout(r, hedgeDelay);
           });
-          await Promise.race([task, globalPromise, timeoutPromise]);
+          await Promise.race([task, globalPromise, timeoutPromise, loopSafetyPromise]);
         } else {
-          await Promise.race([task, globalPromise]);
+          await Promise.race([task, globalPromise, loopSafetyPromise]);
         }
+        markLoopExpiredIfSafetyFired();
 
         // Global combo timeout check: after each target completes, stop trying
         // further targets if the total elapsed time exceeds comboTimeoutMs.
@@ -2294,13 +2500,57 @@ export async function handleComboChat({
       }
 
       if (!anySuccess && runningTasks.size > 0) {
-        await Promise.race([globalPromise, Promise.all([...runningTasks])]);
+        // G1: include loopSafetyPromise so a hung last task (per-model timeout
+        // disabled) cannot freeze this post-loop race forever.
+        await Promise.race([globalPromise, Promise.all([...runningTasks]), loopSafetyPromise]);
+        markLoopExpiredIfSafetyFired();
       }
 
+      // G1: if the safety timer won the race (request would otherwise hang), give
+      // in-flight tasks a short drain window to land their per-model errors into
+      // comboErrors so the 504 carries the same "tried: a (500)" summary the
+      // regular comboExpired branch produces — then return the safety 504.
+      if (loopSafetyFired && !anySuccess) {
+        if (runningTasks.size > 0) {
+          await Promise.race([
+            Promise.allSettled([...runningTasks]),
+            new Promise((resolve) => setTimeout(resolve, COMBO_SAFETY_DRAIN_MS)),
+          ]);
+        }
+        const summary = comboErrors
+          .slice(0, 5)
+          .map((e) => `${e.model} (${e.status})`)
+          .join(", ");
+        const msg =
+          `Combo global timeout (${loopSafetyMs}ms) after ${recordedAttempts}/${orderedTargets.length} targets` +
+          (comboErrors.length > 0
+            ? ` | tried: ${summary}${comboErrors.length > 5 ? `... (+${comboErrors.length - 5})` : ""}`
+            : "") +
+          " without a terminal response";
+        return errorResponseWithComboDiagnostics(
+          504,
+          msg,
+          buildComboDiag("combo_timeout"),
+          { code: "COMBO_TIMEOUT", type: "server_error" }
+        );
+      }
+
+      // #10681: finalize the decision trace (success).
+      finalizeComboTrace(traceInvocationId, orderedTargets);
+      finishComboTrace(traceInvocationId, { status: 200 });
       if (anySuccess) {
+        // G1: clear the safety timer on the happy path so a successful combo does
+        // not leave a 10-minute timer alive per request.
+        if (loopSafetyTimer) {
+          clearTimeout(loopSafetyTimer);
+          loopSafetyTimer = null;
+        }
         return await globalPromise;
       }
 
+      // #10681: finalize the decision trace (global timeout).
+      finalizeComboTrace(traceInvocationId, orderedTargets);
+      finishComboTrace(traceInvocationId, { status: 504 });
       // Global combo timeout: return aggregated error immediately, skipping set retries.
       if (comboExpired) {
         const summary = buildRedactedSummary(comboErrors);
@@ -2343,6 +2593,9 @@ export async function handleComboChat({
       if (setTry < maxSetRetries) continue;
 
       // All set retries exhausted — return the final error
+      // #10681: finalize the decision trace (all targets failed or skipped).
+      finalizeComboTrace(traceInvocationId, orderedTargets);
+      finishComboTrace(traceInvocationId, { status: 503 });
       if (!lastStatus) {
         if (recordedAttempts === 0) {
           notifyWebhookEvent("request.failed", {
@@ -2443,6 +2696,9 @@ export async function handleComboChat({
         }
       }
 
+      // #10681: finalize the decision trace with the aggregated terminal status.
+      finalizeComboTrace(traceInvocationId, orderedTargets);
+      finishComboTrace(traceInvocationId, { status });
       // Retry-after decoration is separate from the wait decision above: only
       // rate-limit-class final statuses may carry a `(reset after ...)` suffix
       // (see unavailableRetryGate.ts — do not stitch a peer target's window onto
@@ -2469,11 +2725,22 @@ export async function handleComboChat({
         );
       }
       const retryAfterSeconds = undefined;
+      // #10966: when every observed failure was independently classified as quota/
+      // balance exhaustion (isQuotaExhaustionResponse, tracked via observeFailure's
+      // allObservedFailuresQuota accumulator), stamp a stable `quota_exhausted`
+      // terminalReason instead of forwarding the raw upstream error string. The raw
+      // string falls through buildRecoveryHint's default branch ("retry" / "failed
+      // transiently"), which is actively misleading for a durable wallet/quota
+      // exhaustion — retrying the same combo will never refill it.
+      const terminalReason =
+        observedFailure && allObservedFailuresQuota
+          ? "quota_exhausted"
+          : (lastError ?? "all_models_failed");
       return withQuotaExhaustionClassification(
         errorResponseWithComboDiagnostics(
           status,
           msg,
-          buildComboDiag(lastError ?? "all_models_failed", retryAfterSeconds)
+          buildComboDiag(terminalReason, retryAfterSeconds)
         ),
         observedFailure ? allObservedFailuresQuota : null
       );
@@ -2604,32 +2871,6 @@ async function handleRoundRobinCombo({
   );
   const tagFilteredTargets = await applyRequestTagRouting(orderedTargets, body, log);
   const evalRankedTargets = orderTargetsByEvalScores(tagFilteredTargets, config.evalRouting, log);
-  const knownContextOverflow = getKnownContextOverflow(evalRankedTargets, body, {
-    clientManagedResponsesContext,
-    deferContextOverflowWhenCompressible,
-    compressionExclusions,
-    sourceFormat,
-    endpointPath,
-    requestHeaders,
-  });
-  if (knownContextOverflow) {
-    return errorResponseWithComboDiagnostics(
-      400,
-      `Request requires approximately ${knownContextOverflow.requiredContextTokens} tokens, but the largest known context limit in this combo is ${knownContextOverflow.maxKnownContextTokens} tokens. Reduce or compact the request context.`,
-      {
-        poolSize: evalRankedTargets.length,
-        attempted: 0,
-        excluded: evalRankedTargets.map((target) => ({
-          provider: target.provider,
-          model: target.modelStr,
-          reason: "context_window",
-        })),
-        attemptOrder: [],
-        terminalReason: "context_length_exceeded",
-      },
-      { code: "context_length_exceeded", type: "invalid_request_error" }
-    );
-  }
   // Align with the main/auto paths: combo config OR top-level settings (#8488 / #8494).
   const rrCompatFailOpen =
     (config as { compatFilterFailOpen?: unknown }).compatFilterFailOpen === true ||
@@ -2782,6 +3023,9 @@ async function handleRoundRobinCombo({
     filteredTargets = await expandPromptCacheAffinityTargets(filteredTargets);
     modelCount = filteredTargets.length;
   }
+  if (disableSessionStickiness) {
+    clearStickyBindingsForCombo(combo.name);
+  }
   const _rrSessionSticky = disableSessionStickiness
     ? ({ targets: filteredTargets, messageHash: null, stuck: false } as const)
     : await applySessionStickiness(
@@ -2833,6 +3077,33 @@ async function handleRoundRobinCombo({
   // and the "Done with this model" path below), mirroring handleComboChat.
   const rrOutcomes: Array<ComboErrorEntry> = [];
 
+  // G4 (silent-stop fix): round-robin has NO global timeout — a hung model
+  // (per-model timeout disabled via targetTimeoutMs: 0) would freeze the request
+  // forever with no response. Safety promise + timer bound the whole loop; when
+  // it fires, rrExpired flips and every subsequent model attempt short-circuits
+  // to the 504. Cleaned up in the loop's finally.
+  const rrConfiguredTimeoutMs =
+    (config as { comboTimeoutMs?: number }).comboTimeoutMs ?? 0;
+  const rrLoopSafetyMs =
+    rrConfiguredTimeoutMs > 0 ? rrConfiguredTimeoutMs : COMBO_LOOP_SAFETY_TIMEOUT_MS;
+  let rrExpired = false;
+  let rrLoopSafetyTimer: ReturnType<typeof setTimeout> | null = null;
+  let rrResolveSafety: ((res: Response) => void) | null = null;
+  const rrSafetyPromise = new Promise<Response>((resolve) => {
+    rrResolveSafety = resolve;
+  });
+  rrLoopSafetyTimer = setTimeout(() => {
+    rrExpired = true;
+    log.warn(
+      "COMBO-RR",
+      `Round-robin loop exceeded ${rrLoopSafetyMs}ms without a terminal response — force-terminating`
+    );
+    rrResolveSafety?.(
+      errorResponse(504, `Round-robin combo exceeded ${rrLoopSafetyMs}ms without a terminal response`)
+    );
+  }, rrLoopSafetyMs);
+  rrLoopSafetyTimer.unref?.();
+
   // #1731: Per-request in-memory set of providers whose quota is fully exhausted.
   // When a target returns a quota-exhausted 429, remaining targets from the same
   // provider are skipped to avoid the cascade through N same-provider targets.
@@ -2841,8 +3112,11 @@ async function handleRoundRobinCombo({
   const transientRateLimitedProviders = new Set<string>();
 
   // Try each model starting from the round-robin target
-  for (let offset = 0; offset < modelCount; offset++) {
-    const modelIndex = (rrStartIndex + offset) % modelCount;
+  try {
+    for (let offset = 0; offset < modelCount; offset++) {
+      // G4: stop launching new work once the safety timer fired.
+      if (rrExpired) break;
+      const modelIndex = (rrStartIndex + offset) % modelCount;
     const target = filteredTargets[modelIndex];
     const modelStr = target.modelStr;
     const provider = target.provider;
@@ -2987,11 +3261,15 @@ async function handleRoundRobinCombo({
           fingerprint: resolveTargetFingerprint(target) ?? "",
         });
 
-        const result = await handleSingleModel(attemptBody, modelStr, {
-          ...targetForAttempt,
-          effectiveComboStrategy: "round-robin",
-          failoverBeforeRetry: config.failoverBeforeRetry,
-        });
+        const result = await Promise.race([
+          handleSingleModel(attemptBody, modelStr, {
+            ...targetForAttempt,
+            effectiveComboStrategy: "round-robin",
+            failoverBeforeRetry: config.failoverBeforeRetry,
+          }),
+          rrSafetyPromise,
+        ]);
+        if (rrExpired) return result; // G4: safety timer won — stop everything
 
         // Quota-aware scheduling: reserve the estimated budget for this
         // dispatch (opt-in, same env gate as the pre-request check). Best-effort
@@ -3005,7 +3283,7 @@ async function handleRoundRobinCombo({
           try {
             const { reserveQuota } = await import("../../src/lib/quota/quotaScheduler.ts");
             reserveQuota(target.connectionId, modelStr, attemptBody as Record<string, unknown>, {
-              tokenLimit: resolveTargetTokenLimit(target),
+              tokenLimit: await resolveTargetTokenLimit(target),
             });
           } catch {
             // best-effort only
@@ -3377,7 +3655,10 @@ async function handleRoundRobinCombo({
           kind: classifyComboOutcome(result.status, errorText),
         });
         if (offset > 0) fallbackCount++;
-        log.warn("COMBO-RR", `${modelStr} failed, trying next model`, { status: result.status });
+        log.warn("COMBO-RR", `${modelStr} failed, trying next model`, {
+          status: result.status,
+          errorBody: redactConnectionLabel(errorText),
+        });
 
         if (
           resilienceSettings.providerCooldown.enabled &&
@@ -3425,6 +3706,26 @@ async function handleRoundRobinCombo({
       // ALWAYS release semaphore slot
       release();
     }
+  }
+  } catch (err) {
+    // G4: unexpected exception in the round-robin loop must never crash the
+    // request silently — surface a 500 instead of hanging the client.
+    log.error?.("COMBO-RR", "Unexpected error in round-robin loop", err);
+    return errorResponse(500, "Unexpected error in round-robin combo");
+  } finally {
+    if (rrLoopSafetyTimer) {
+      clearTimeout(rrLoopSafetyTimer);
+      rrLoopSafetyTimer = null;
+    }
+  }
+
+  // G4: if the safety timer fired between iterations (no race captured it),
+  // terminate with the actionable 504 instead of the generic exhaustion path.
+  if (rrExpired) {
+    return errorResponse(
+      504,
+      `Round-robin combo exceeded ${rrLoopSafetyMs}ms without a terminal response`
+    );
   }
 
   // All models exhausted

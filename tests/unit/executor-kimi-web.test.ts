@@ -50,7 +50,7 @@ describe("KimiWebExecutor", () => {
         credentials: { apiKey: "opaque-kimi-access-token" },
         signal: null,
       } as never);
-      assert.ok(capturedUrl.startsWith("https://www.kimi.com/"), `got ${capturedUrl}`);
+      assert.ok(capturedUrl.startsWith("https://www.kimi.ai/"), `got ${capturedUrl}`);
       assert.ok(!capturedUrl.includes("moonshot.cn"));
     } finally {
       globalThis.fetch = originalFetch;
@@ -238,10 +238,7 @@ describe("extractKimiAccessToken", () => {
   });
 
   it("strips a leading Authorization: Bearer label", () => {
-    assert.equal(
-      extractKimiAccessToken("Authorization: Bearer current-token"),
-      "current-token"
-    );
+    assert.equal(extractKimiAccessToken("Authorization: Bearer current-token"), "current-token");
   });
 
   it("returns empty when no Kimi token is present", () => {

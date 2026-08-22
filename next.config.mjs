@@ -438,6 +438,11 @@ const nextConfig = {
         destination: "/dashboard/omni-skills",
         permanent: true,
       },
+      {
+        source: "/dashboard/providers/freepik",
+        destination: "/dashboard/providers/magnific",
+        permanent: true,
+      },
       // Architecture
       {
         source: "/docs/architecture",

@@ -450,7 +450,7 @@ test("CodexExecutor.transformRequest strips store from compact requests even whe
   assert.equal(result.instructions, "keep this");
 });
 
-test("CodexExecutor.transformRequest preserves native assistant commentary history", () => {
+test("CodexExecutor.transformRequest preserves commentary and strips orphan summaries", () => {
   const executor = new CodexExecutor();
   const body = {
     _nativeCodexPassthrough: true,
@@ -526,9 +526,8 @@ test("CodexExecutor.transformRequest preserves native assistant commentary histo
     ),
     true
   );
-  // Reasoning items are stripped from the Responses input — encrypted_content is
-  // unusable with store=false (previous_response_id deleted) and the summary blob
-  // only inflates context on every subsequent agentic turn (decolua/9router#1599).
+  // Summary-only reasoning is display state, not continuation state. Replaying it
+  // with store=false only inflates every subsequent agentic turn (decolua/9router#1599).
   assert.equal(
     result.input.some((item) => item.type === "reasoning"),
     false
@@ -541,6 +540,54 @@ test("CodexExecutor.transformRequest preserves native assistant commentary histo
     result.input.some((item) => item.type === "function_call_output"),
     true
   );
+});
+
+test("CodexExecutor.transformRequest preserves active opaque reasoning with a summary", () => {
+  const executor = new CodexExecutor();
+  const reasoning = {
+    type: "reasoning",
+    encrypted_content: "provider-state",
+    summary: [{ type: "summary_text", text: "Display summary" }],
+  };
+
+  const result = executor.transformRequest(
+    "gpt-5.5-low",
+    {
+      _nativeCodexPassthrough: true,
+      input: [reasoning],
+      stream: false,
+    },
+    false,
+    { requestEndpointPath: "/responses" }
+  );
+
+  assert.equal(result.store, false);
+  assert.deepEqual(result.input, [reasoning]);
+});
+
+test("CodexExecutor.transformRequest preserves orphan summaries when store is enabled", () => {
+  const executor = new CodexExecutor();
+  const reasoning = {
+    type: "reasoning",
+    summary: [{ type: "summary_text", text: "Display summary" }],
+  };
+
+  const result = executor.transformRequest(
+    "gpt-5.5-low",
+    {
+      _nativeCodexPassthrough: true,
+      input: [reasoning],
+      stream: false,
+    },
+    false,
+    {
+      requestEndpointPath: "/responses",
+      providerSpecificData: { openaiStoreEnabled: true },
+    }
+  );
+
+  assert.equal(result.store, true);
+  assert.deepEqual(result.input, [reasoning]);
 });
 
 test("CodexExecutor.transformRequest still strips assistant commentary outside native passthrough", () => {

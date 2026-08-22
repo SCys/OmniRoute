@@ -54,11 +54,6 @@
       "count": 3
     }
   },
-  "open-sse/handlers/chatCore/codexFailover.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
   "open-sse/handlers/chatCore/comboContextCache.ts": {
     "no-restricted-imports": {
       "count": 1
@@ -349,11 +344,6 @@
     }
   },
   "src/app/(dashboard)/home/page.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/app/api/auth/login/route.ts": {
     "no-restricted-imports": {
       "count": 1
     }
@@ -818,14 +808,9 @@
       "count": 1
     }
   },
-  "src/app/api/settings/require-login/route.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
   "src/app/api/settings/route.ts": {
     "no-restricted-imports": {
-      "count": 2
+      "count": 1
     }
   },
   "src/app/api/settings/system-prompt/route.ts": {
@@ -1023,11 +1008,6 @@
       "count": 1
     }
   },
-  "src/lib/api/modelTestRunner.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
   "src/lib/api/proxyRegistryRouteHandlers.ts": {
     "no-restricted-imports": {
       "count": 1
@@ -1080,11 +1060,6 @@
   },
   "src/lib/db/tokenLimits.ts": {
     "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "src/lib/embeddings/service.ts": {
-    "no-restricted-imports": {
       "count": 1
     }
   },
@@ -1278,11 +1253,6 @@
   },
   "src/models/index.ts": {
     "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/shared/components/CursorAuthModal.tsx": {
-    "react-hooks/exhaustive-deps": {
       "count": 1
     }
   },
@@ -1629,11 +1599,6 @@
   "tests/unit/auth-disable-cooling-2997.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 11
-    }
-  },
-  "tests/unit/auth-login-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
     }
   },
   "tests/unit/auth-ollama-cloud-per-model-403-3027.test.ts": {
@@ -2514,11 +2479,6 @@
       "count": 12
     }
   },
-  "tests/unit/login-bootstrap-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 10
-    }
-  },
   "tests/unit/management-password.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
@@ -2932,11 +2892,6 @@
   "tests/unit/response-sanitizer.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 83
-    }
-  },
-  "tests/unit/responses-parse-once-4041.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 6
     }
   },
   "tests/unit/responses-translation-fixes.test.ts": {

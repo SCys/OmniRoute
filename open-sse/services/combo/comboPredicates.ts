@@ -18,6 +18,15 @@ import type { ResolvedComboTarget } from "./types.ts";
 
 // Status codes that should mark round-robin target semaphores as cooling down.
 export const TRANSIENT_FOR_SEMAPHORE = [429, 502, 503, 504];
+// G1 (silent-stop fix): hard ceiling for the combo target loop when the operator
+// left comboTimeoutMs at 0 ("unlimited"). Without this, a hung upstream (per-model
+// timeout disabled) would freeze the request forever with no response. 10 minutes
+// is a generous bound for legitimate long-running fallback cascades.
+export const COMBO_LOOP_SAFETY_TIMEOUT_MS = 10 * 60 * 1000;
+// G1: after the safety timer fires, wait this long for in-flight targets to land
+// their per-model errors into comboErrors (so the 504 carries the same "tried:"
+// summary as the regular timeout path) before returning the safety response.
+export const COMBO_SAFETY_DRAIN_MS = 2000;
 // Patterns that signal all accounts for a provider are rate-limited / exhausted.
 // Used to detect 503 responses from handleNoCredentials so combo can fallback.
 export const ALL_ACCOUNTS_RATE_LIMITED_PATTERNS = [

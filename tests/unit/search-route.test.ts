@@ -52,7 +52,7 @@ test("v1 search GET lists all search providers", async () => {
 
   assert.equal(response.status, 200);
   assert.equal(body.object, "list");
-  assert.equal(body.data.length, 15);
+  assert.equal(body.data.length, 16);
   assert.deepEqual(ids, [
     "serper-search",
     "brave-search",
@@ -69,6 +69,7 @@ test("v1 search GET lists all search providers", async () => {
     "zai-search",
     "jina-search",
     "duckduckgo-free",
+    "x-search",
   ]);
 });
 
@@ -316,12 +317,16 @@ test("v1 search POST accepts authless SearXNG with provider_options baseUrl", as
   }
 });
 
-test("v1 search POST accepts authless SearXNG with the built-in default base URL", async () => {
+test("v1 search POST rejects authless SearXNG on the unconfigured catalog default base URL (#10976)", async () => {
+  // #10976/#10981 (already merged on this base): the catalog-default
+  // localhost:8888 always fails in Docker/K8s, so it's now skipped unless a
+  // request/connection baseUrl override resolves it to a real URL. This
+  // replaces the older "default URL is attempted as-is" expectation.
   const originalFetch = globalThis.fetch;
-  let capturedUrl = "";
+  let fetchCalled = false;
 
   globalThis.fetch = async (url) => {
-    capturedUrl = String(url);
+    fetchCalled = true;
     return new Response(
       JSON.stringify({
         results: [
@@ -351,13 +356,9 @@ test("v1 search POST accepts authless SearXNG with the built-in default base URL
     );
     const body = (await response.json()) as any;
 
-    assert.equal(response.status, 200);
-    assert.equal(
-      capturedUrl,
-      "http://localhost:8888/search?q=default+self+hosted+meta+search&format=json&categories=general"
-    );
-    assert.equal(body.provider, "searxng-search");
-    assert.equal(body.results[0].title, "Default SearXNG result");
+    assert.equal(response.status, 503);
+    assert.equal(fetchCalled, false);
+    assert.match(String(body.error?.message ?? body.error ?? ""), /catalog default/i);
   } finally {
     globalThis.fetch = originalFetch;
   }

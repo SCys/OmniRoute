@@ -505,8 +505,35 @@ export const webSearchOutput = z.object({
 export const webSearchTool: McpToolDefinition<typeof webSearchInput, typeof webSearchOutput> = {
   name: "omniroute_web_search",
   description:
-    "Performs a web search using OmniRoute's search gateway. Supports multiple providers (Serper, Brave, Perplexity, Exa, Tavily, Google PSE, Linkup, SearchAPI, SearXNG) with automatic failover. Returns search results with titles, URLs, snippets, and position data.",
+    "Performs a web search using OmniRoute's search gateway. Supports multiple providers (Serper, Brave, Perplexity, Exa, Tavily, Google PSE, Linkup, SearchAPI, SearXNG) with automatic failover. Returns search results with titles, URLs, snippets, and position data. Not X/Twitter — use omniroute_x_search for that.",
   inputSchema: webSearchInput,
+  outputSchema: webSearchOutput,
+  scopes: ["execute:search"],
+  auditLevel: "basic",
+  phase: 1,
+  sourceEndpoints: ["/v1/search"],
+};
+
+export const xSearchInput = z.object({
+  query: z
+    .string()
+    .min(1, "Query is required")
+    .max(500, "Query must be 500 characters or fewer")
+    .describe("X search query (keywords, topic, or @handle)"),
+  max_results: z
+    .number()
+    .int()
+    .min(1)
+    .max(20)
+    .default(5)
+    .describe("Maximum number of X results to return"),
+});
+
+export const xSearchTool: McpToolDefinition<typeof xSearchInput, typeof webSearchOutput> = {
+  name: "omniroute_x_search",
+  description:
+    "Search X (Twitter) through OmniRoute using SuperGrok / xAI server-side x_search. Requires a connected xai-oauth (SuperGrok) or xAI API key. This is Grok X Search, not web search and not the X Developer Platform MCP.",
+  inputSchema: xSearchInput,
   outputSchema: webSearchOutput,
   scopes: ["execute:search"],
   auditLevel: "basic",
@@ -1532,6 +1559,7 @@ export const MCP_TOOLS = [
   listModelsCatalogTool,
   radarCatalogTool,
   webSearchTool,
+  xSearchTool,
   webFetchTool,
   simulateRouteTool,
   setBudgetGuardTool,

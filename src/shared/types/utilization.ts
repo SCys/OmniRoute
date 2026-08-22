@@ -19,11 +19,18 @@ export interface ProviderUtilizationPoint {
   windowKey: string;
 }
 
+export interface ConnectionMetaEntry {
+  email: string | null;
+  name: string | null;
+  displayName: string | null;
+}
+
 export interface ProviderUtilizationResponse {
   timeRange: "1h" | "24h" | "7d" | "30d";
   bucketSizeMinutes: number;
   providers: string[];
   data: ProviderUtilizationPoint[];
+  connectionMeta?: Record<string, ConnectionMetaEntry>;
 }
 
 export interface ComboHealthMetrics {
@@ -272,7 +279,8 @@ export type ComboScoringInspectorFactorKey =
   | "cacheAffinity"
   | "sessionAvailability"
   | "resetWindowAffinity"
-  | "connectionDensity";
+  | "connectionDensity"
+  | "quality";
 
 export type ComboScoringInspectorSource =
   "combo_health" | "combo_forecast" | "combo_autopilot" | "runtime" | "default";

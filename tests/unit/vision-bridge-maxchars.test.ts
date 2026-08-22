@@ -62,6 +62,7 @@ test("modalityBridgeVisionMaxChars=120 caps the description with a … suffix", 
     deps: {
       getSettings: async () => ({
         visionBridgeEnabled: true,
+        modalityBridgeVisionMode: "describe",
         modalityBridgeVisionMaxChars: 120,
       }),
       callVisionModel: async (_imageDataUri: string, _config: VisionModelConfig) =>
@@ -88,6 +89,7 @@ test("no modalityBridgeVisionMaxChars key: description is passed through in full
     deps: {
       getSettings: async () => ({
         visionBridgeEnabled: true,
+        modalityBridgeVisionMode: "describe",
       }),
       callVisionModel: async (_imageDataUri: string, _config: VisionModelConfig) =>
         LONG_DESCRIPTION,
@@ -118,6 +120,7 @@ test("updateSettingsSchema accepts an explicit modalityBridgeVisionMaxChars: 0 t
     deps: {
       getSettings: async () => ({
         visionBridgeEnabled: true,
+        modalityBridgeVisionMode: "describe",
         modalityBridgeVisionMaxChars: 0,
       }),
       callVisionModel: async (_imageDataUri: string, _config: VisionModelConfig) =>

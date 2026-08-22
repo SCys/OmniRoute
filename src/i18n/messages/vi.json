@@ -1165,6 +1165,8 @@
     "consoleLogs": "Nhật ký bảng điều khiển",
     "logsTimeline": "Timeline",
     "logsTimelineSubtitle": "Dòng thời gian yêu cầu trực quan",
+    "conversations": "Conversations",
+    "conversationsSubtitle": "Multi-turn agentic conversations",
     "globalRouting": "Định tuyến toàn cục",
     "mitmProxy": "MITM Proxy",
     "oneProxy": "1Proxy",
@@ -1282,8 +1284,6 @@
     "resilienceConnectionsSubtitle": "Cooldown, cầu dao, trạng thái khóa",
     "settingsModalityBridge": "Cầu Kết Nối Modality",
     "settingsModalityBridgeSubtitle": "Chuyển đổi hình ảnh/âm thanh → văn bản cho các mô hình chỉ văn bản",
-    "conversations": "Conversations",
-    "conversationsSubtitle": "Multi-turn agentic conversations",
     "commandPalette": {
       "title": "Bảng lệnh",
       "searchPlaceholder": "Tìm kiếm trang, cài đặt, công cụ...",
@@ -1800,6 +1800,11 @@
     "updateStarted": "Đã bắt đầu cập nhật...",
     "reloadingPageAutomatically": "Đang tự động tải lại trang...",
     "providerTopology": "Cấu trúc liên kết nhà cung cấp",
+    "recentRequests": "Yêu cầu gần đây",
+    "recentRequestsEmpty": "Chưa có yêu cầu nào.",
+    "recentRequestsModel": "Mô hình",
+    "recentRequestsTokens": "Vào / Ra",
+    "recentRequestsWhen": "Khi",
     "downloadDmg": "Tải xuống DMG (macOS)",
     "downloadDmgDescription": "Đã có phiên bản mới của ứng dụng máy tính OmniRoute. Vui lòng tải xuống và cài đặt trình cài đặt DMG cho macOS để cập nhật (hiện tại: v{version}).",
     "downloadExe": "Tải xuống EXE (Windows)",
@@ -3606,6 +3611,10 @@
     "wizardStep3Desc": "Chọn cách phân phối các yêu cầu giữa các mô hình của bạn - hiện có 14 chiến lược",
     "wizardStep4Title": "Xem lại & Lưu",
     "wizardStep4Desc": "Xem lại cấu hình của bạn và kích hoạt combo",
+    "usageGuideInvokeTitle": "How to call this combo",
+    "usageGuideInvokeDesc": "Send the combo's exact name as the model, e.g. model: \"my-combo\" (or combo/my-combo).",
+    "usageGuideInvokeAutoNote": "auto and auto/* are a separate zero-config router that does not use your combos (unless a combo is literally named auto).",
+    "usageGuideInvokeOpenrouterNote": "openrouter/auto is a real paid OpenRouter product (Auto Best Available), not an OmniRoute alias — exclude it via Settings → Routing → Hide paid models.",
     "emailVisibilityStateOn": "Bật",
     "emailVisibilityStateOff": "Tắt",
     "reorderHandle": "Kéo để sắp xếp lại",
@@ -3718,7 +3727,12 @@
     "errorDescription": "Hiện không thể tải dữ liệu combo. Hãy kiểm tra kết nối rồi thử lại.",
     "errorId": "ID lỗi: {id}",
     "errorRetry": "Thử lại",
-    "comboLabel": "Combo"
+    "comboLabel": "Combo",
+    "duplicateAutoComboConfirm": "Tạo một tổ hợp tĩnh từ \"{name}\"?",
+    "duplicateAutoComboSnapshotMsg": "Điều này sẽ chụp lại các nhà cung cấp/mô hình đang kết nối hiện tại phù hợp với mẫu này vào một tổ hợp có thể chỉnh sửa.",
+    "duplicateAutoComboFailedPrefix": "Không thể sao chép tổ hợp tự động:",
+    "duplicateAutoComboUnknownError": "Lỗi không xác định",
+    "duplicateAutoComboTitle": "Tạo tổ hợp tĩnh từ {name}"
   },
   "costs": {
     "title": "Chi phí",
@@ -4965,7 +4979,9 @@
         "skipped": "đã được cấu hình",
         "failed": "thất bại"
       }
-    }
+    },
+    "securityDescSkipWarning": "⚠️ Không có mật khẩu, bạn sẽ không thể thêm nhà cung cấp trong quá trình thiết lập. Bạn có thể thêm sau từ bảng điều khiển sau khi đặt mật khẩu.",
+    "providerRequiresPassword": "Bạn cần đặt mật khẩu trước khi thêm nhà cung cấp. Hãy quay lại bước bảo mật và đặt mật khẩu, hoặc thêm nhà cung cấp sau từ bảng điều khiển."
   },
   "providers": {
     "title": "Nhà cung cấp",
@@ -5233,6 +5249,17 @@
     "skippingExistingModels": "Bỏ qua {count} mô hình đã tồn tại",
     "autoSync": "Tự động đồng bộ hóa",
     "autoSyncShort": "Đồng bộ",
+    "autoFetchModels": "Tự động lấy các mô hình upstream",
+    "autoFetchModelsTooltip": "Lấy và lưu trữ các mô hình upstream khi cần thiết",
+    "autoFetchModelsEnabled": "Mô hình upstream tự động lấy dữ liệu đã được kích hoạt",
+    "autoFetchModelsDisabled": "Tự động lấy mô hình upstream đã bị vô hiệu hóa",
+    "autoFetchModelsToggleFailed": "Không thể chuyển đổi chế độ tự động lấy mô hình upstream",
+    "autoFetchModelsPartialFailure": "Một số kết nối đã được cập nhật, nhưng mô hình upstream auto-fetch không được thay đổi ở mọi nơi",
+    "overridesUpstreamModel": "Ghi đè lên upstream",
+    "overridesUpstreamModelHint": "Cài đặt của bạn ghi đè lên mô hình upstream này",
+    "resetToUpstreamDefaults": "Khôi phục mặc định của upstream",
+    "resetToUpstreamDefaultsSuccess": "Đã khôi phục các giá trị mặc định của mô hình upstream",
+    "resetToUpstreamDefaultsFailed": "Không thể khôi phục mặc định mô hình upstream",
     "autoSyncTooltip": "Tự động làm mới danh sách mô hình sau mỗi 24 giờ (có thể cấu hình qua MODEL_SYNC_INTERVAL_HOURS)",
     "autoSyncEnabled": "Đã bật tự động đồng bộ hóa — các mô hình sẽ được làm mới định kỳ",
     "autoSyncDisabled": "Đã tắt tự động đồng bộ hóa",
@@ -6194,7 +6221,7 @@
       "galadriel": "Kết nối Galadriel bằng khóa API.",
       "predibase": "25 USD tín dụng dùng thử miễn phí (có hiệu lực 30 ngày)",
       "chenzk": "Gateway tương thích OpenAI với danh mục mô hình trực tiếp tại chenzk.top.",
-      "freepik": "Tạo hình ảnh bằng API Mystic của Freepik.",
+      "magnific": "Tạo hình ảnh bằng API Mystic của Freepik.",
       "freetheai": "Gateway miễn phí tương thích OpenAI, hỗ trợ chuyển tiếp mô hình.",
       "g4f-gemini": "Proxy ngược g4f.space miễn phí, không cần khóa cho Gemini, giới hạn 5 yêu cầu mỗi phút.",
       "g4f-groq": "Proxy ngược g4f.space miễn phí, không cần khóa cho Groq, giới hạn 5 yêu cầu mỗi phút.",
@@ -6209,6 +6236,7 @@
       "claude": "Kết nối Claude Code bằng luồng OAuth hiện có.",
       "cline": "Kết nối Cline bằng luồng OAuth hiện có.",
       "cursor": "Kết nối Cursor IDE bằng luồng OAuth hiện có.",
+      "cursor-api": "Connect Cursor with a user API key (crsr_...) from cursor.com/dashboard/api; no IDE session needed.",
       "github": "Kết nối GitHub Copilot bằng luồng OAuth hiện có.",
       "gitlab-duo": "Ứng dụng OAuth với phạm vi ai_features + read_user. Cấu hình GITLAB_DUO_OAUTH_CLIENT_ID và tùy chọn GITLAB_DUO_OAUTH_CLIENT_SECRET trên instance OmniRoute này.",
       "kilocode": "Kết nối Kilo Code bằng luồng OAuth hiện có.",
@@ -6271,6 +6299,15 @@
     "cheaperInferenceSupporterBadge": "Người bạn mã nguồn mở",
     "cheaperInferenceSupporterTooltip": "Cheaper Inference hỗ trợ OmniRoute với tư cách là người bạn mã nguồn mở",
     "kimiPartnerLinkNote": "Partner link — supports OmniRoute at no extra cost to you",
+    "codexQuotaPools": "Nhóm hạn mức Codex",
+    "codexPoolAvailable": "Khả dụng",
+    "codexPoolPartiallyLimited": "Bị giới hạn một phần",
+    "codexPoolFullyLimited": "Bị giới hạn hoàn toàn",
+    "codexPoolLimited": "{count} mục bị giới hạn",
+    "codexPoolQuotaExhausted": "Đã hết hạn mức",
+    "codexPoolCoolingDown": "Đang trong thời gian chờ",
+    "codexPoolUsed": "đã dùng",
+    "codexPoolUntil": "Đến {value}",
     "anonymousFallbackTitle": "Dự phòng ẩn danh",
     "anonymousFallbackDesc": "Khi tất cả kết nối đã cấu hình đều cạn kiệt (hạn ngạch, tín dụng hoặc hết hạn), hãy tạm thời sử dụng tầng không cần khóa của nhà cung cấp này. Tắt tùy chọn này để bỏ qua nhà cung cấp thay vì gửi yêu cầu ẩn danh — khuyến nghị khi tầng không cần khóa từ chối các yêu cầu đó (401).",
     "anonymousFallbackEnabled": "Đã bật dự phòng ẩn danh cho {provider}",
@@ -6346,18 +6383,7 @@
     "savedModelEndpointSettings": "Đã lưu cài đặt endpoint mô hình",
     "searchByModelAria": "Tìm kiếm theo mô hình",
     "selectSupportedEndpoint": "Chọn ít nhất một endpoint được hỗ trợ",
-    "antigravityClientProfileHarness": "Harness / CLI",
-    "autoFetchModels": "Tự động lấy các mô hình upstream",
-    "autoFetchModelsDisabled": "Tự động lấy mô hình upstream đã bị vô hiệu hóa",
-    "autoFetchModelsEnabled": "Mô hình upstream tự động lấy dữ liệu đã được kích hoạt",
-    "autoFetchModelsTooltip": "Lấy và lưu trữ các mô hình upstream khi cần thiết",
-    "overridesUpstreamModel": "Ghi đè lên upstream",
-    "autoFetchModelsPartialFailure": "Một số kết nối đã được cập nhật, nhưng mô hình upstream auto-fetch không được thay đổi ở mọi nơi",
-    "overridesUpstreamModelHint": "Cài đặt của bạn ghi đè lên mô hình upstream này",
-    "autoFetchModelsToggleFailed": "Không thể chuyển đổi chế độ tự động lấy mô hình upstream",
-    "resetToUpstreamDefaults": "Khôi phục mặc định của upstream",
-    "resetToUpstreamDefaultsSuccess": "Đã khôi phục các giá trị mặc định của mô hình upstream",
-    "resetToUpstreamDefaultsFailed": "Không thể khôi phục mặc định mô hình upstream"
+    "antigravityClientProfileHarness": "Harness / CLI"
   },
   "settings": {
     "title": "Cài đặt",
@@ -7189,6 +7215,7 @@
     "configured": "đã định cấu hình",
     "none": "Không có",
     "modelOverrideValuePlaceholder": "Giá trị số",
+    "modelOverrideReasoningEffortsPlaceholder": "English comma-separated, e.g. low, medium, high",
     "addKeyValue": "Thêm cặp khóa-giá trị",
     "noModelOverrides": "Không có ghi đè nào được định cấu hình cho mô hình này.",
     "modelOverrideLoadFailed": "Tải ghi đè mô hình thất bại",
@@ -7760,13 +7787,13 @@
         "label": "Ponytail (lazy senior dev)",
         "description": "Lazy senior-dev discipline: climb the YAGNI ladder, fix root cause, smallest working diff."
       },
-      "terse-cjk": {
-        "label": "CJK súc tích (文言)",
-        "description": "Văn phong Hán cổ cực kỳ súc tích (chỉ khả dụng với tiếng Trung)."
-      },
       "i-have-adhd": {
         "label": "Tôi bị ADHD (ưu tiên hành động)",
         "description": "Đầu ra ưu tiên hành động: nêu hành động kế tiếp trước, các bước được đánh số, một bước tiếp theo cụ thể, không mở đầu dài dòng."
+      },
+      "terse-cjk": {
+        "label": "CJK súc tích (文言)",
+        "description": "Văn phong Hán cổ cực kỳ súc tích (chỉ khả dụng với tiếng Trung)."
       }
     },
     "resilienceWaitForCooldown": "Chờ thời gian hồi",
@@ -8044,6 +8071,10 @@
     "disableSessionStickinessDesc": "Các tổ hợp luân phiên và ngẫu nhiên sẽ chuyển sang một kết nối khác với mỗi yêu cầu, thay vì gắn toàn bộ cuộc trò chuyện với một kết nối dựa trên mã băm của tin nhắn đầu tiên. Hãy để tùy chọn này tắt để duy trì các lần trúng cache prompt cho các cuộc trò chuyện nhiều lượt. Các thiết lập ghi đè theo từng tổ hợp được ưu tiên.",
     "promptCacheAffinity": "Prompt-cache locality routing",
     "promptCacheAffinityDesc": "Prefer the same provider account for matching prompt-cache keys while preserving health and quota failover.",
+    "reasoningTokenBuffer": "Bộ đệm token suy luận",
+    "reasoningTokenBufferDesc": "Cho phép định tuyến combo thêm khoảng dư max_tokens chỉ với các mô hình suy luận đã biết, khi toàn bộ bộ đệm vẫn nằm trong giới hạn đầu ra đã biết.",
+    "zeroLatencyOptimizations": "Tối ưu hóa zero-latency",
+    "zeroLatencyOptimizationsDesc": "Bật hedging, bỏ qua TTFT theo dự đoán và nén dự phòng chủ động. Để tắt nếu bạn không muốn các tính năng độ trễ này chạy đua giữa các đích hoặc nén các yêu cầu dự phòng.",
     "credentialRedaction": "Credential Redaction",
     "credentialRedactionDesc": "Redact API keys, tokens, and secrets from context sent to providers and from responses.",
     "enableCredentialRedaction": "Enable credential redaction",
@@ -8199,11 +8230,7 @@
     "cliproxyapiHealth": "Sức Khỏe",
     "cliproxyapiPort": "Cổng",
     "qdrantHost": "Máy chủ",
-    "qdrantCollection": "Bộ Sưu Tập",
-    "reasoningTokenBuffer": "Bộ đệm token suy luận",
-    "reasoningTokenBufferDesc": "Cho phép định tuyến combo thêm khoảng dư max_tokens chỉ với các mô hình suy luận đã biết, khi toàn bộ bộ đệm vẫn nằm trong giới hạn đầu ra đã biết.",
-    "zeroLatencyOptimizations": "Tối ưu hóa zero-latency",
-    "zeroLatencyOptimizationsDesc": "Bật hedging, bỏ qua TTFT theo dự đoán và nén dự phòng chủ động. Để tắt nếu bạn không muốn các tính năng độ trễ này chạy đua giữa các đích hoặc nén các yêu cầu dự phòng."
+    "qdrantCollection": "Bộ Sưu Tập"
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -9098,6 +9125,16 @@
     "grokAutoTopUpMax": "tối đa",
     "grokAutoTopUpMonth": "tháng",
     "grokAdditionalCredits": "Tín dụng bổ sung",
+    "kimiExtraUsageCredits": "Tín dụng sử dụng bổ sung",
+    "kimiExtraUsage": "Sử dụng bổ sung",
+    "kimiExtraUsageEnabled": "Đã bật",
+    "kimiExtraUsageDisabled": "Đã tắt",
+    "kimiExtraUsageFrozen": "Đã đóng băng",
+    "kimiExtraUsageUnavailable": "Không khả dụng",
+    "kimiMonthlyUsed": "Đã dùng trong tháng này",
+    "kimiMonthlyLimit": "Giới hạn hàng tháng",
+    "kimiMonthlyLimitUnlimited": "Không giới hạn",
+    "kimiAdditionalCredits": "Tín dụng bổ sung",
     "loggerTab": "Logger",
     "proxyTab": "Proxy",
     "budgetManagement": "Quản lý ngân sách",
@@ -10596,11 +10633,23 @@
   },
   "cursorAuthModal": {
     "title": "Kết nối Cursor IDE",
+    "tabLogin": "Login with Cursor",
+    "tabImport": "Import token",
+    "loginDescription": "Opens Cursor's browser login. Works in Docker — approve in your host browser, then return here.",
+    "loginWithCursor": "Login with Cursor",
+    "startingLogin": "Starting…",
+    "waitingApproval": "Waiting for Cursor login approval…",
+    "openUrlHint": "If the browser did not open:",
+    "openLoginLink": "Open login page",
+    "cancelLogin": "Cancel login",
     "autoDetecting": "Tự động phát hiện token...",
     "readingFromCursor": "Đang đọc token từ Cursor IDE hoặc cursor-agent",
     "tokensAutoDetected": "Đã tự động phát hiện token từ Cursor IDE thành công!",
     "cursorNotDetected": "Không phát hiện thấy Cursor IDE. Vui lòng dán token của bạn thủ công.",
+    "dockerImportHint": "Running in Docker? Prefer Login with Cursor. IDE auto-import and cursor-agent are usually unavailable inside the container. See docs/providers/CURSOR-DOCKER.md.",
     "accessToken": "Token truy cập",
+    "refreshToken": "Refresh Token",
+    "refreshTokenPlaceholder": "Optional — enables automatic token refresh",
     "required": "*",
     "accessTokenPlaceholder": "Token truy cập sẽ được tự động điền...",
     "machineId": "Mã máy",
@@ -10612,7 +10661,10 @@
     "errorAutoDetect": "Không thể tự động phát hiện token",
     "errorAutoDetectFailed": "Tự động phát hiện token không thành công",
     "errorEnterToken": "Vui lòng nhập token truy cập",
-    "errorImportFailed": "Nhập thất bại"
+    "errorImportFailed": "Nhập thất bại",
+    "errorLoginStart": "Failed to start Cursor login",
+    "errorLoginPoll": "Cursor login failed",
+    "errorLoginTimeout": "Cursor login timed out — try again"
   },
   "pricingModal": {
     "title": "Cấu hình giá",
@@ -12155,7 +12207,7 @@
       },
       "omni-webhooks": {
         "name": "Webhook",
-        "description": "Đăng ký, liệt kê, kiểm tra và xóa endpoint webhook. Cấu hình đăng ký sự kiện như request.completed, provider.error, budget.exceeded và quản lý thử gửi lại."
+        "description": "__MISSING__:Register, list, test, and remove webhook endpoints. Configure event subscriptions (request.completed, request.failed, quota.exceeded, etc.) and manage delivery retries."
       },
       "omni-mcp": {
         "name": "Máy chủ MCP",
@@ -12723,6 +12775,10 @@
       },
       "ALLOW_MULTI_CONNECTIONS_PER_COMPAT_NODE": {
         "description": "Cho phép nhiều kết nối trên mỗi node tương thích."
+      },
+      "DISABLE_CONTEXT_WINDOW_CHECKS": {
+        "label": "Tắt kiểm tra cửa sổ ngữ cảnh",
+        "description": "Bỏ qua kiểm tra cục bộ của OmniRoute về cửa sổ ngữ cảnh và giới hạn token đầu vào tối đa cho yêu cầu trực tiếp đến một mô hình đơn lẻ. Nhà cung cấp thượng nguồn vẫn áp dụng các giới hạn thực tế. Tính năng nén prompt và giới hạn token đầu ra vẫn hoạt động."
       },
       "RESPONSES_PASSTHROUGH_DROP_COMMENTARY": {
         "description": "Loại các mục đầu ra thuộc giai đoạn commentary nội bộ khỏi luồng chuyển tiếp Responses API trước khi gửi tới ứng dụng khách. Tắt cờ này để nhận nguyên dữ liệu commentary từ thượng nguồn."
@@ -13364,6 +13420,7 @@
     }
   },
   "featureFlagCapabilityFilterEnabledDescription": "Từ chối yêu cầu trước khi gửi đi khi mô hình đích thiếu các khả năng bắt buộc (thị giác, công cụ, đầu ra có cấu trúc, cửa sổ ngữ cảnh). Bảo vệ các yêu cầu trực tiếp đến một nhà cung cấp khi chúng bỏ qua bộ lọc tương thích của combo.",
+  "featureFlagDisableContextWindowChecksDescription": "Bỏ qua kiểm tra cục bộ của OmniRoute về cửa sổ ngữ cảnh và giới hạn token đầu vào tối đa cho yêu cầu trực tiếp đến một mô hình đơn lẻ. Nhà cung cấp thượng nguồn vẫn áp dụng các giới hạn thực tế. Tính năng nén prompt và giới hạn token đầu ra vẫn hoạt động.",
   "publicSystem": {
     "notFound": {
       "title": "Không tìm thấy trang",

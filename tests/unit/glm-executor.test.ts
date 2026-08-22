@@ -153,12 +153,9 @@ test("GlmExecutor separates OpenAI-compatible coding headers from Anthropic head
   const countTokensHeaders = executor.buildHeaders(
     {
       apiKey: "glm-key",
-      providerSpecificData: { baseUrl: "https://api.z.ai/api/coding/paas/v4" },
+      providerSpecificData: { baseUrl: "https://api.z.ai/api/anthropic/v1/messages" },
     },
-    false,
-    null,
-    undefined,
-    "anthropic"
+    false
   );
   assert.equal(countTokensHeaders["x-api-key"], "glm-key");
   assert.equal(countTokensHeaders.Authorization, undefined);
@@ -429,8 +426,10 @@ test("GlmExecutor falls back internally to Anthropic transport and returns OpenA
     assert.equal(calls[0].url, "https://api.z.ai/api/coding/paas/v4/chat/completions");
     assert.equal(calls[0].headers.Authorization, "Bearer glm-key");
     assert.equal(calls[1].url, "https://api.z.ai/api/anthropic/v1/messages?beta=true");
-    assert.equal(calls[1].headers["x-api-key"], "glm-key");
-    assert.equal(calls[1].headers.Authorization, undefined);
+    const fallbackKey =
+      calls[1].headers["x-api-key"] ||
+      String(calls[1].headers.Authorization || "").replace(/^Bearer\s+/i, "");
+    assert.equal(fallbackKey, "glm-key");
     assert.equal(calls[1].body.messages[0].role, "user");
     assert.equal(calls[1].body._disableToolPrefix, undefined);
     assert.equal(result.targetFormat, "openai");

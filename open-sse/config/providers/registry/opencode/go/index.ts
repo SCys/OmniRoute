@@ -1,4 +1,5 @@
 import type { RegistryEntry } from "../../../shared.ts";
+import { OPENCODE_ZEN_GO_SHARED_MODELS } from "../../../shared.ts";
 
 export const opencode_goProvider: RegistryEntry = {
   id: "opencode-go",
@@ -13,6 +14,8 @@ export const opencode_goProvider: RegistryEntry = {
   authPrefix: "Bearer",
   defaultContextLength: 200000,
   models: [
+    ...OPENCODE_ZEN_GO_SHARED_MODELS,
+
     // Port from decolua/9router 8efacc11: align with official Go endpoints —
     // glm-5.2 is now advertised and Kimi chat traffic must route through
     // `kimi-k2.7-code` (the live API rejects the plain `kimi-k2.7` alias for
@@ -25,7 +28,7 @@ export const opencode_goProvider: RegistryEntry = {
     { id: "glm-5.2-max", name: "GLM-5.2 (max effort)", supportsReasoning: true },
     { id: "glm-5.1", name: "GLM-5.1" },
     { id: "glm-5", name: "GLM-5" },
-    { id: "kimi-k2.7-code", name: "Kimi K2.7 Code" },
+    // kimi-k2.7-code declared identically on opencode-zen — see OPENCODE_ZEN_GO_SHARED_MODELS.
     { id: "kimi-k2.6", name: "Kimi K2.6" },
     { id: "kimi-k2.5", name: "Kimi K2.5" },
     // #8353: Kimi K3 base + max-effort alias from the OpenCode Go registry.
@@ -89,7 +92,8 @@ export const opencode_goProvider: RegistryEntry = {
       supportsVision: false,
       supportsReasoning: true,
     },
-    { id: "qwen3.6-plus", name: "Qwen3.6 Plus", targetFormat: "claude", supportsVision: false },
+    // qwen3.6-plus / qwen3.5-plus base ids declared identically on opencode-zen — see
+    // OPENCODE_ZEN_GO_SHARED_MODELS.
     {
       id: "qwen3.6-plus-high",
       name: "Qwen3.6 Plus (high effort)",
@@ -104,7 +108,6 @@ export const opencode_goProvider: RegistryEntry = {
       supportsVision: false,
       supportsReasoning: true,
     },
-    { id: "qwen3.5-plus", name: "Qwen3.5 Plus", targetFormat: "claude", supportsVision: false },
     // #8353: hy3 is the Go-tier base id (distinct from hy3-preview / hy3-free).
     { id: "hy3", name: "Hunyuan3", contextLength: 256000, supportsReasoning: true },
     {
@@ -126,6 +129,75 @@ export const opencode_goProvider: RegistryEntry = {
       supportsReasoning: true,
     },
     { id: "hy3-preview", name: "Hunyuan3 Preview" },
+    // Muse Spark 1.2 Contributor — base + effort-tier aliases from the OpenCode Go
+    // registry (`opencode models opencode-go --verbose`; exact suffix set:
+    // minimal/low/medium/high/xhigh, no max).
+    {
+      id: "muse-spark-1.2-contributor",
+      name: "Muse Spark 1.2 Contributor",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-minimal",
+      name: "Muse Spark 1.2 Contributor (minimal effort)",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-low",
+      name: "Muse Spark 1.2 Contributor (low effort)",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-medium",
+      name: "Muse Spark 1.2 Contributor (medium effort)",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-high",
+      name: "Muse Spark 1.2 Contributor (high effort)",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
+    {
+      id: "muse-spark-1.2-contributor-xhigh",
+      name: "Muse Spark 1.2 Contributor (xhigh effort)",
+      contextLength: 1048576,
+      maxOutputTokens: 131072,
+      supportsReasoning: true,
+      supportsVision: true,
+      supportsAudio: true,
+      supportsVideo: true,
+      targetFormat: "openai-responses",
+    },
     // #8353: Grok 4.5 + effort tiers from the OpenCode Go registry.
     { id: "grok-4.5", name: "Grok 4.5", supportsReasoning: true },
     { id: "grok-4.5-low", name: "Grok 4.5 (low effort)", supportsReasoning: true },

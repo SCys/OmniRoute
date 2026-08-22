@@ -1,21 +1,12 @@
 // Re-export service kinds from leaf module (avoids circular dep with providerSchema)
 export type { ServiceKind } from "./serviceKinds";
-export { SERVICE_KIND_VALUES } from "./serviceKinds";
-
 export type RiskNoticeVariant = "oauth" | "webCookie" | "deprecated" | "embedded-service";
-
-export interface ProviderRiskNoticeFields {
-  subscriptionRisk?: boolean;
-  riskNoticeVariant?: RiskNoticeVariant;
-  isEmbeddedService?: boolean;
-}
 
 import { NOAUTH_PROVIDERS } from "./providers/noauth";
 export { supportsNoAuthProviderProxy } from "./providers/noauth";
 import { OAUTH_PROVIDERS } from "./providers/oauth";
 import { WEB_COOKIE_PROVIDERS, resolveWebProviderHost } from "./providers/web-cookie";
 export { resolveWebProviderHost };
-export type { WebProviderHostLink } from "./providers/web-cookie";
 import { APIKEY_PROVIDERS } from "./providers/apikey";
 import { LOCAL_PROVIDERS } from "./providers/local";
 import { SEARCH_PROVIDERS } from "./providers/search";
@@ -70,6 +61,10 @@ export const PROVIDER_CONNECTION_FAMILY_ALIASES: Readonly<Record<string, readonl
   alibaba: ["alibaba-cn"],
   "kimi-coding": ["kimi-coding-apikey"],
   xai: ["xai-oauth", "xao"],
+  // magnific is the canonical (post-rebrand) slug; freepik stays a legacy
+  // alias so old URLs and pre-migration connection rows keep working.
+  magnific: ["freepik"],
+  freepik: ["magnific"],
 };
 
 export function getProviderConnectionFamilyIds(providerId: unknown): readonly string[] {
@@ -90,7 +85,7 @@ export const IMAGE_ONLY_PROVIDER_IDS = new Set([
   "recraft",
   "topaz",
   "segmind",
-  "freepik",
+  "magnific",
   "deepai",
 ]);
 
@@ -146,8 +141,8 @@ export const AGGREGATOR_PROVIDER_IDS = new Set([
   "free-ai",
   "void-ai",
   "helixmind",
-
-]);;
+  "tabitoken",
+]);
 
 export const ENTERPRISE_CLOUD_PROVIDER_IDS = new Set([
   "azure-openai",
@@ -217,6 +212,8 @@ export function isLocalProvider(providerId: unknown): boolean {
 }
 
 export const SELF_HOSTED_CHAT_PROVIDER_IDS = new Set([
+  "mlx-gemma",
+  "mlx-qwen",
   "ollama-local",
   "lm-studio",
   "vllm",
@@ -273,6 +270,8 @@ export function providerAllowsOptionalApiKey(providerId: unknown): boolean {
 const BULK_API_KEY_EXCLUDED = new Set([
   "vertex",
   "vertex-partner",
+  "mlx-gemma",
+  "mlx-qwen",
   "ollama-local",
   "grok-web",
   "perplexity-web",
@@ -385,18 +384,6 @@ export const AI_PROVIDERS = new Proxy({} as Record<string, any>, {
     return undefined;
   },
 });
-
-export type AiProviderId =
-  | keyof typeof NOAUTH_PROVIDERS
-  | keyof typeof OAUTH_PROVIDERS
-  | keyof typeof APIKEY_PROVIDERS
-  | keyof typeof WEB_COOKIE_PROVIDERS
-  | keyof typeof LOCAL_PROVIDERS
-  | keyof typeof SEARCH_PROVIDERS
-  | keyof typeof AUDIO_ONLY_PROVIDERS
-  | keyof typeof UPSTREAM_PROXY_PROVIDERS
-  | keyof typeof CLOUD_AGENT_PROVIDERS
-  | keyof typeof SYSTEM_PROVIDERS;
 
 export type AiProviderDefinition =
   | (typeof NOAUTH_PROVIDERS)[keyof typeof NOAUTH_PROVIDERS]

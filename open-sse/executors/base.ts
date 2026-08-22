@@ -103,6 +103,13 @@ import {
 } from "./base/headers.ts";
 import { applyPeerTraceHeader } from "@/shared/resilience/peerRouting";
 import { applyClineProtocolHeaders } from "@/shared/utils/clineAuth";
+import { isProbeContext } from "@/shared/utils/probeOrigin";
+import {
+  parseAndValidatePublicUrl,
+  parseAndValidateNonMetadataUrl,
+} from "@/shared/network/outboundUrlGuard";
+import { getProviderValidationGuard } from "@/shared/network/outboundUrlGuardPolicy";
+import { isLocalProvider, isSelfHostedChatProvider } from "@/shared/constants/providers";
 // Header helpers extracted to a pure leaf; re-exported for external importers
 // (executors + tests) that import them from "./base.ts".
 export {
@@ -397,6 +404,29 @@ export class BaseExecutor {
   }
 
   /**
+   * SSRF guard for the runtime dispatch path (GHSA-4f49-hj64-448x). A persisted,
+   * caller-supplied `providerSpecificData.baseUrl` reaches the fetch() calls
+   * below, so a `manage`-scope actor (or, on a keyless install, an anonymous
+   * one) could point a provider at loopback / internal / cloud-metadata hosts
+   * and exfiltrate the stored upstream key. Mirror the provider VALIDATION
+   * guard so runtime dispatch makes the same decision the validation layer
+   * already makes: local / self-hosted providers are exempt (they legitimately
+   * use private URLs, and the OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS opt-in still
+   * applies through the guard), and for everything else `public-only` mode
+   * blocks private + metadata while the default `block-metadata` mode blocks the
+   * cloud-metadata IMDS pivot. Throws on a blocked URL.
+   */
+  protected assertOutboundUrlAllowed(url: string): void {
+    if (!url) return;
+    if (isLocalProvider(this.provider) || isSelfHostedChatProvider(this.provider)) return;
+    if (getProviderValidationGuard() === "public-only") {
+      parseAndValidatePublicUrl(url);
+      return;
+    }
+    parseAndValidateNonMetadataUrl(url);
+  }
+
+  /**
    * Alternate protocol selected on this connection, if the provider declares one
    * that matches. Centralizes the registry lookup so every call-site resolves the
    * same way.
@@ -614,6 +644,7 @@ export class BaseExecutor {
   async countTokens({ model, body, credentials, signal, log }: CountTokensInput) {
     const url = this.buildCountTokensUrl(model, credentials);
     if (!url) return null;
+    this.assertOutboundUrlAllowed(url); // GHSA-4f49
 
     const headers = this.buildHeaders(credentials, false);
     const requestBody =
@@ -689,7 +720,10 @@ export class BaseExecutor {
     // Track per-URL intra-retry attempts to avoid infinite loops
     const retryAttemptsByUrl: Record<number, number> = {};
 
-    if (this.needsRefresh(credentials)) {
+    // Probe-origin dispatches must not consume a refresh-token rotation —
+    // routing state untouched; the reactive 401/403 path is probe-guarded
+    // in chatCore (#9817).
+    if (!isProbeContext() && this.needsRefresh(credentials)) {
       try {
         // Fix A: wire onCredentialsRefreshed through runWithOnPersist so it runs
         // INSIDE the per-connection mutex inside getAccessToken. Not every
@@ -800,7 +834,14 @@ export class BaseExecutor {
         activeCredentials
       );
       const url = this.buildUrl(model, stream, urlIndex, requestCredentials);
-      const headers = this.buildHeaders(requestCredentials, stream, clientHeaders, model, undefined, body);
+      const headers = this.buildHeaders(
+        requestCredentials,
+        stream,
+        clientHeaders,
+        model,
+        undefined,
+        body
+      );
       applyConfiguredUserAgent(headers, requestCredentials?.providerSpecificData);
 
       // Strip OpenAI SDK (X-Stainless-*) metadata + normalize SDK-derived User-Agent
@@ -858,6 +899,9 @@ export class BaseExecutor {
         // Timeout only covers response start; stream stalls are handled downstream.
         const fetchStartTimeoutMs = this.getTimeoutMs();
         const fetchWithStartTimeout = async (requestUrl: string, requestOptions: RequestInit) => {
+          // GHSA-4f49: guard here (not only next to the first buildUrl) so retries
+          // and fallback URLs are validated too, before any bytes leave the host.
+          this.assertOutboundUrlAllowed(requestUrl);
           const timeoutController = fetchStartTimeoutMs > 0 ? new AbortController() : null;
           let timeoutId: ReturnType<typeof setTimeout> | null = null;
           if (timeoutController) {
