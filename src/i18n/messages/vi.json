@@ -6269,6 +6269,20 @@
     "webSessionGuideStep3": "Sao chép thông tin xác thực được yêu cầu từ tên miền riêng của nhà cung cấp. Đối với cookie, chỉ sao chép giá trị tiêu đề Cookie và bỏ qua Cookie:.",
     "webSessionGuideStep3Manual": "Cách thủ công: mở công cụ dành cho nhà phát triển của trình duyệt (F12 → Network), tải lại trang, mở một yêu cầu đã xác thực và sao chép giá trị tiêu đề Cookie trong Request Headers — bỏ tiền tố Cookie:.",
     "webSessionGuideStep4": "Dán vào đây và kiểm tra kết nối. Nếu nó ngừng hoạt động, hãy đăng nhập lại và thay thế bằng một giá trị mới.",
+    "harImportButtonLabel": "Nhập tệp .har",
+    "harImportButtonBusy": "Đang nhập…",
+    "harImportButtonHint": "Xuất từ thẻ Network của DevTools sau khi gửi ít nhất một tin nhắn chat.",
+    "harImportStatusValid": "Đã nhập — hợp lệ trong ~{minutes} phút.",
+    "harImportStatusExpiringSoon": "Đã nhập — chỉ còn hợp lệ ~{minutes} phút nữa.",
+    "harImportStatusExpired": "Đã nhập, nhưng token này đã hết hạn ({minutes} phút trước) — hãy xuất một HAR mới.",
+    "harImportStatusUnknownExpiry": "Đã nhập. Không đọc được thời hạn.",
+    "harImportErrorNotJson": "Tệp đó không phải JSON hợp lệ — có đúng là bản xuất .har không?",
+    "harImportErrorNoEntries": "HAR này không có mục network nào được ghi lại.",
+    "harImportErrorNoChathubUrl": "Không tìm thấy kết nối Copilot chat trong HAR này. Hãy gửi ít nhất một tin nhắn chat trong m365.cloud.microsoft trước khi xuất.",
+    "harImportErrorUnparsableUrl": "Tìm thấy kết nối chat, nhưng không đọc được URL của nó.",
+    "harImportErrorMissingFields": "Tìm thấy kết nối chat, nhưng token bị thiếu trong đó.",
+    "harImportErrorReadFailed": "Không đọc được tệp đó.",
+    "harImportErrorUnknown": "Không trích xuất được thông tin xác thực từ tệp HAR đó.",
     "webSessionSecurityHint": "Hãy coi đây như mật khẩu: nó có thể truy cập vào tài khoản web đã đăng nhập của bạn cho đến khi hết hạn hoặc bị thu hồi.",
     "webNoAuthGuideTitle": "Không yêu cầu thông tin xác thực",
     "webNoAuthGuideBody": "{provider} không cần khóa API hoặc cookie. Lưu kết nối để sử dụng endpoint web miễn phí của nó.",
@@ -12207,7 +12221,7 @@
       },
       "omni-webhooks": {
         "name": "Webhook",
-        "description": "__MISSING__:Register, list, test, and remove webhook endpoints. Configure event subscriptions (request.completed, request.failed, quota.exceeded, etc.) and manage delivery retries."
+        "description": "Đăng ký, liệt kê, kiểm thử và xoá các endpoint webhook. Cấu hình đăng ký sự kiện (request.completed, request.failed, quota.exceeded, v.v.) và quản lý thử lại giao hàng."
       },
       "omni-mcp": {
         "name": "Máy chủ MCP",
@@ -13855,5 +13869,12 @@
     "toolsMismatch": "Nhà cung cấp không hỗ trợ gọi công cụ",
     "structuredOutputMismatch": "Nhà cung cấp không hỗ trợ đầu ra có cấu trúc",
     "contextWindowMismatch": "Yêu cầu vượt quá cửa sổ ngữ cảnh của nhà cung cấp"
+  },
+  "cheaperInferenceSponsorBanner": {
+    "title": "Cheaper Inference là Đối tác Mã nguồn Mở của OmniRoute",
+    "description": "Một cổng xếp hạng theo chi phí, bán lại hàng chục mô hình tiên phong sau một endpoint tương thích OpenAI — định tuyến mỗi yêu cầu đến nhà cung cấp đủ điều kiện rẻ nhất, không bao giờ vượt giá niêm yết.",
+    "cta": "Lấy khóa API",
+    "partnerLinkNote": "Liên kết đối tác",
+    "dismissAriaLabel": "Đóng"
   }
 }

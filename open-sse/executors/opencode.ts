@@ -15,6 +15,8 @@ import {
   markSuccess as markAccountSuccess,
   maskAccountId,
   isNetworkErrorRotatable,
+  isEmptyUpstreamRejection,
+  extractChatcmplId,
 } from "./accountRotation.ts";
 import { isNetworkRotationSharedEgressGuardEnabled } from "@/shared/utils/featureFlags";
 
@@ -253,14 +255,41 @@ export class OpencodeExecutor extends BaseExecutor {
 
     try {
       this.syncAccountsFromCredentials(input.credentials);
+      const { log } = input;
 
       const hasProxies = this.accounts.some((a) => a.proxy !== null);
-      // Fast path: no multi-account proxy wiring configured → original behavior.
+      // Fast path: no multi-account proxy wiring configured → original behavior,
+      // plus exactly ONE bounded retry when the upstream answers a 400 empty
+      // rejection (same predicate and logging as the rotation loop). Everything
+      // else passes untouched: this path deliberately preserves BaseExecutor's
+      // intra-URL 429 retries (no skipUpstreamRetry here).
       if (this.accounts.length === 1 && !hasProxies) {
-        return await super.execute(input);
+        const single = (await super.execute(input)) as HttpExecuteResult;
+        if (single.response.status === 400) {
+          let bodyText: string | null = null;
+          try {
+            bodyText = await single.response.clone().text();
+          } catch {
+            log?.debug?.("OPENCODE", "body read failed on direct account");
+          }
+          if (bodyText !== null) {
+            if (isEmptyUpstreamRejection(400, bodyText)) {
+              const chatcmplId = extractChatcmplId(bodyText);
+              log?.warn?.(
+                "OPENCODE",
+                `upstream empty rejection on direct account (${chatcmplId}), retrying once…`
+              );
+              return await super.execute(input);
+            }
+            log?.debug?.(
+              "OPENCODE",
+              "400 without error field, signature not matched on direct account — observing"
+            );
+          }
+        }
+        return single;
       }
 
-      const { log } = input;
       // This loop only ever dispatches through super.execute() (the HTTP request
       // path), which always resolves the object-shaped arm of ExecutorExecuteResult
       // — the bare-Response arm belongs to web/scraping executors only (base.ts:290).
@@ -277,8 +306,13 @@ export class OpencodeExecutor extends BaseExecutor {
       // network call, but proxied accounts (independent egress) are still
       // tried normally.
       let sharedEgressDown = false;
+      // Bounded extra attempts for empty upstream rejections: +1 for a single
+      // account (retry the same one), none for a multi-account fleet (rotation
+      // through the accounts is the retry). Avoids an unbounded loop on a
+      // persistently malformed upstream.
+      const emptyRejectionBudget = this.accounts.length === 1 ? 1 : 0;
 
-      for (let attempt = 0; attempt < this.accounts.length; attempt++) {
+      for (let attempt = 0; attempt < this.accounts.length + emptyRejectionBudget; attempt++) {
         const account = this.pickAccount();
         const masked = maskAccountId(account.fingerprint);
 
@@ -352,6 +386,34 @@ export class OpencodeExecutor extends BaseExecutor {
           this.markCooldown(account);
           log?.warn?.("OPENCODE", `Rate limited (429) on account ${masked}, rotating to next…`);
           continue;
+        }
+
+        // Empty upstream rejection (malformed 400: no error field, no real
+        // content, finish_reason null — see isEmptyUpstreamRejection). Rotate/
+        // retry instead of propagating it as a fatal success: the observed
+        // envelope was marking subagent sessions as failed. Read the body ONLY
+        // for a 400 (never a 200/streaming — that would buffer the good path);
+        // classify, log, and continue. Neitheries markCooldown nor markSuccess:
+        // the failure is upstream's, not this account's.
+        if (status === 400) {
+          let bodyText: string | null = null;
+          try {
+            bodyText = await result.response.clone().text();
+          } catch {
+            log?.debug?.("OPENCODE", "body read failed on empty rejection check");
+          }
+          if (bodyText !== null && isEmptyUpstreamRejection(400, bodyText)) {
+            const chatcmplId = extractChatcmplId(bodyText);
+            log?.warn?.(
+              "OPENCODE",
+              `upstream empty rejection on account ${masked} (${chatcmplId}), rotating to next…`
+            );
+            continue;
+          }
+          // A 400 carrying a real error (or non-empty content): propagate
+          // immediately, untouched — same as before this change.
+          this.markSuccess(account);
+          return result;
         }
 
         this.markSuccess(account);

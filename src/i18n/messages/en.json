@@ -5692,8 +5692,8 @@
     "aggregatorsGateways": "Aggregators Gateways",
     "enterpriseCloud": "Enterprise & Cloud",
     "apiFormatLabel": "Api Format Label",
-    "apiKeyOptionalHint": "Api Key Optional Hint",
-    "apiKeyOptionalLabel": "Api Key Optional Label",
+    "apiKeyOptionalHint": "Leave empty if your local setup or provider does not require authentication.",
+    "apiKeyOptionalLabel": "API Key (optional)",
     "apiRegionChina": "Api Region China",
     "apiRegionHint": "Api Region Hint",
     "apiRegionInternational": "Api Region International",
@@ -13869,5 +13869,12 @@
     "toolsMismatch": "Provider does not support tool calling",
     "structuredOutputMismatch": "Provider does not support structured output",
     "contextWindowMismatch": "Request exceeds provider context window"
+  },
+  "cheaperInferenceSponsorBanner": {
+    "title": "Cheaper Inference is an OmniRoute Open Source Friend",
+    "description": "A cost-ranked gateway reselling dozens of frontier models behind one OpenAI-compatible endpoint — routing each request to the cheapest eligible provider, never above list price.",
+    "cta": "Get an API Key",
+    "partnerLinkNote": "Partner link",
+    "dismissAriaLabel": "Dismiss"
   }
 }

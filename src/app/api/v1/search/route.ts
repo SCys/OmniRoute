@@ -58,9 +58,7 @@ export async function OPTIONS() {
 export async function GET() {
   const settings = await getSettings().catch(() => ({} as any));
   const blockedProviders = settings?.blockedProviders || [];
-  const providers = getAllSearchProviders().filter(
-    (p) => !isProviderBlockedByIdOrAlias(p.id, blockedProviders)
-  );
+  const providers = getAllSearchProviders(blockedProviders);
   const timestamp = Math.floor(Date.now() / 1000);
 
   const data = providers.map((p) => ({

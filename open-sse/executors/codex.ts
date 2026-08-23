@@ -517,10 +517,12 @@ export function filterNonstandardCodexSse(response: Response): Response {
   const transform = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       buffer += decoder.decode(chunk, { stream: true });
-      let sep: number;
-      while ((sep = buffer.indexOf("\n\n")) !== -1) {
-        const block = buffer.slice(0, sep + 2);
-        buffer = buffer.slice(sep + 2);
+      while (true) {
+        const separator = /\r?\n\r?\n/.exec(buffer);
+        if (!separator) break;
+        const blockEnd = separator.index + separator[0].length;
+        const block = buffer.slice(0, blockEnd);
+        buffer = buffer.slice(blockEnd);
         if (!dropBlock(block)) controller.enqueue(encoder.encode(block));
       }
     },
@@ -1396,7 +1398,6 @@ export class CodexExecutor extends BaseExecutor {
       provider: "codex",
       preserveEncryptedReasoning:
         credentials?.providerSpecificData?.preserveEncryptedReasoning === true,
-      onIncompatibleReasoning: "drop",
     });
 
     if (nativeCodexPassthrough) {

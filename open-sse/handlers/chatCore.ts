@@ -516,7 +516,7 @@ export async function handleChatCore({
   conversationId = null,
   modelPinned = false,
   skipResourcePressureGuard = false,
-  reasoningTransportFallback = "skip",
+  reasoningTransportFallback = "drop",
   managedLease = null,
 }) {
   let { provider, model, extendedContext } = modelInfo;
@@ -1213,7 +1213,7 @@ export async function handleChatCore({
         provider,
         preserveEncryptedReasoning:
           credentials?.providerSpecificData?.preserveEncryptedReasoning === true,
-        onIncompatibleReasoning: reasoningTransportFallback === "drop" ? "drop" : "reject",
+        onIncompatibleReasoning: reasoningTransportFallback === "skip" ? "reject" : "drop",
       }
     );
     if (policy.incompatibleReasoning) {

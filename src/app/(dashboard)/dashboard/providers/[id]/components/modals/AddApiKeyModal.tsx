@@ -757,46 +757,48 @@ export default function AddApiKeyModal({
                 onImport={(apiKey) => setFormData({ ...formData, apiKey })}
               />
             )}
-            {!isNoAuthWebSessionCredential && (
-              <div className="flex gap-2">
-                <Input
-                  label={apiCredentialLabel}
-                  type="password"
-                  value={formData.apiKey}
-                  onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !validating && !saving) {
-                      e.preventDefault();
-                      handleValidate();
-                    }
-                  }}
-                  className="flex-1"
-                  placeholder={apiCredentialPlaceholder}
-                  hint={apiCredentialHint}
-                  autoComplete="off"
-                  spellCheck={false}
-                  autoCapitalize="off"
-                />
-                <div className="pt-6">
-                  <Button
-                    onClick={handleValidate}
-                    disabled={
-                      (!isCompatible && !apiKeyOptional && !formData.apiKey) ||
-                      (isGooglePse && !formData.cx.trim()) ||
-                      validating ||
-                      saving
-                    }
-                    variant="secondary"
-                  >
-                    {validating
-                      ? t("checking")
-                      : webSessionCredential
-                        ? getWebSessionCredentialCheckLabel(t, webSessionCredential)
-                        : t("check")}
-                  </Button>
+            {!isNoAuthWebSessionCredential && (() => {
+              const isCheckDisabled =
+                (!isCompatible && !apiKeyOptional && !formData.apiKey) ||
+                (isGooglePse && !formData.cx.trim()) ||
+                validating ||
+                saving;
+              return (
+                <div className="flex gap-2">
+                  <Input
+                    label={apiCredentialLabel}
+                    type="password"
+                    value={formData.apiKey}
+                    onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !isCheckDisabled) {
+                        e.preventDefault();
+                        handleValidate();
+                      }
+                    }}
+                    className="flex-1"
+                    placeholder={apiCredentialPlaceholder}
+                    hint={apiCredentialHint}
+                    autoComplete="off"
+                    spellCheck={false}
+                    autoCapitalize="off"
+                  />
+                  <div className="pt-6">
+                    <Button
+                      onClick={handleValidate}
+                      disabled={isCheckDisabled}
+                      variant="secondary"
+                    >
+                      {validating
+                        ? t("checking")
+                        : webSessionCredential
+                          ? getWebSessionCredentialCheckLabel(t, webSessionCredential)
+                          : t("check")}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
             {isChatGptWebCodex && (
               <div className="space-y-3 rounded-lg border border-border bg-surface/40 p-3">
                 <div>
