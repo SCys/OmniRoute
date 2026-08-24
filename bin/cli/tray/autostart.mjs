@@ -114,10 +114,13 @@ function writeLinuxSystemdUnit(cliPath) {
   const unitDir = dirname(linuxSystemdUnitPath());
   mkdirSync(unitDir, { recursive: true });
   const envFile = join(userHomeDir(), ".omniroute", ".env");
+  const nodeBinDir = dirname(process.execPath);
+  const userLocalBin = join(userHomeDir(), ".local", "bin");
+  const pathEnv = `${nodeBinDir}:${userLocalBin}:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin`;
   const lines = [
     "[Unit]",
     "Description=OmniRoute AI proxy router",
-    "After=network-online.target",
+    "After=network-online.target graphical-session.target",
     "Wants=network-online.target",
     "",
     "[Service]",
@@ -134,6 +137,7 @@ function writeLinuxSystemdUnit(cliPath) {
     `ExecStart=${buildServeExecLine(cliPath, { tray: false })}`,
     "Restart=on-failure",
     "RestartSec=5",
+    `Environment="PATH=${pathEnv}"`,
   ];
   if (existsSync(envFile)) lines.push(`EnvironmentFile=-${envFile}`);
   lines.push("", "[Install]", "WantedBy=default.target", "");
@@ -276,6 +280,10 @@ function isAgentSelfMac() {
   }
 }
 
+function isDetachedTrayWorker() {
+  return process.argv.includes("--tray-worker");
+}
+
 function enableMac() {
   const plistDir = join(homedir(), "Library", "LaunchAgents");
   mkdirSync(plistDir, { recursive: true });
@@ -300,7 +308,7 @@ function enableMac() {
   // If we're already the running agent, launchctl load/unload would SIGTERM us.
   // The plist is updated on disk and launchd already has us loaded under our own
   // PID — nothing more to do for the current session.
-  if (isAgentSelfMac()) return existsSync(plistPath);
+  if (isAgentSelfMac() || isDetachedTrayWorker()) return existsSync(plistPath);
   try {
     execSync("launchctl load -w " + JSON.stringify(plistPath), { stdio: "ignore" });
   } catch {}
@@ -313,7 +321,7 @@ function disableMac() {
   // `launchctl unload` sends SIGTERM and a user clicking "Disable Autostart"
   // from the tray would lose the tray icon instead of just flipping the label.
   // Removing the plist file is enough to stop the agent at the next login.
-  if (!isAgentSelfMac()) {
+  if (!isAgentSelfMac() && !isDetachedTrayWorker()) {
     try {
       execSync("launchctl unload -w " + JSON.stringify(plistPath), { stdio: "ignore" });
     } catch {}

@@ -974,7 +974,14 @@
     "batchFileUsedByCount": "{count, plural, one {# batch} other {# batch}}",
     "batchFilePreview": "Bản xem trước",
     "batchFilePreviewTruncated": "Hiển thị {shown} dòng đầu tiên (tổng cộng {total} dòng)",
-    "batchFileDownloadFull": "Tải xuống toàn bộ tệp"
+    "batchFileDownloadFull": "Tải xuống toàn bộ tệp",
+    "batchHeaderSubtitle": "Chạy nhiều yêu cầu như một job duy nhất",
+    "batchStep1": "1 · Tải lên JSONL",
+    "batchStep1Desc": "Thêm yêu cầu",
+    "batchStep2": "2 · Tạo batch",
+    "batchStep2Desc": "Chạy job",
+    "batchStep3": "3 · Nhận kết quả",
+    "batchStep3Desc": "Tải xuống đầu ra"
   },
   "disabled": "Đã tắt",
   "featureFlagOmnirouteEmergencyFallbackDescription": "Định tuyến các yêu cầu đã hết ngân sách đến nhà cung cấp/mô hình dự phòng khẩn cấp miễn phí.",
@@ -1260,6 +1267,7 @@
     "agentBridgeSubtitle": "Chặn lưu lượng agent IDE",
     "trafficInspector": "Traffic Inspector",
     "trafficInspectorSubtitle": "Giám sát lệnh gọi LLM + gỡ lỗi mọi lưu lượng HTTPS",
+    "trafficInspectorPurpose": "Xem chính xác những gì ứng dụng của bạn gửi đến và nhận từ các nhà cung cấp AI. Hoạt động với bất kỳ ứng dụng khách nào tương thích với OpenAI.",
     "cliCode": "CLI Code",
     "cliCodeSubtitle": "Các công cụ lập trình trỏ đến OmniRoute",
     "cliAgents": "CLI Agents",
@@ -1861,7 +1869,16 @@
     "directDownloadHint": "Hoặc tải trực tiếp định dạng trình cài đặt phù hợp:",
     "releaseNotes": "Ghi chú phát hành",
     "readMore": "Đọc thêm",
-    "noAuthLabel": "Không xác thực"
+    "noAuthLabel": "Không xác thực",
+    "readinessEyebrow": "Chuẩn bị định tuyến",
+    "readinessTitle": "Gửi yêu cầu đầu tiên của bạn",
+    "readinessSubtitle": "Bốn bước nhỏ. OmniRoute kiểm tra mức độ sẵn sàng khi bạn thực hiện.",
+    "readinessStep1": "Kết nối một nhà cung cấp",
+    "readinessStep2": "Định cấu hình xác thực endpoint",
+    "readinessStep3": "Sao chép endpoint của bạn",
+    "readinessStep4": "Gửi một yêu cầu thử nghiệm",
+    "readinessContinue": "Tiếp tục thiết lập",
+    "readinessDismiss": "Bỏ qua lúc này"
   },
   "analytics": {
     "title": "Phân tích",
@@ -2223,6 +2240,10 @@
     "fullAccess": "Toàn quyền truy cập",
     "keyManagement": "Quản lý khóa API",
     "keyManagementDesc": "Tạo và quản lý khóa API để xác thực các yêu cầu tới endpoint của bạn",
+    "requestFlowAria": "Ứng dụng của bạn gửi yêu cầu qua một API key tới OmniRoute",
+    "requestFlowYourApp": "Ứng dụng của bạn",
+    "requestFlowApiKey": "API key",
+    "requestFlowOmniRoute": "OmniRoute",
     "totalKeys": "Tổng số khóa",
     "restricted": "Bị hạn chế",
     "totalRequests": "Tổng số yêu cầu",
@@ -2901,6 +2922,7 @@
       "interpreter": "Tác nhân lập trình tự trị Open Interpreter CLI",
       "omp": "Tác nhân lập trình Oh My Pi trên terminal",
       "letta": "Tác nhân Letta CLI có bộ nhớ lâu dài và khả năng dùng công cụ",
+      "prime-agent": "Prime Agent — bộ khung lập trình RLM tự cải tiến hỗ trợ API tương thích OpenAI",
       "warp": "Terminal Warp AI hỗ trợ nhà cung cấp tùy chỉnh",
       "agent-deck": "Trình điều phối đa tác nhân Agent Deck"
     },
@@ -4134,7 +4156,10 @@
     "notionIntegrationHelp": "Tạo một Tích hợp nội bộ tại",
     "notionIntegrationToken": "Token tích hợp nội bộ Notion",
     "notionNotConnected": "Chưa kết nối",
-    "notionTokenConfigured": "Đã cấu hình token. Các công cụ Notion khả dụng qua MCP."
+    "notionTokenConfigured": "Đã cấu hình token. Các công cụ Notion khả dụng qua MCP.",
+    "subtitle": "Dùng endpoint tương thích OpenAI với hầu hết SDK và công cụ.",
+    "testEndpoint": "Kiểm tra endpoint →",
+    "advancedProtocols": "Giao thức nâng cao"
   },
   "endpoints": {
     "tabProxy": "Endpoint Proxy",
@@ -4607,6 +4632,13 @@
     "retry": "Thử lại",
     "allOperational": "Tất cả hệ thống đang hoạt động bình thường",
     "issuesDetected": "Phát hiện sự cố hệ thống",
+    "healthVerdictReady": "OmniRoute đã sẵn sàng",
+    "healthVerdictActionRequired": "Cần hành động để khôi phục hoạt động đầy đủ",
+    "healthVerdictCoolingDown": "Đang nguội sau các thay đổi gần đây",
+    "healthSubtitle": "Kiểm tra tình trạng hệ thống",
+    "advancedDiagnosticsTitle": "Chẩn đoán nâng cao",
+    "hide": "Ẩn",
+    "show": "Hiện",
     "updatedAt": "Đã cập nhật {time}",
     "latency": "Độ trễ",
     "latencyP50": "p50",
@@ -5835,6 +5867,8 @@
     "rateLimitOverridesSection": "Ghi đè giới hạn tốc độ",
     "rateLimitOverridesMaxConcurrentHint": "Ghi đè số yêu cầu đồng thời tối đa cho kết nối này. Ghi đè giới hạn ở cấp tài khoản.",
     "rateLimitOverridesMaxConcurrentLabel": "Đồng thời tối đa (Giới hạn tốc độ)",
+    "rateLimitOverridesMaxWaitMsHint": "Thời gian tối đa (ms) một yêu cầu có thể chờ để có suất giới hạn tốc độ trước khi thất bại. Ghi đè cài đặt Resilience toàn cục chỉ cho kết nối này.",
+    "rateLimitOverridesMaxWaitMsLabel": "Thời gian chờ hàng đợi tối đa (ms)",
     "rateLimitOverridesMinTimeHint": "Thời gian tối thiểu (ms) giữa các yêu cầu. Ghi đè độ trễ bộ giới hạn tốc độ mặc định.",
     "rateLimitOverridesMinTimeLabel": "Khoảng thời gian tối thiểu (ms)",
     "rateLimitOverridesRpmHint": "Số yêu cầu tối đa mỗi phút cho kết nối này. Ghi đè giá trị mặc định của nhà cung cấp.",
@@ -6112,7 +6146,6 @@
       "glmt": "Hồ sơ GLM đặt sẵn với ngân sách token cao hơn, bật thinking và thời gian chờ dài hơn.",
       "getgoapi": "Kết nối GoAPI bằng khóa API.",
       "groq": "Gói miễn phí: 30 RPM / 14,4 nghìn RPD — không cần thẻ tín dụng",
-      "hackclub": "Đăng nhập bằng tài khoản Hack Club tại ai.hackclub.com.",
       "haiper": "Lấy khóa API tại haiper.ai/haiper-api",
       "heroku": "Kết nối Heroku AI bằng khóa API.",
       "hcnsec": "Lấy khóa API tại api.hcnsec.cn",
@@ -6677,6 +6710,18 @@
     "sidebarVisibility": "Ẩn các mục trên thanh bên",
     "sidebarVisibilityDesc": "Ẩn bất kỳ mục điều hướng nào trên thanh bên để giảm bớt sự lộn xộn về mặt trực quan mà không vô hiệu hóa bất kỳ tính năng nào",
     "sidebarVisibilityHint": "Bất kỳ phần nào trên thanh bên sẽ tự động bị ẩn khi tất cả các mục bên trong nó đều bị ẩn",
+    "presetAll": "Tất cả",
+    "presetAllDesc": "Hiển thị mọi thứ",
+    "presetEssentials": "Thiết yếu",
+    "presetEssentialsDesc": "Lộ trình cho người mới bắt đầu - Công cụ nâng cao vẫn có thể tìm kiếm",
+    "presetMinimal": "Tối giản",
+    "presetMinimalDesc": "Chỉ các trang cốt lõi",
+    "presetDeveloper": "Nhà phát triển",
+    "presetDeveloperDesc": "Công cụ dev & proxy",
+    "presetAdmin": "Quản trị",
+    "presetAdminDesc": "Giám sát & kiểm toán",
+    "settingsSidebarTitle": "Tùy chỉnh thanh bên",
+    "settingsSidebarDesc": "Chọn các mục trên thanh bên sẽ hiển thị. Thiết yếu giữ cho các công cụ nâng cao vẫn có thể tìm kiếm.",
     "hideHealthLogs": "Ẩn nhật ký kiểm tra sức khỏe",
     "hideHealthLogsDesc": "Khi BẬT, sẽ chặn các thông báo [HealthCheck] trong bảng điều khiển máy chủ",
     "themeAccent": "Màu chủ đề",
@@ -12031,7 +12076,8 @@
         "title": "Các tác nhân ACP",
         "phrase": "Các CLI mà OmniRoute khởi chạy làm phần phụ trợ thực thi (luồng ngược)",
         "flow": "Ứng dụng khách → OmniRoute → khởi chạy CLI (stdio/ACP) → phản hồi",
-        "seeOther": "See →"
+        "seeOther": "See →",
+        "warning": "Hầu hết người dùng có thể bỏ qua — chỉ dùng khi một tích hợp yêu cầu."
       }
     },
     "comparison": {
@@ -13431,6 +13477,13 @@
         "modelLockouts": "Khóa Mô Hình",
         "count": "Số Lượng Kết Nối"
       }
+    },
+    "reassuranceTitle": "Kết nối của bạn tự khôi phục",
+    "reassuranceDetail": "Thường không cần hành động. OmniRoute tạm cho kết nối nghỉ sau lỗi, rồi thử lại an toàn.",
+    "plainStates": {
+      "healthy": "Có thể gửi yêu cầu",
+      "coolingDown": "Sắp thử lại",
+      "lockedOut": "Cần bạn xử lý"
     }
   },
   "featureFlagCapabilityFilterEnabledDescription": "Từ chối yêu cầu trước khi gửi đi khi mô hình đích thiếu các khả năng bắt buộc (thị giác, công cụ, đầu ra có cấu trúc, cửa sổ ngữ cảnh). Bảo vệ các yêu cầu trực tiếp đến một nhà cung cấp khi chúng bỏ qua bộ lọc tương thích của combo.",

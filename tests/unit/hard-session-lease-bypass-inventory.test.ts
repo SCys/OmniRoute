@@ -20,6 +20,7 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/compression/compare/verify/route.ts": 1,
     "src/app/api/internal/codex-responses-ws/route.ts": 1,
     "src/app/api/search/providers/route.ts": 3,
+    "src/app/api/v1/_shared/elevenLabsProxy.ts": 1,
     "src/app/api/v1/audio/speech/route.ts": 1,
     "src/app/api/v1/_shared/videoModelResolution.ts": 1,
     "src/app/api/v1/audio/transcriptions/route.ts": 2,
@@ -40,7 +41,11 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/v1/session-leases/route.ts": 1,
     "src/app/api/v1/videos/generations/route.ts": 2,
     "src/app/api/v1/web/fetch/route.ts": 1,
-    "src/lib/embeddings/service.ts": 2,
+    // #11088/#11271: third site is the synced local-endpoint route — it resolves
+    // credentials through getProviderCredentials with the connection allowlist
+    // from resolveLocalSyncedEndpointRoute, and handles allRateLimited, so it is
+    // fenced the same way as the two pre-existing sites.
+    "src/lib/embeddings/service.ts": 3,
     "src/lib/memory/embedding/index.ts": 1,
     "src/lib/search/executeWebSearch.ts": 2,
     "src/lib/skills/webFetchExecution.ts": 1,

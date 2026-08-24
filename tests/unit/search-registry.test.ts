@@ -476,6 +476,24 @@ test("validateProviderApiKeySchema requires cx for Google PSE", async () => {
   assert.equal(valid.success, true);
 });
 
+test("validateProviderApiKeySchema accepts AWS Polly signing credentials", async () => {
+  const { validateProviderApiKeySchema } = await import("../../src/shared/validation/schemas.ts");
+
+  const result = validateProviderApiKeySchema.safeParse({
+    provider: "aws-polly",
+    apiKey: "aws-secret-access-key",
+    accessKeyId: "AKIAEXAMPLE",
+    sessionToken: "temporary-session-token",
+    region: "us-east-1",
+  });
+
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.equal(result.data.accessKeyId, "AKIAEXAMPLE");
+    assert.equal(result.data.sessionToken, "temporary-session-token");
+  }
+});
+
 test("v1SearchSchema applies defaults", async () => {
   const { v1SearchSchema } = await import("../../src/shared/validation/schemas.ts");
 

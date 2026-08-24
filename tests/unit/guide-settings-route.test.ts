@@ -127,7 +127,11 @@ test("guide-settings POST writes OpenCode config with current schema and multi-m
     "cc/claude-sonnet-4-20250514",
     "gg/gemini-2.5-pro",
   ]);
-  assert.equal(content.providers, undefined);
+  // The v2 provider schema is dual-written alongside the v1 block: the v2
+  // entry lives under `providers.omniroute` with `package`/`settings`.
+  assert.equal(content.providers.omniroute.package, "@opencode-ai/ai/providers/openai-compatible");
+  assert.equal(content.providers.omniroute.settings.baseURL, "http://my-omni/v1");
+  assert.ok(content.providers.omniroute.settings.apiKey.startsWith("sk-"));
 });
 
 test("guide-settings POST preserves existing OpenCode config fields while only updating provider.omniroute", async () => {

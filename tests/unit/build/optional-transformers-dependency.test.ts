@@ -120,4 +120,14 @@ test("every @huggingface/transformers consumer loads it lazily so absent install
     /^\s*import\s+(?:[^'"]*?\s+from\s+)?["']@huggingface\/transformers["']/m,
     "onnxWorker.ts must not statically import @huggingface/transformers"
   );
+  // Positive anchor (required by source-scanner-guards.test.ts): prove the read
+  // resolved to the real, non-empty onnxWorker.ts. Without this, renaming or
+  // gutting the worker would leave the negative guard above passing while
+  // protecting nothing. The worker loads the optional transformer deps lazily
+  // via a dynamicImport() helper, so anchor on that stable call.
+  assert.match(
+    workerSrc,
+    /dynamicImport\(["']@huggingface\/transformers["']\)/,
+    "onnxWorker.ts must load @huggingface/transformers via a deferred dynamicImport()"
+  );
 });

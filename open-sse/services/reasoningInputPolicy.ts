@@ -344,3 +344,65 @@ export function applyReasoningInputPolicy(
   }
   return { incompatibleReasoning: false };
 }
+
+export function createReasoningTransportIncompatibleError(): Error & {
+  statusCode: number;
+  errorType: string;
+} {
+  const error = new Error(
+    "Reasoning continuation is not compatible with the selected target"
+  ) as Error & { statusCode: number; errorType: string };
+  error.statusCode = 400;
+  error.errorType = "reasoning_transport_incompatible";
+  return error;
+}
+
+export const REASONING_FALLBACK_HEADER = "x-omniroute-reasoning-fallback";
+
+function readFallbackHeader(
+  headers: Headers | Record<string, unknown> | null | undefined
+): string | null {
+  if (!headers) return null;
+  if (headers instanceof Headers) {
+    const value = headers.get(REASONING_FALLBACK_HEADER);
+    return typeof value === "string" ? value : null;
+  }
+  if (typeof headers !== "object") return null;
+  for (const [key, value] of Object.entries(headers)) {
+    if (key.toLowerCase() === REASONING_FALLBACK_HEADER && typeof value === "string") {
+      return value;
+    }
+  }
+  return null;
+}
+
+/**
+ * Resolves the action taken when inbound continuation reasoning is incompatible with the selected
+ * target's reasoning transport. Combo steps keep their explicit configuration. Single-target
+ * requests default to "drop" so replayed summary-only reasoning from agentic clients does not
+ * hard-fail every continuation turn; an operator (OMNIROUTE_SINGLE_TARGET_REASONING_FALLBACK=reject)
+ * or caller (x-omniroute-reasoning-fallback: reject) may explicitly enforce "reject".
+ */
+export function resolveIncompatibleReasoningAction(options: {
+  reasoningTransportFallback?: string | null;
+  isComboStep?: boolean;
+  headers?: Headers | Record<string, unknown> | null;
+  env?: Record<string, string | undefined>;
+}): "drop" | "reject" {
+  if (options.reasoningTransportFallback === "drop") return "drop";
+  if (options.isComboStep && options.reasoningTransportFallback === "skip") return "reject";
+
+  const headerRaw = readFallbackHeader(options.headers)?.trim().toLowerCase();
+  if (headerRaw === "reject") return "reject";
+  if (headerRaw === "drop") return "drop";
+
+  const envRaw = (
+    options.env ?? process.env
+  ).OMNIROUTE_SINGLE_TARGET_REASONING_FALLBACK?.trim().toLowerCase();
+  if (envRaw === "reject") return "reject";
+  if (envRaw === "drop") return "drop";
+
+  // Default to "drop" for single-target requests so multi-turn agentic loops on direct
+  // Codex / OpenAI targets work seamlessly out of the box.
+  return "drop";
+}
