@@ -1,0 +1,165 @@
+name: Build and Publish Docker Image to GHCR
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+      - "**"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Dockerfile build target"
+        required: false
+        default: "runner-base"
+        type: choice
+        options:
+          - "runner-base"
+          - "runner-web"
+          - "runner-cli"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            arch: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch: arm64
+    steps:
+      - name: Expand swap space
+        run: |
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile /swapfile
+          sudo fallocate -l 8G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -h
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve lowercase image name
+        id: image
+        run: |
+          IMAGE_NAME="ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
+          echo "name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'runner-base' }}
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          tags: ${{ steps.image.outputs.name }}
+          cache-from: type=gha,scope=docker-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=docker-${{ matrix.arch }}
+          build-args: |
+            OMNIROUTE_BUILD_MEMORY_MB=8192
+            OMNIROUTE_USE_TURBOPACK=0
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: Publish Multi-Arch Manifest to GHCR
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract build metadata (version, sha, date)
+        id: vars
+        run: |
+          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "latest")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date -u +'%Y%m%d')
+          IMAGE_NAME="ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          IMAGE="${{ steps.vars.outputs.image }}"
+          VERSION="${{ steps.vars.outputs.version }}"
+          DATE="${{ steps.vars.outputs.build_date }}"
+          SHA="${{ steps.vars.outputs.short_sha }}"
+
+          # 仅保留指定的 4 个 tag
+          TAGS=(
+            "-t" "${IMAGE}:latest"
+            "-t" "${IMAGE}:${VERSION}"
+            "-t" "${IMAGE}:${VERSION}-${DATE}"
+            "-t" "${IMAGE}:${VERSION}-${SHA}"
+          )
+
+          DIGESTS=()
+          for f in /tmp/digests/*; do
+            DIGESTS+=("${IMAGE}@sha256:$(basename "$f")")
+          done
+
+          echo "Publishing multi-arch manifest with tags: ${TAGS[*]}"
+          echo "Source platform digests: ${DIGESTS[*]}"
+          docker buildx imagetools create "${TAGS[@]}" "${DIGESTS[@]}"
