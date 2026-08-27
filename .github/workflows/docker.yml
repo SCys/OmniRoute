@@ -82,7 +82,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=docker-${{ matrix.arch }}
           build-args: |
             OMNIROUTE_BUILD_MEMORY_MB=8192
-            OMNIROUTE_USE_TURBOPACK=0
+            OMNIROUTE_USE_TURBOPACK=1
 
       - name: Export digest
         run: |
