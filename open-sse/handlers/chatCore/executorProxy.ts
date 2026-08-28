@@ -105,7 +105,11 @@ export async function resolveExecutorWithProxy(
       "UPSTREAM_PROXY",
       `${prov} routed through CLIProxyAPI (per-connection claude-native override)`
     );
-    return getExecutor("cliproxyapi");
+    const [cfg, { dedicatedApiKey }] = await Promise.all([
+      getUpstreamProxyConfigCached(prov),
+      loadCliproxyapiSettings(),
+    ]);
+    return resolveCliproxyapiExecutor(cfg.cliproxyapiModelMapping, dedicatedApiKey);
   }
 
   // Sibling per-connection override for Dario (#dario). Checked AFTER the

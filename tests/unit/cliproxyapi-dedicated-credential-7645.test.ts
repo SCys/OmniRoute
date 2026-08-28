@@ -70,13 +70,19 @@ type ExecutorLike = { execute: (input: ExecuteInput) => Promise<unknown> };
  */
 async function withCapturedCliproxyapiRequest(
   fn: () => Promise<unknown>
-): Promise<{ headers: Record<string, string>; called: boolean }> {
+): Promise<{
+  headers: Record<string, string>;
+  body: Record<string, unknown>;
+  called: boolean;
+}> {
   let capturedHeaders: Record<string, string> | null = null;
+  let capturedBody: Record<string, unknown> | null = null;
   const originalFetch = globalThis.fetch;
   // @ts-expect-error test stub
   globalThis.fetch = async (url: string, init: RequestInit) => {
     if (String(url).includes("8317")) {
       capturedHeaders = init.headers as Record<string, string>;
+      capturedBody = JSON.parse(String(init.body)) as Record<string, unknown>;
       return new Response(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -89,7 +95,11 @@ async function withCapturedCliproxyapiRequest(
   } finally {
     globalThis.fetch = originalFetch;
   }
-  return { headers: capturedHeaders ?? {}, called: capturedHeaders !== null };
+  return {
+    headers: capturedHeaders ?? {},
+    body: capturedBody ?? {},
+    called: capturedHeaders !== null,
+  };
 }
 
 describe("#7645 — settingsSchemas has a dedicated cliproxyapi_api_key field", () => {
@@ -161,6 +171,47 @@ describe("#7645 — CLIProxyAPI fallback leg authenticates with the dedicated ke
       `Bearer ${DEDICATED_KEY}`,
       "CLIProxyAPI passthrough mode must authenticate with the dedicated key"
     );
+  });
+
+  it("per-connection claude-native mode keeps the dedicated key and model mapping", async () => {
+    const sourceModel = "claude-3-opus";
+    const mappedModel = "claude-3-opus-mapped";
+
+    await settingsDb.updateSettings({ cliproxyapi_api_key: DEDICATED_KEY });
+    await upstreamProxyDb.upsertUpstreamProxyConfig({
+      providerId: "anthropic-7645-per-connection",
+      mode: "native",
+      enabled: true,
+      cliproxyapiModelMapping: { [sourceModel]: mappedModel },
+    });
+
+    const executor = await resolveExecutorWithProxy(
+      "anthropic-7645-per-connection",
+      undefined,
+      { cliproxyapiMode: "claude-native" }
+    );
+
+    const { headers, body, called } = await withCapturedCliproxyapiRequest(() =>
+      (executor as ExecutorLike).execute({
+        model: sourceModel,
+        body: { model: sourceModel, messages: [{ role: "user", content: "hi" }] },
+        stream: false,
+        credentials: { apiKey: NATIVE_KEY },
+      })
+    );
+
+    assert.equal(called, true, "the per-connection override must invoke CLIProxyAPI");
+    assert.equal(
+      headers.Authorization,
+      `Bearer ${DEDICATED_KEY}`,
+      "per-connection CLIProxyAPI mode must authenticate with the dedicated key"
+    );
+    assert.notEqual(
+      headers.Authorization,
+      `Bearer ${NATIVE_KEY}`,
+      "per-connection CLIProxyAPI mode must not reuse the native credential"
+    );
+    assert.equal(body.model, mappedModel, "per-connection CLIProxyAPI mode must map the model");
   });
 
   it("falls back to the connection's own credential when no dedicated key is configured (no regression)", async () => {
