@@ -19,6 +19,11 @@ on:
           - "runner-web"
           - "runner-cli"
 
+# Fork-only GHCR publish. Keep this file out of upstream feature PRs.
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -50,8 +55,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Resolve lowercase image name
         id: image
@@ -79,7 +82,7 @@ jobs:
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           tags: ${{ steps.image.outputs.name }}
           cache-from: type=gha,scope=docker-${{ matrix.arch }}
-          cache-to: type=gha,mode=max,scope=docker-${{ matrix.arch }}
+          cache-to: type=gha,mode=min,scope=docker-${{ matrix.arch }},ignore-error=true
           build-args: |
             OMNIROUTE_BUILD_MEMORY_MB=8192
             OMNIROUTE_USE_TURBOPACK=1
@@ -108,8 +111,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Extract build metadata (version, sha, date)
         id: vars
