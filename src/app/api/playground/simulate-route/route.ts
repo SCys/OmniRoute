@@ -152,7 +152,33 @@ export async function POST(request: Request) {
         errors.push(`Combo "${body.comboId}" not found.`);
         return NextResponse.json({ error: "Combo not found" }, { status: 404 });
       }
-      const targets = typeof combo.targets === "string" ? JSON.parse(combo.targets) : combo.targets;
+      const persistedSteps = Array.isArray(combo.models) ? combo.models : [];
+      const modelSteps = persistedSteps.filter(
+        (step: any) =>
+          typeof step === "string" ||
+          ((step.kind === undefined || step.kind === "model") && typeof step.model === "string")
+      );
+      const unsupportedStepCount = persistedSteps.length - modelSteps.length;
+      if (unsupportedStepCount > 0) {
+        warnings.push(
+          `Skipped ${unsupportedStepCount} unsupported persisted combo ${unsupportedStepCount === 1 ? "step" : "steps"}.`
+        );
+      }
+      const targets = modelSteps.map((step: any) => {
+        const value = typeof step === "string" ? step : step.model;
+        const separator = value.indexOf("/");
+        const parsedProvider = separator === -1 ? undefined : value.slice(0, separator);
+        const parsedModel = separator === -1 ? value : value.slice(separator + 1);
+
+        return {
+          provider:
+            typeof step === "string"
+              ? parsedProvider || "unknown"
+              : step.providerId || step.provider || parsedProvider || "unknown",
+          model: parsedModel,
+          weight: typeof step === "string" ? undefined : step.weight,
+        };
+      });
       comboInfo = { name: combo.name, strategy: combo.strategy, targets };
     } else if (body.combo) {
       comboInfo = body.combo;
@@ -172,7 +198,11 @@ export async function POST(request: Request) {
     for (let i = 0; i < comboInfo.targets.length; i++) {
       const t = comboInfo.targets[i];
       const conn = connections.find(
-        (c: any) => c.id === t.provider || c.name === t.provider || c.displayName === t.provider
+        (c: any) =>
+          c.provider === t.provider ||
+          c.id === t.provider ||
+          c.name === t.provider ||
+          c.displayName === t.provider
       );
       const cost = estimateCost(t.model, promptTokens);
       const latency = estimateLatency(t.model);
