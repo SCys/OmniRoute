@@ -59,8 +59,11 @@ infrastructure and settings. Three tiers exist, applied in priority order:
 ```
   ┌─────────────────────────────────────────────────────────────┐
   │  TIER 0 — Keyword (FTS5)                                     │
-  │  Always available. SQLite FTS5 full-text search over         │
-  │  content + key. Used when strategy = "exact" or as fallback. │
+  │  Probe-driven availability: FTS5 when the SQLite build       │
+  │  supports it (better-sqlite3 / node:sqlite / bun:sqlite);    │
+  │  unavailable on FTS5-less builds (e.g. sql.js/WASM —         │
+  │  "no such module: fts5"). Used when strategy = "exact" or    │
+  │  as fallback; engine-status keyword reflects the probe.      │
   └──────────────────────────────────┬──────────────────────────┘
                                      │ strategy = semantic|hybrid?
                                      ▼

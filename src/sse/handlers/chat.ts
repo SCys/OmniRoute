@@ -66,6 +66,7 @@ import { createHookContext, runHooks, initPreRequestRegistry } from "@/lib/middl
 import { rejectPeerRequest } from "@/shared/resilience/peerRouting";
 import { isRuntimeProviderRetirementError } from "@/shared/constants/providerRetirement";
 import { isCommonChatGptWebRetirementError } from "@/shared/constants/chatgptWebRetirement";
+import { isChatGptWebCodexModel } from "@/shared/constants/chatgptWebCodex";
 import { deleteHandoff, getHandoff } from "@/lib/db/contextHandoffs";
 import { getComboByName, updateCombo } from "@/lib/db/combos";
 import { isModelAllowedForKey } from "@/lib/db/apiKeys";
@@ -89,6 +90,7 @@ import {
   checkPipelineGates,
   checkResourcePressureBeforeProviderWork,
   executeChatWithBreaker,
+  findShadowedCompatibleNode,
   handleNoCredentials,
   safeResolveProxy,
   safeLogEvents,
@@ -103,10 +105,10 @@ import {
 import { buildModalityBridgeHeader } from "@/lib/guardrails/modalityBridge/bridgeStats";
 import { resolveConversationId } from "@omniroute/open-sse/services/conversationTracker.ts";
 import {
+  classifyProviderBreakerResult,
   isAntigravityMissingProjectError,
   isProviderBreakerFailureStatus,
   resolveStreamReadinessClassificationError,
-  shouldTripProviderBreakerForResult,
 } from "./chatPredicates";
 import { markAntigravityMissingCloudCodeProject } from "@omniroute/open-sse/services/antigravityProjectPersistence.ts";
 import { connectionHasExtraKeys } from "@omniroute/open-sse/services/apiKeyRotator.ts";
@@ -658,6 +660,7 @@ async function handleChatImplementation(
   );
   if (
     previousResponseIdMode !== "preserve" &&
+    !isChatGptWebCodexModel(modelStr) &&
     sourceFormat === FORMATS.OPENAI_RESPONSES &&
     typeof (body as { previous_response_id?: unknown }).previous_response_id === "string"
   ) {
@@ -1699,6 +1702,11 @@ async function handleSingleModelChat(
                 (candidate): candidate is string => typeof candidate === "string"
               )
             : undefined;
+        // #11943: only when no connection was ever tried — a built-in provider
+        // whose id/alias is also a configured compatible-node prefix means the
+        // operator's node was shadowed by the reserved-prefix guard, not broken.
+        const shadowedNode =
+          excludedConnectionIds.size === 0 ? await findShadowedCompatibleNode(provider) : null;
         const noCredsRes = handleNoCredentials(
           credentials,
           excludedConnectionIds.size > 0 ? Array.from(excludedConnectionIds)[0] : null,
@@ -1707,7 +1715,8 @@ async function handleSingleModelChat(
           lastError,
           lastStatus,
           candidateAliases,
-          isCombo
+          isCombo,
+          shadowedNode
         );
         const lastFailedConnectionId =
           excludedConnectionIds.size > 0
@@ -1914,7 +1923,9 @@ async function handleSingleModelChat(
 
       if (result.success) {
         clearModelLock(provider, credentials.connectionId, model);
-        if (!forceLiveComboTest) {
+        // #12254: exactly-once breaker accounting — combo successes are recorded by
+        // combo.ts (recordProviderSuccess); live combo tests never touch the breaker.
+        if (classifyProviderBreakerResult(result, isCombo, forceLiveComboTest) === "success") {
           breaker._onSuccess();
         }
         if (injectedHandoff && runtimeOptions.sessionId && comboName) {
@@ -2361,7 +2372,7 @@ async function handleSingleModelChat(
       // breaker for real traffic (#9817).
       if (
         !(await shouldIsolateProbeFailures()) &&
-        shouldTripProviderBreakerForResult(result, isCombo, forceLiveComboTest)
+        classifyProviderBreakerResult(result, isCombo, forceLiveComboTest) === "failure"
       ) {
         breaker._onFailure();
       }
