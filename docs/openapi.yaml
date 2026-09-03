@@ -8953,6 +8953,14 @@ paths:
       responses:
         "200":
           description: OK
+  /api/conductor/tasks:
+    post:
+      tags:
+        - Conductor
+      summary: "POST conductor › tasks"
+      responses:
+        "201":
+          description: Created
   /api/conductor/tasks/{id}:
     get:
       tags:
