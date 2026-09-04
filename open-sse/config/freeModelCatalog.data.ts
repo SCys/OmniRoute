@@ -106,9 +106,12 @@ export const FREE_MODEL_BUDGETS: FreeModelBudget[] = [
   { provider: "bytez", modelId: "meta-llama/Llama-3.3-70B-Instruct", displayName: "meta-llama/Llama-3.3-70B-Instruct", monthlyTokens: 0, creditTokens: 1000000, freeType: "recurring-credit", poolKey: "bytez", tos: "ambiguous" },
   { provider: "bytez", modelId: "mistralai/Mistral-7B-Instruct-v0.3", displayName: "mistralai/Mistral-7B-Instruct-v0.3", monthlyTokens: 0, creditTokens: 1000000, freeType: "recurring-credit", poolKey: "bytez", tos: "ambiguous" },
   { provider: "bytez", modelId: "Qwen/Qwen2.5-72B-Instruct", displayName: "Qwen/Qwen2.5-72B-Instruct", monthlyTokens: 0, creditTokens: 1000000, freeType: "recurring-credit", poolKey: "bytez", tos: "ambiguous" },
-  // hardStopGuaranteed: Cerebras pricing page states "Free Trial: 1M tokens/day... no credit card" (open-sse/services/../providers/apikey/inference-hosts.ts:74-84).
-  { provider: "cerebras", modelId: "zai-glm-4.7", displayName: "GLM 4.7", monthlyTokens: 30000000, creditTokens: 0, freeType: "recurring-daily", poolKey: "cerebras", tos: "caution", hardStopGuaranteed: true },
-  { provider: "cerebras", modelId: "gpt-oss-120b", displayName: "GPT OSS 120B", monthlyTokens: 30000000, creditTokens: 0, freeType: "recurring-daily", poolKey: "cerebras", tos: "caution", hardStopGuaranteed: true },
+  // #11773: cerebras.ai/pricing (2026-09-03) is a one-time $5 signup credit
+  // gated on a payment method, 30-day expiry — not the old no-card 1M/day
+  // trial. creditTokens stays 0 because Cerebras publishes dollars, not a
+  // token grant. hardStopGuaranteed must stay unset: a stored card can bill.
+  { provider: "cerebras", modelId: "zai-glm-4.7", displayName: "GLM 4.7", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "cerebras", tos: "caution" },
+  { provider: "cerebras", modelId: "gpt-oss-120b", displayName: "GPT OSS 120B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "cerebras", tos: "caution" },
   // #8717: drop dead Workers AI ids (400/403/410). Keep Neurons/day budget on fp8-fast.
   { provider: "cloudflare-ai", modelId: "@cf/mistral/mistral-7b-instruct-v0.2-lora", displayName: "Mistral 7B (🆓)", monthlyTokens: 0, creditTokens: 0, freeType: "recurring-daily", poolKey: "cloudflare-ai", tos: "caution" },
   { provider: "cloudflare-ai", modelId: "@cf/qwen/qwen2.5-coder-32b-instruct", displayName: "Qwen 2.5 Coder 32B (🆓)", monthlyTokens: 0, creditTokens: 0, freeType: "recurring-daily", poolKey: "cloudflare-ai", tos: "caution" },
@@ -277,18 +280,9 @@ export const FREE_MODEL_BUDGETS: FreeModelBudget[] = [
   { provider: "nscale", modelId: "openai/gpt-oss-20b", displayName: "openai/gpt-oss-20b", monthlyTokens: 0, creditTokens: 5000000, freeType: "one-time-initial", poolKey: "nscale", tos: "caution" },
   { provider: "nscale", modelId: "meta-llama/Llama-4-Scout-17B-16E-Instruct", displayName: "meta-llama/Llama-4-Scout-17B-16E-Instruct", monthlyTokens: 0, creditTokens: 5000000, freeType: "one-time-initial", poolKey: "nscale", tos: "caution" },
   { provider: "nscale", modelId: "meta-llama/Llama-3.3-70B-Instruct", displayName: "meta-llama/Llama-3.3-70B-Instruct", monthlyTokens: 0, creditTokens: 5000000, freeType: "one-time-initial", poolKey: "nscale", tos: "caution" },
-  { provider: "nvidia", modelId: "z-ai/glm-5.2", displayName: "GLM 5.2", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "minimaxai/minimax-m2.7", displayName: "MiniMax M2.7", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
   { provider: "nvidia", modelId: "google/gemma-4-31b-it", displayName: "Gemma 4 31B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "mistralai/mistral-small-4-119b-2603", displayName: "Mistral Small 4 2603", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "mistralai/mistral-large-3-675b-instruct-2512", displayName: "Mistral Large 3 675B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "mistralai/devstral-2-123b-instruct-2512", displayName: "Devstral 2 123B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "qwen/qwen3.5-397b-a17b", displayName: "Qwen3.5-397B-A17B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "qwen/qwen3.5-122b-a10b", displayName: "Qwen3.5-122B-A10B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "stepfun-ai/step-3.5-flash", displayName: "Step 3.5 Flash", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "openai/gpt-oss-120b", displayName: "GPT OSS 120B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
-  { provider: "nvidia", modelId: "openai/gpt-oss-20b", displayName: "GPT OSS 20B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
   { provider: "nvidia", modelId: "nvidia/nemotron-3-super-120b-a12b", displayName: "Nemotron 3 Super 120B A12B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
+  { provider: "nvidia", modelId: "openai/gpt-oss-120b", displayName: "GPT OSS 120B", monthlyTokens: 0, creditTokens: 0, freeType: "one-time-initial", poolKey: "nvidia", tos: "caution" },
   { provider: "ollama-cloud", modelId: "deepseek-v4-pro", displayName: "DeepSeek V4 Pro", monthlyTokens: 20000000, creditTokens: 0, freeType: "recurring-monthly", poolKey: "ollama-cloud", tos: "ambiguous" },
   { provider: "ollama-cloud", modelId: "deepseek-v4-flash", displayName: "DeepSeek V4 Flash", monthlyTokens: 20000000, creditTokens: 0, freeType: "recurring-monthly", poolKey: "ollama-cloud", tos: "ambiguous" },
   { provider: "ollama-cloud", modelId: "kimi-k2.6", displayName: "Kimi K2.6", monthlyTokens: 20000000, creditTokens: 0, freeType: "recurring-monthly", poolKey: "ollama-cloud", tos: "ambiguous" },
