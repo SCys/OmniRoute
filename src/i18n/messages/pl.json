@@ -13133,6 +13133,7 @@
     "segmentHint": "Każdy segment = jedna darmowa pula · deduplikacja puli, rzetelne zliczanie (bez zawyżonych limitów zapytań).",
     "boost": "Odblokuj ~{tokens} więcej/mies. dzięki jednorazowemu doładowaniu OpenRouter za 10 $ (50 → 1000 żądań/dzień)",
     "uncapped": "Trwale bezpłatne, brak opublikowanego limitu (z ograniczeniem zapytań) — rzeczywisty dostęp, nieuwzględniony w nagłówku:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} few {# modele} many {# modeli} other {# modeli}} oznaczono jako ograniczone przez ToS — Ty decydujesz",
     "provider": "Dostawca",
     "model": "Model",

@@ -13143,6 +13143,7 @@
     "segmentHint": "Each segment = one free pool · pool-deduped, honest counting (no inflated rate-limit ceilings).",
     "boost": "Unlock ~{tokens} more/mo with a one-time $10 OpenRouter top-up (50 → 1000 req/day)",
     "uncapped": "Permanently free, no published cap (rate-limited) — real access, not counted in the headline:",
+    "gated": "~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# models}} flagged as ToS-restricted — you decide",
     "provider": "Provider",
     "model": "Model",

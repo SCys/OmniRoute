@@ -13133,6 +13133,7 @@
     "segmentHint": "Každý segment = jeden bezplatný pool · deduplikovaný pool, poctivé počítání (žádné uměle navýšené stropy limitů).",
     "boost": "Odemkněte o ~{tokens} více/měs. jednorázovým dobitím $10 na OpenRouteru (50 → 1000 požadavků/den)",
     "uncapped": "Trvale zdarma, bez zveřejněného limitu (omezená rychlost) — reálný přístup, nepočítá se do hlavního přehledu:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model označený jako omezený ToS} few {# modely označené jako omezené ToS} other {# modelů označených jako omezené ToS}} — rozhodnutí je na vás",
     "provider": "Poskytovatel",
     "model": "Model",

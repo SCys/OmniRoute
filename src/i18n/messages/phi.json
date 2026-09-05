@@ -13133,6 +13133,7 @@
     "segmentHint": "Bawat segment = isang libreng pool · pool-deduped, tapat na pagbibilang (walang pinalobong mga ceiling ng rate-limit).",
     "boost": "I-unlock ang ~{tokens} pa/buwan gamit ang isang beses na $10 OpenRouter top-up (50 → 1000 req/araw)",
     "uncapped": "Permanenteng libre, walang nai-publish na limitasyon (rate-limited) — totoong access, hindi binibilang sa headline:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# modelo} other {# na modelo}} ang na-flag bilang ToS-restricted — ikaw ang magpasya",
     "provider": "Provider",
     "model": "Modelo",

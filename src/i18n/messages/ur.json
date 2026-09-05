@@ -13133,6 +13133,7 @@
     "segmentHint": "ہر حصہ = ایک مفت پول · پول ڈی ڈپلیکیٹڈ، ایماندارانہ گنتی (بغیر کسی بڑھی ہوئی ریٹ لمٹ کی حد کے)۔",
     "boost": "ایک بار $10 OpenRouter ٹاپ اپ کے ساتھ مزید ~{tokens}/ماہ ان لاک کریں (50 → 1000 req/day)",
     "uncapped": "مستقل طور پر مفت، کوئی شائع شدہ حد نہیں (ریٹ لمیٹڈ) — حقیقی رسائی، ہیڈ لائن میں شمار نہیں:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# ماڈل} other {# ماڈلز}} ToS-محدود کے طور پر نشان زد — آپ فیصلہ کریں",
     "provider": "فراہم کنندہ",
     "model": "ماڈل",

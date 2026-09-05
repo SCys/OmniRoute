@@ -13133,6 +13133,7 @@
     "segmentHint": "每個區段 = 一個免費池 · 池間去重、誠實計數（無膨脹的速率限制上限）。",
     "boost": "一次性 $10 OpenRouter 充值即可解鎖約 {tokens}/月（50 → 1000 請求/天）",
     "uncapped": "永久免費，無公佈上限（有速率限制）——真實存取，不計入標題數字：",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# models}} flagged as ToS-restricted — you decide",
     "provider": "提供者",
     "model": "模型",

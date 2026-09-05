@@ -13140,6 +13140,7 @@
     "segmentHint": "Jedes Segment = ein kostenloser Pool · Pool-dedupliziert, ehrliche Zählung (keine künstlich erhöhten Rate-Limit-Obergrenzen).",
     "boost": "Schalten Sie ~{tokens} mehr/Monat mit einer einmaligen $10 OpenRouter-Aufladung frei (50 → 1000 Anfr./Tag)",
     "uncapped": "Dauerhaft kostenlos, kein veröffentlichtes Limit (ratenbegrenzt) — echter Zugang, nicht in der Überschrift gezählt:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# Modell} other {# Modelle}} als ToS-eingeschränkt markiert — Sie entscheiden",
     "provider": "Anbieter",
     "model": "Modell",

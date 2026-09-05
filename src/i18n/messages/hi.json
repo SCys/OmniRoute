@@ -13133,6 +13133,7 @@
     "segmentHint": "प्रत्येक सेगमेंट = एक मुफ़्त पूल · पूल-डीडुप्लिकेटेड, सटीक गणना (कोई बढ़ी हुई रेट-लिमिट सीमा नहीं)।",
     "boost": "एकमुश्त $10 OpenRouter टॉप-अप के साथ ~{tokens} अधिक/माह अनलॉक करें (50 → 1000 req/day)",
     "uncapped": "स्थायी रूप से मुफ़्त, कोई प्रकाशित सीमा नहीं (रेट-लिमिटेड) — वास्तविक एक्सेस, हेडलाइन में नहीं गिना गया:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# मॉडल} other {# मॉडल}} ToS-प्रतिबंधित के रूप में चिह्नित — आप तय करें",
     "provider": "प्रदाता",
     "model": "मॉडल",

@@ -13133,6 +13133,7 @@
     "segmentHint": "Hvert segment = én gratis pulje · pulje-dedupliceret, ærlig optælling (ingen oppustede hastighedsgrænselofter).",
     "boost": "Lås op for ~{tokens} mere/md. med en engangsoptankning på $10 hos OpenRouter (50 → 1000 anm./dag)",
     "uncapped": "Permanent gratis, intet offentliggjort loft (hastighedsbegrænset) — reel adgang, ikke talt med i overskriften:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# modeller}} markeret som ToS-begrænset — du bestemmer",
     "provider": "Udbyder",
     "model": "Model",

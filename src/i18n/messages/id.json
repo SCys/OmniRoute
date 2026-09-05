@@ -13133,6 +13133,7 @@
     "segmentHint": "Setiap segmen = satu pool gratis · deduplikasi pool, penghitungan jujur (tanpa batas rate-limit yang digelembungkan).",
     "boost": "Buka ~{tokens} tambahan/bln dengan top-up OpenRouter $10 satu kali (50 → 1000 req/hari)",
     "uncapped": "Gratis permanen, tanpa batas yang dipublikasikan (dibatasi rate-limit) — akses nyata, tidak dihitung dalam tajuk utama:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# model}} ditandai sebagai dibatasi ToS — Anda yang menentukan",
     "provider": "Penyedia",
     "model": "Model",

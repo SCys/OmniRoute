@@ -13133,6 +13133,7 @@
     "segmentHint": "각 세그먼트 = 하나의 무료 풀 · 풀 중복 제거, 정직한 집계 (부풀려진 요율 제한 한도 없음).",
     "boost": "일회성 $10 OpenRouter 충전으로 월 약 {tokens}개 추가 잠금 해제 (일일 50 → 1000회 요청)",
     "uncapped": "영구 무료, 공개된 제한 없음 (요율 제한됨) — 헤드라인에 집계되지 않는 실제 액세스:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {#개 모델} other {#개 모델}}이 이용약관(ToS) 제한으로 표시됨 — 귀하가 결정하세요",
     "provider": "제공업체",
     "model": "모델",

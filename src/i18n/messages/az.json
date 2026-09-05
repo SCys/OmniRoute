@@ -13133,6 +13133,7 @@
     "segmentHint": "Hər seqment = bir pulsuz hovuz · hovuz üzrə təkrarlanmayan, dürüst sayım (şişirdilmiş sorğu limiti tavanları olmadan).",
     "boost": "Birdəfəlik $10 OpenRouter balans artımı ilə ayda ~{tokens} daha çox əldə edin (50 → 1000 sorğu/gün)",
     "uncapped": "Həmişəlik pulsuz, dərc edilmiş limit yoxdur (sorğu sayı məhdudlaşdırılıb) — real giriş, əsas göstəricidə sayılmır:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# model}} ToS ilə məhdudlaşdırılmış kimi qeyd edilib — qərar sizindir",
     "provider": "Provayder",
     "model": "Model",

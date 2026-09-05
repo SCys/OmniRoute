@@ -13133,6 +13133,7 @@
     "segmentHint": "כל מקטע = מאגר חינמי אחד · מניעת כפילויות במאגר, ספירה הוגנת (ללא תקרות מגבלת קצב מנופחות).",
     "boost": "פתחו עוד כ-{tokens}/חודש עם טעינה חד-פעמית של $10 ב-OpenRouter ‏(50 → 1000 בקשות/יום)",
     "uncapped": "חינם לצמיתות, ללא מגבלה מפורסמת (מוגבל בקצב) — גישה אמיתית, לא נספר בכותרת הראשית:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {מודל #} other {# מודלים}} מסומנים כחסומים לפי תנאי השימוש — ההחלטה בידיך",
     "provider": "ספק",
     "model": "מודל",

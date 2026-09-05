@@ -13133,6 +13133,7 @@
     "segmentHint": "Cada segmento = um pool gratuito · deduplicado por pool, contagem honesta (sem limites de taxa inflacionados).",
     "boost": "Desbloqueie mais ~{tokens}/mês com um carregamento único de $10 no OpenRouter (50 → 1000 ped/dia)",
     "uncapped": "Permanentemente gratuito, sem limite publicado (com limite de taxa) — acesso real, não contabilizado no destaque:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# modelo assinalado} other {# modelos assinalados}} com restrições de ToS — você decide",
     "provider": "Fornecedor",
     "model": "Modelo",

@@ -13133,6 +13133,7 @@
     "segmentHint": "Setiap segmen = satu kolam percuma · kolam dinyahduplikasi, pengiraan jujur (tiada siling had kadar yang melambung).",
     "boost": "Nyahkunci ~{tokens} lagi/bln dengan tambah nilai OpenRouter $10 sekali sahaja (50 → 1000 perm/hari)",
     "uncapped": "Percuma selama-lamanya, tiada had diterbitkan (had kadar dikenakan) — akses sebenar, tidak dikira dalam tajuk utama:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# model}} ditandakan sebagai disekat ToS — anda tentukan",
     "provider": "Penyedia",
     "model": "Model",

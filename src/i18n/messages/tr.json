@@ -13133,6 +13133,7 @@
     "segmentHint": "Her segment = bir ücretsiz havuz · havuzdan tekilleştirilmiş, dürüst sayım (şişirilmiş istek sınırı tavanları yok).",
     "boost": "Tek seferlik 10 $'lık OpenRouter bakiye yüklemesi ile ayda yaklaşık ~{tokens} daha fazlasının kilidini açın (50 → 1000 istek/gün)",
     "uncapped": "Kalıcı olarak ücretsiz, yayınlanmış bir sınır yok (istek sınırlı) — gerçek erişim, başlıkta sayılmaz:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# model} other {# model}} Hizmet Şartları kısıtlamalı olarak işaretlendi — karar sizin",
     "provider": "Sağlayıcı",
     "model": "Model",

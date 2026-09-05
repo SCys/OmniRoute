@@ -13133,6 +13133,7 @@
     "segmentHint": "ప్రతి విభాగం = ఒక ఉచిత పూల్ · పూల్-డూప్లికేట్ తీసివేసినది, నిజాయితీ గల లెక్కింపు (ఎక్కువ చేసి చూపిన రేట్-పరిమితి గరిష్టాలు లేవు).",
     "boost": "ఒకేసారి $10 OpenRouter టాప్-అప్‌తో నెలకు మరో ~{tokens} అన్‌లాక్ చేయండి (రోజుకు 50 → 1000 అభ్యర్థనలు)",
     "uncapped": "శాశ్వతంగా ఉచితం, ప్రచురించిన పరిమితి లేదు (రేట్-పరిమితం చేయబడింది) — నిజమైన యాక్సెస్, హెడ్‌లైన్‌లో లెక్కించబడదు:",
+    "gated": "__MISSING__:~{tokens}/mo more behind a regional identity check (e.g. mainland-China real-name verification) — real quota, not counted in the headline:",
     "tosRestricted": "{count, plural, one {# మోడల్} other {# మోడల్స్}} ToS-పరిమితం చేయబడినట్లుగా ఫ్లాగ్ చేయబడ్డాయి — మీరే నిర్ణయించుకోండి",
     "provider": "ప్రొవైడర్",
     "model": "మోడల్",
