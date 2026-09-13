@@ -8,6 +8,7 @@ import {
   GITHUB_COPILOT_CHAT_PLUGIN_VERSION,
   GITHUB_COPILOT_CHAT_USER_AGENT,
   GITHUB_COPILOT_EDITOR_VERSION,
+  CODEBUDDY_CN_USER_AGENT,
 } from "@omniroute/open-sse/config/providerHeaderProfiles.ts";
 // userAgent / editorVersion on GITHUB_CONFIG are captured-pin snapshots for
 // lockstep tests. Request construction must call getGitHubCopilotChatUserAgent()
@@ -107,13 +108,9 @@ export const QODER_CONFIG = {
 // (Custom Device-Auth Flow: POST stateUrl → open authUrl → GET pollUrl?state=).
 // No client_id/secret — the upstream CLI ships none.
 //
-// CODEBUDDY_CN_USER_AGENT is the single source of truth for the CLI/CodeBuddy version
-// string. It MUST stay identical across OAuth (this file), chat completions
-// (open-sse/config/providers/registry/codebuddy-cn/index.ts) and usage/quota
-// (open-sse/services/usage/codebuddy-cn.ts) — a mismatched version string across a
-// single account's auth vs. chat calls is exactly the kind of internally-inconsistent
-// client fingerprint Tencent's WAF flags as anomalous (#12702).
-export const CODEBUDDY_CN_USER_AGENT = "CLI/2.108.1 CodeBuddy/2.108.1";
+// CODEBUDDY_CN_USER_AGENT is defined in open-sse/config/providerHeaderProfiles.ts
+// (#12702) so provider registry imports do not drag OAuth constants into client bundles.
+export { CODEBUDDY_CN_USER_AGENT };
 
 export const CODEBUDDY_CN_CONFIG = {
   baseUrl: "https://copilot.tencent.com",

@@ -37,6 +37,8 @@ const SERVER_ONLY = new Set([
   "src/lib/db/migrationRunner.ts",
   "open-sse/utils/proxyFetch.ts",
   "open-sse/utils/tlsClient.ts",
+  "open-sse/utils/cursorAgentCliVersion.ts",
+  "open-sse/services/model.ts",
 ]);
 
 /**
