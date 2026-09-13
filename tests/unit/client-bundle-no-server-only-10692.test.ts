@@ -37,6 +37,8 @@ const SERVER_ONLY = new Set([
   "src/lib/db/migrationRunner.ts",
   "open-sse/utils/proxyFetch.ts",
   "open-sse/utils/tlsClient.ts",
+  "open-sse/utils/cursorAgentCliVersion.ts",
+  "open-sse/services/model.ts",
 ]);
 
 /**
@@ -163,7 +165,9 @@ function walk(dir: string, acc: string[] = []): string[] {
 
 function clientEntryPoints(): string[] {
   return walk(path.join(REPO_ROOT, "src")).filter((file) =>
-    /^\s*["']use client["']/m.test(fs.readFileSync(path.join(REPO_ROOT, file), "utf8").slice(0, 200))
+    /^\s*["']use client["']/m.test(
+      fs.readFileSync(path.join(REPO_ROOT, file), "utf8").slice(0, 200)
+    )
   );
 }
 

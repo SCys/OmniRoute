@@ -1,0 +1,1 @@
+- fix(build): decouple combo control center and provider registry from server-only dependencies to restore production client builds (#13474)

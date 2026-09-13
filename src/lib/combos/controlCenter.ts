@@ -1,6 +1,6 @@
 import { normalizeComboModels, type ComboStep } from "./steps";
 import { resolveComboTargetModelStr } from "../../../open-sse/services/combo/opencodeTargetAlias.ts";
-import { resolveProviderAlias } from "../../../open-sse/services/model.ts";
+import { resolveProviderId } from "@/shared/constants/providers";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -108,6 +108,18 @@ function toString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 }
 
+const MANUAL_PROVIDER_ALIASES: Record<string, string> = {
+  xiaomi: "xiaomi-mimo",
+  llamacpp: "llama-cpp",
+  agy: "antigravity",
+  aq: "amazon-q",
+};
+
+function resolveCanonicalProviderId(rawProvider: string | null | undefined): string | null {
+  if (!rawProvider) return null;
+  return MANUAL_PROVIDER_ALIASES[rawProvider] || resolveProviderId(rawProvider) || rawProvider;
+}
+
 function providerFromModel(model: string | null | undefined): string | null {
   if (!model) return null;
   // #11912: resolve through the same "opencode" -> "oc" combo-target alias
@@ -118,7 +130,7 @@ function providerFromModel(model: string | null | undefined): string | null {
   const slashIndex = normalized.indexOf("/");
   if (slashIndex <= 0) return null;
   const prefix = normalized.slice(0, slashIndex);
-  return resolveProviderAlias(prefix) || prefix;
+  return resolveCanonicalProviderId(prefix);
 }
 
 function normalizeSuccessRate(value: unknown): number {
@@ -171,12 +183,13 @@ export function getComboControlCenterTargets(
           ? `${step.providerId}/${step.modelPattern}`
           : step.model;
     const healthEntry = healthByStepId.get(step.id) || healthByModel.get(model) || null;
-    const provider =
+    const rawProvider =
       step.kind === "model"
         ? step.providerId || providerFromModel(step.model) || healthEntry?.provider || null
         : step.kind === "provider-wildcard"
           ? step.providerId
           : null;
+    const provider = resolveCanonicalProviderId(rawProvider);
 
     return {
       id: step.id,
