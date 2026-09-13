@@ -152,3 +152,24 @@ test("resolved targets and runtime config helpers are defensive", () => {
   assert.deepEqual(extractComboRuntimeConfig({ config: null }), {});
   assert.deepEqual(extractComboRuntimeConfig({ config: { maxRetries: 2 } }), { maxRetries: 2 });
 });
+
+test("getComboControlCenterTargets normalizes opencode and provider alias model prefixes", () => {
+  const targets = getComboControlCenterTargets({
+    name: "alias-combo",
+    models: [
+      "opencode/gpt-4.1-mini",
+      "opencode-zen/deepseek-chat",
+      "oc/claude-3-7-sonnet",
+      "xiaomi/mimo-v2-flash",
+      "llamacpp/llama-3.3-70b",
+      "agy/claude-3-5-sonnet",
+    ],
+  });
+
+  assert.equal(targets[0].provider, "opencode");
+  assert.equal(targets[1].provider, "opencode-zen");
+  assert.equal(targets[2].provider, "opencode");
+  assert.equal(targets[3].provider, "xiaomi-mimo");
+  assert.equal(targets[4].provider, "llama-cpp");
+  assert.equal(targets[5].provider, "antigravity");
+});
