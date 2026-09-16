@@ -4,11 +4,11 @@ import {
   getAntigravityFetchAvailableModelsUrls,
 } from "@omniroute/open-sse/config/antigravityUpstream.ts";
 import {
+  CODEBUDDY_CN_USER_AGENT,
   GITHUB_COPILOT_API_VERSION,
   GITHUB_COPILOT_CHAT_PLUGIN_VERSION,
   GITHUB_COPILOT_CHAT_USER_AGENT,
   GITHUB_COPILOT_EDITOR_VERSION,
-  CODEBUDDY_CN_USER_AGENT,
 } from "@omniroute/open-sse/config/providerHeaderProfiles.ts";
 // userAgent / editorVersion on GITHUB_CONFIG are captured-pin snapshots for
 // lockstep tests. Request construction must call getGitHubCopilotChatUserAgent()
@@ -20,7 +20,7 @@ import {
   GROK_BUILD_TOKEN_URL,
 } from "@omniroute/open-sse/config/grokBuild.ts";
 import { resolvePublicCred } from "@omniroute/open-sse/utils/publicCreds.ts";
-import { CURSOR_AGENT_CLI_VERSION } from "@omniroute/open-sse/utils/cursorAgentCliVersion.ts";
+import { CURSOR_AGENT_CLI_VERSION } from "@omniroute/open-sse/utils/cursorAgentCliVersionPin.ts";
 import { buildGitLabOAuthEndpoints, GITLAB_DUO_DEFAULT_BASE_URL } from "../gitlab";
 
 /**
@@ -107,9 +107,6 @@ export const QODER_CONFIG = {
 // CodeBuddy CN (Tencent — copilot.tencent.com) OAuth Configuration
 // (Custom Device-Auth Flow: POST stateUrl → open authUrl → GET pollUrl?state=).
 // No client_id/secret — the upstream CLI ships none.
-//
-// CODEBUDDY_CN_USER_AGENT is defined in open-sse/config/providerHeaderProfiles.ts
-// (#12702) so provider registry imports do not drag OAuth constants into client bundles.
 export { CODEBUDDY_CN_USER_AGENT };
 
 export const CODEBUDDY_CN_CONFIG = {
@@ -378,7 +375,7 @@ export const KIRO_CONFIG = {
 // Cursor stores credentials in SQLite database: state.vscdb
 // Keys: cursorAuth/accessToken, cursorAuth/refreshToken, storage.serviceMachineId
 // Deep-control PKCE + refresh aligned with OpenCodex (lidge-jun/opencodex src/oauth/cursor.ts).
-// clientVersion pin lives in open-sse/utils/cursorAgentCliVersion.ts — single source of truth.
+// clientVersion pin lives in open-sse/utils/cursorAgentCliVersionPin.ts — single source of truth.
 export const CURSOR_CONFIG = {
   // API endpoints
   apiEndpoint: "https://api2.cursor.sh",
