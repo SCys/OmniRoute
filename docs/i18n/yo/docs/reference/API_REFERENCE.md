@@ -1,21 +1,12 @@
-# API_REFERENCE (Yorùbá)
+# API Reference (Yorùbá)
 
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
 ---
 
----
-
-title: "Ìtọ́kasí API"
-version: 3.8.51
-lastUpdated: 2026-08-31
----
-
-# Ìtọ́kasí API
-
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
-Ìtọ́kasí pàtàkì fún API OmniRoute. Ó ṣàlàyé ojú-ìṣàmúlò `/v1` ti gbogbo ènìyàn àti àwọn endpoint ìṣàkóso tí a sábà máa ń lò jù; [`docs/openapi.yaml`](../openapi.yaml) tí ẹ̀rọ lè kà àti igi ipa-ọ̀nà lábẹ́ `src/app/api/` ni àwọn orísun tó pé pérépéré.
+Àkọ́tọ́ pàtàkì fún OmniRoute API. Ó ṣàlàyé ojú-ọ̀nà gbogbogbò `/v1` àti àwọn endpoint ìṣàkóso tí a ń lò jù lọ; [`docs/openapi.yaml`](../openapi.yaml) tí ẹ̀rọ lè kà àti igi route tó wà lábẹ́ `src/app/api/` ni àwọn orísun tó pé pátápátá.
 
 ---
 
@@ -526,35 +517,41 @@ A máa fi ìpilẹ̀ orúkọ olùpèsè kún un láìfọwọ́ṣe bí kò bá
 
 ## API Àwọn Fáìlì
 
-Endpoint àwọn fáìlì tó bá OpenAI mu fún ìwọlé/ìjáde ìpele-ọ̀pọ̀ àti àwọn ìrùsókè fáìlì tó ní ìdí pàtó.
+Endpoint àwọn fáìlì tó bá OpenAI mu fún ìwọlé/ìjáde batch àti àwọn ìgbéjáde fáìlì gẹ́gẹ́ bí ìdí lílò.
 
-| Ọ̀nà    | Path                     | Àpèjúwe                                                                                                                 |
-| ------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/files`              | Ṣe ìrùsókè fáìlì kan (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — 512 MiB ó pọ̀jù |
-| GET    | `/v1/files`              | Ṣe àkójọ àwọn fáìlì fún kọ́kọ́rọ́ API tí a ti jẹ́rìí sí                                                                     |
-| GET    | `/v1/files/[id]`         | Gba metadata fáìlì kan                                                                                                  |
-| DELETE | `/v1/files/[id]`         | Pa fáìlì kan rẹ́                                                                                                         |
-| GET    | `/v1/files/[id]/content` | Ṣe ìṣàn ara fáìlì aise padà                                                                                             |
+| Ọ̀nà    | Path                     | Àpèjúwe                                                                                                                |
+| ------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/files`              | Gbé fáìlì kan sókè (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — 512 MiB ó pọ̀ jù |
+| GET    | `/v1/files`              | Ṣàtòjọ àwọn fáìlì fún kọ́kọ́rọ́ API tí a ti fìdí rẹ̀ múlẹ̀                                                                  |
+| GET    | `/v1/files/[id]`         | Gba metadata fáìlì kan padà                                                                                            |
+| DELETE | `/v1/files/[id]`         | Pa fáìlì kan rẹ́                                                                                                        |
+| GET    | `/v1/files/[id]/content` | Ṣàn ara fáìlì gidi náà padà                                                                                            |
 
-**Ìjẹ́rìísí:** Kọ́kọ́rọ́ API Bearer — àwọn fáìlì ni a pín sí ìwọ̀n kọ́kọ́rọ́-API-kọ̀ọ̀kan nípasẹ̀ `getApiKeyRequestScope`.
-
----
-
-## API Àwọn Ìpele-ọ̀pọ̀
-
-Ṣíṣe àkójọpọ̀ ìpele-ọ̀pọ̀ tó bá OpenAI mu.
-
-| Ọ̀nà    | Path                      | Àpèjúwe                                                                                                 |
-| ------ | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/batches`             | Ṣẹ̀dá ìpele-ọ̀pọ̀ — `v1BatchCreateSchema` ń fọwọ́sí body (`input_file_id`, `endpoint`, `completion_window`) |
-| GET    | `/v1/batches`             | Ṣe àkójọ àwọn ìpele-ọ̀pọ̀                                                                                 |
-| GET    | `/v1/batches/[id]`        | Gba ipò ìpele-ọ̀pọ̀ + `request_counts`                                                                    |
-| DELETE | `/v1/batches/[id]`        | Pa ìpele-ọ̀pọ̀ tó ti parí/tó kùnà rẹ́                                                                      |
-| POST   | `/v1/batches/[id]/cancel` | Fagilé ìpele-ọ̀pọ̀ tó ń lọ lọ́wọ́                                                                           |
-
-**Ìjẹ́rìísí:** Kọ́kọ́rọ́ API Bearer. A pín àwọn ìpele-ọ̀pọ̀ sí ìwọ̀n kọ́kọ́rọ́-API-kọ̀ọ̀kan.
+**Ìfàṣẹsí:** Kọ́kọ́rọ́ API Bearer — a pín àwọn fáìlì sí ìwọ̀n kọ́kọ́rọ́ API kọ̀ọ̀kan nípasẹ̀ `getApiKeyRequestScope`. Kọ́kọ́rọ́ kan
+rí, gba, ó sì lè pa àwọn fáìlì tirẹ̀ nìkan; session dashboard tí kò ní kọ́kọ́rọ́ máa ń ka gbogbo
+instance náà; fáìlì tí kò ní onílé (ìgbéjáde aláìlórúkọ tàbí ti session dashboard) ni a kọ̀ fún gbogbo
+olùpè tí kì í ṣe ti session. `GET /v1/files` máa kọ olùpè aláìlórúkọ — àti kọ́kọ́rọ́ tí a gbé kalẹ̀ tí
+kò bá ojútùú kankan mu — pẹ̀lú `401` àní nígbà tí `REQUIRE_API_KEY=false`, dípò ṣíṣe àtòjọ àwọn fáìlì
+gbogbo tenant (GHSA-m3hp-hq9g-fpmv, GHSA-2jm2-mpx8-6523).
 
 ---
+
+## API Àwọn Ìdìpọ̀
+
+Ṣíṣe àkójọpọ̀ ní ìdìpọ̀ tó bá OpenAI mu.
+
+| Ọ̀nà    | Ipa-ọ̀nà                   | Àpèjúwe                                                                                                          |
+| ------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/batches`             | Ṣẹ̀dá ìdìpọ̀ — ara ni a fìdí rẹ̀ múlẹ̀ pẹ̀lú `v1BatchCreateSchema` (`input_file_id`, `endpoint`, `completion_window`) |
+| GET    | `/v1/batches`             | Ṣàtòjọ àwọn ìdìpọ̀                                                                                                |
+| GET    | `/v1/batches/[id]`        | Gba ipò ìdìpọ̀ + `request_counts`                                                                                 |
+| DELETE | `/v1/batches/[id]`        | Pa ìdìpọ̀ tí ó ti parí/tí ó kùnà rẹ́                                                                               |
+| POST   | `/v1/batches/[id]/cancel` | Fagilé ìdìpọ̀ tí ó ń lọ lọ́wọ́                                                                                      |
+
+**Ìfàṣẹsí:** Kọ́kọ́rọ́ API Bearer. Àwọn ìdìpọ̀ ní ààlà fún kọ́kọ́rọ́ API kọ̀ọ̀kan lábẹ́ òfin alápa-mẹ́ta kan náà bíi
+àwọn fáìlì: kọ́kọ́rọ́ tirẹ̀ nìkan, session dashboard ká gbogbo instance, àwọn àkọsílẹ̀ tí kò ní olóhun ni a kọ̀ fún gbogbo
+olùpè tí kì í ṣe ti session (gbígbà padà, píparẹ́, fífagilé, àti àyẹ̀wò `input_file_id` nígbà ṣíṣẹ̀dá).
+`GET /v1/batches` kọ olùpè aláìlórúkọ pẹ̀lú `401` kódà nígbà tí `REQUIRE_API_KEY=false`.
 
 ## API Ìṣàwárí
 
@@ -1619,18 +1616,18 @@ oríṣiríṣi provider. Àwọn wọ̀nyí ni ó ń mú àwọn ojúewé `/das
 
 ## Ìṣàkóso Àwọn Irinṣẹ́ CLI
 
-Ṣàkóso àwọn irinṣẹ́ CLI tí ń ṣiṣẹ́ pọ̀ mọ́ OmniRoute (antigravity, chipotle, commandCode,
-devin-cli, àti bẹ́ẹ̀ bẹ́ẹ̀ lọ). Wo [Ìtọ́kasí Provider](./PROVIDER_REFERENCE.md) fún àtòjọ kíkún.
+Ṣàkóso àwọn irinṣẹ́ CLI tí ó ń ṣiṣẹ́ pọ̀ mọ́ OmniRoute (antigravity, commandCode,
+devin-cli, àti bẹ́ẹ̀ bẹ́ẹ̀ lọ). Wo [Ìtọ́kasí Olùpèsè](./PROVIDER_REFERENCE.md) fún àkójọ kíkún.
 
-| Ọ̀nà  | Path                                    | Àpèjúwe                                                                                                                                                           |
+| Ọ̀nà  | Ipa-ọ̀nà                                 | Àpèjúwe                                                                                                                                                           |
 | ---- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET  | `/api/cli-tools/all-statuses`           | Ipò gbogbo àwọn irinṣẹ́ CLI (tí a ti fi sílẹ̀, version, ìgbà tí a rí i kẹ́yìn)                                                                                       |
+| GET  | `/api/cli-tools/all-statuses`           | Ipò gbogbo àwọn irinṣẹ́ CLI (fífìsílẹ̀, ẹ̀yà, ìgbà tí a rí i kẹ́yìn)                                                                                                  |
 | GET  | `/api/cli-tools/status`                 | Àlàyé ipò fún irinṣẹ́ CLI kan (`?tool=` query)                                                                                                                     |
-| POST | `/api/cli-tools/apply`                  | Kọ config tí irinṣẹ́ kan ṣe (`dryRun` ń ṣàfihàn àwòtẹ́lẹ̀; `422` + `containerEphemeralTarget` nígbà tí ó wà nínú container; `migration` ń ṣàkọsílẹ̀ Codex YAML àtijọ́) |
-| GET  | `/api/cli-tools/backups`                | Ṣàkójọ àwọn backup config irinṣẹ́ CLI                                                                                                                              |
-| POST | `/api/cli-tools/backups`                | Ṣẹ̀dá backup gbogbo àwọn config irinṣẹ́ CLI                                                                                                                         |
-| POST | `/api/cli-tools/backups`                | Mú padà: endpoint kan náà pẹ̀lú `{tool, backupId}` nínú body yóò mú backup náà padà                                                                                |
-| GET  | `/api/cli-tools/antigravity-mitm`       | Ipò proxy MITM Antigravity (irinṣẹ́ CLI "antigravity-mitm")                                                                                                        |
+| POST | `/api/cli-tools/apply`                  | Kọ àtúnṣe tí irinṣẹ́ kan ṣẹ̀dá (`dryRun` ń ṣàfihàn àyẹ̀wò; `422` + `containerEphemeralTarget` nígbà tí ó wà nínú container; `migration` ń ṣàkọsílẹ̀ Codex YAML àtijọ́) |
+| GET  | `/api/cli-tools/backups`                | Ṣàkójọ àwọn àfẹ̀yìntì àtúnṣe irinṣẹ́ CLI                                                                                                                            |
+| POST | `/api/cli-tools/backups`                | Ṣẹ̀dá àfẹ̀yìntì gbogbo àwọn àtúnṣe irinṣẹ́ CLI                                                                                                                       |
+| POST | `/api/cli-tools/backups`                | Mú padà: endpoint kan náà pẹ̀lú `{tool, backupId}` nínú body yóò mú àfẹ̀yìntì náà padà                                                                              |
+| GET  | `/api/cli-tools/antigravity-mitm`       | Ipò proxy Antigravity MITM (irinṣẹ́ CLI "antigravity-mitm")                                                                                                        |
 | POST | `/api/cli-tools/antigravity-mitm/alias` | Ṣètò àwọn alias antigravity-mitm                                                                                                                                  |
 
 **Ìfàṣẹsí:** Ó nílò session ìṣàkóso.

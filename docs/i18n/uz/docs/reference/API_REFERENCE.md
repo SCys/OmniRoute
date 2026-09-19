@@ -1,21 +1,12 @@
-# API_REFERENCE (Oʻzbekcha)
+# API Reference (Oʻzbekcha)
 
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
 ---
 
----
-
-title: "API maʼlumotnomasi"
-version: 3.8.51
-lastUpdated: 2026-08-31
----
-
-# API maʼlumotnomasi
-
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
-OmniRoute API uchun asosiy maʼlumotnoma. Unda ommaviy `/v1` interfeysi va eng koʻp ishlatiladigan boshqaruv endpointlari yoritilgan; mashina oʻqiy oladigan [`docs/openapi.yaml`](../openapi.yaml) fayli hamda `src/app/api/` ichidagi marshrutlar daraxti toʻliq manbalar hisoblanadi.
+OmniRoute API uchun asosiy maʼlumotnoma. U ommaviy `/v1` interfeysini va eng ko‘p ishlatiladigan boshqaruv endpointlarini qamrab oladi; mashina o‘qiy oladigan [`docs/openapi.yaml`](../openapi.yaml) fayli va `src/app/api/` ostidagi marshrutlar daraxti to‘liq manbalardir.
 
 ---
 
@@ -510,33 +501,38 @@ Agar provayder prefiksi mavjud boʻlmasa, u avtomatik ravishda qoʻshiladi. Mos 
 
 ## Files API
 
-Paketli kiritish/chiqarish va fayl maqsadiga ko‘ra yuklash uchun OpenAI bilan mos keluvchi fayllar endpointi.
+Paketli kirish/chiqish va fayl maqsadiga ko‘ra yuklash uchun OpenAI bilan mos keluvchi fayllar endpointi.
 
-| Metod  | Yo‘l                     | Tavsif                                                                                                                   |
-| ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| POST   | `/v1/files`              | Faylni yuklash (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — maksimal hajm 512 MiB |
-| GET    | `/v1/files`              | Autentifikatsiya qilingan API kaliti uchun fayllar ro‘yxatini olish                                                      |
-| GET    | `/v1/files/[id]`         | Fayl metama’lumotlarini olish                                                                                            |
-| DELETE | `/v1/files/[id]`         | Faylni o‘chirish                                                                                                         |
-| GET    | `/v1/files/[id]/content` | Faylning xom mazmunini oqim tarzida qaytarish                                                                            |
+| Metod  | Yo‘l                     | Tavsif                                                                                                              |
+| ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/files`              | Faylni yuklash (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — maksimum 512 MiB |
+| GET    | `/v1/files`              | Autentifikatsiya qilingan API kaliti uchun fayllar ro‘yxatini olish                                                 |
+| GET    | `/v1/files/[id]`         | Fayl metama’lumotlarini olish                                                                                       |
+| DELETE | `/v1/files/[id]`         | Faylni o‘chirish                                                                                                    |
+| GET    | `/v1/files/[id]/content` | Faylning ishlov berilmagan tarkibini oqim tarzida qaytarish                                                         |
 
-**Autentifikatsiya:** Bearer API kaliti — fayllar `getApiKeyRequestScope` orqali har bir API kaliti doirasida ajratiladi.
+**Autentifikatsiya:** Bearer API kaliti — fayllar `getApiKeyRequestScope` orqali har bir API kaliti doirasida ajratiladi. Kalit
+faqat o‘ziga tegishli fayllarni ko‘radi, yuklab oladi va o‘chiradi; kalitsiz boshqaruv paneli sessiyasi
+butun instansiyani o‘qiydi; egasi bo‘lmagan faylga (anonim yoki boshqaruv paneli sessiyasi orqali yuklangan)
+sessiyasiz murojaat qiluvchilarning barchasi uchun ruxsat berilmaydi. `GET /v1/files` anonim murojaat qiluvchini
+hamda taqdim etilgan, ammo aniqlanmaydigan kalitni, hatto `REQUIRE_API_KEY=false` bo‘lganda ham, barcha ijarachilarning
+fayllarini ro‘yxatlash o‘rniga `401` bilan rad etadi (GHSA-m3hp-hq9g-fpmv, GHSA-2jm2-mpx8-6523).
 
 ---
 
 ## Batches API
 
-OpenAI bilan mos keluvchi paketli qayta ishlash.
+OpenAI bilan mos keluvchi paketli ishlov berish.
 
-| Metod  | Yo‘l                      | Tavsif                                                                                                                      |
+| Metod  | Yoʻl                      | Tavsif                                                                                                                      |
 | ------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/batches`             | Paket yaratish — so‘rov tanasi `v1BatchCreateSchema` orqali tekshiriladi (`input_file_id`, `endpoint`, `completion_window`) |
-| GET    | `/v1/batches`             | Paketlar ro‘yxatini olish                                                                                                   |
+| POST   | `/v1/batches`             | Paket yaratish — soʻrov tanasi `v1BatchCreateSchema` orqali tekshiriladi (`input_file_id`, `endpoint`, `completion_window`) |
+| GET    | `/v1/batches`             | Paketlar roʻyxatini olish                                                                                                   |
 | GET    | `/v1/batches/[id]`        | Paket holati va `request_counts`ni olish                                                                                    |
-| DELETE | `/v1/batches/[id]`        | Yakunlangan/muvaffaqiyatsiz paketni o‘chirish                                                                               |
+| DELETE | `/v1/batches/[id]`        | Yakunlangan/muvaffaqiyatsiz paketni oʻchirish                                                                               |
 | POST   | `/v1/batches/[id]/cancel` | Jarayondagi paketni bekor qilish                                                                                            |
 
-**Autentifikatsiya:** Bearer API kaliti. Paketlar har bir API kaliti doirasida ajratiladi.
+**Autentifikatsiya:** Bearer API kaliti. Paketlar fayllardagi kabi ayni uch tomonlama qoida asosida har bir API kaliti doirasida ajratiladi: faqat oʻz kaliti uchun ruxsat beriladi, boshqaruv paneli seansi barcha instansiyalar doirasida ruxsatga ega, egasi koʻrsatilmagan yozuvlarga esa seanssiz barcha murojaat qiluvchilar uchun ruxsat berilmaydi (olish, oʻchirish, bekor qilish va yaratishdagi `input_file_id` tekshiruvi). `GET /v1/batches` anonim murojaat qiluvchining soʻrovini, hatto `REQUIRE_API_KEY=false` boʻlganda ham, `401` bilan rad etadi.
 
 ---
 
@@ -1588,21 +1584,21 @@ Operatsion boshqaruv uchun faqat administratorlarga moʻljallangan endpointlar.
 
 ## CLI vositalarini boshqarish
 
-OmniRoute bilan integratsiyalashadigan CLI vositalarini (antigravity, chipotle, commandCode,
+OmniRoute bilan integratsiyalashadigan CLI vositalarini (antigravity, commandCode,
 devin-cli va boshqalar) boshqaring. Toʻliq roʻyxat uchun [Provayder maʼlumotnomasi](./PROVIDER_REFERENCE.md)ga qarang.
 
-| Metod | Yoʻl                                    | Tavsif                                                                                                                                                                                    |
-| ----- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET   | `/api/cli-tools/all-statuses`           | Barcha CLI vositalarining holati (oʻrnatilganligi, versiyasi, oxirgi faollik vaqti)                                                                                                       |
-| GET   | `/api/cli-tools/status`                 | Bitta CLI vositasi holati tafsilotlari (`?tool=` soʻrovi)                                                                                                                                 |
-| POST  | `/api/cli-tools/apply`                  | Vosita uchun yaratilgan konfiguratsiyani yozish (`dryRun` oldindan koʻrsatadi; konteynerlashtirilganda `422` + `containerEphemeralTarget`; `migration` eski Codex YAML haqida qayd etadi) |
-| GET   | `/api/cli-tools/backups`                | CLI vositalari konfiguratsiyasi zaxira nusxalarini roʻyxatlash                                                                                                                            |
-| POST  | `/api/cli-tools/backups`                | Barcha CLI vositalari konfiguratsiyalarining zaxira nusxasini yaratish                                                                                                                    |
-| POST  | `/api/cli-tools/backups`                | Tiklash: tanada `{tool, backupId}` bilan ayni endpoint ushbu zaxira nusxasini tiklaydi                                                                                                    |
-| GET   | `/api/cli-tools/antigravity-mitm`       | Antigravity MITM proksi holati (`antigravity-mitm` CLI vositasi)                                                                                                                          |
-| POST  | `/api/cli-tools/antigravity-mitm/alias` | antigravity-mitm taxalluslarini sozlash                                                                                                                                                   |
+| Metod | Yoʻl                                    | Tavsif                                                                                                                                                                                   |
+| ----- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET   | `/api/cli-tools/all-statuses`           | Barcha CLI vositalarining holati (oʻrnatilganligi, versiyasi, oxirgi aniqlangan vaqti)                                                                                                   |
+| GET   | `/api/cli-tools/status`                 | Bitta CLI vositasi uchun batafsil holat (`?tool=` soʻrovi)                                                                                                                               |
+| POST  | `/api/cli-tools/apply`                  | Vosita uchun yaratilgan konfiguratsiyani yozish (`dryRun` — oldindan koʻrish; konteynerlashtirilganda `422` + `containerEphemeralTarget`; `migration` eski Codex YAML haqida qayd etadi) |
+| GET   | `/api/cli-tools/backups`                | CLI vositalari konfiguratsiyasi zaxira nusxalarini roʻyxatlash                                                                                                                           |
+| POST  | `/api/cli-tools/backups`                | Barcha CLI vositalari konfiguratsiyalarining zaxira nusxasini yaratish                                                                                                                   |
+| POST  | `/api/cli-tools/backups`                | Tiklash: soʻrov tanasida `{tool, backupId}` bilan ayni endpoint ushbu zaxira nusxasini tiklaydi                                                                                          |
+| GET   | `/api/cli-tools/antigravity-mitm`       | Antigravity MITM proksisi holati (`antigravity-mitm` CLI vositasi)                                                                                                                       |
+| POST  | `/api/cli-tools/antigravity-mitm/alias` | antigravity-mitm taxalluslarini sozlash                                                                                                                                                  |
 
-**Autentifikatsiya:** Boshqaruv seansi talab qilinadi.
+**Autentifikatsiya:** Boshqaruv sessiyasi talab qilinadi.
 
 ---
 

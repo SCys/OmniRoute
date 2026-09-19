@@ -1,21 +1,12 @@
-# API_REFERENCE (ქართული)
+# API Reference (ქართული)
 
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
 ---
 
----
-
-title: "API ცნობარი"
-version: 3.8.51
-lastUpdated: 2026-08-31
----
-
-# API ცნობარი
-
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇳🇬 [ig](../../../ig/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
-OmniRoute API-ის ძირითადი ცნობარი. იგი მოიცავს საჯარო `/v1` ინტერფეისსა და ყველაზე ხშირად გამოყენებულ მართვის საბოლოო წერტილებს; ამომწურავი წყაროებია მანქანურად წაკითხვადი [`docs/openapi.yaml`](../openapi.yaml) და `src/app/api/`-ის ქვეშ არსებული მარშრუტების ხე.
+OmniRoute API-ის ძირითადი ცნობარი. იგი მოიცავს საჯარო `/v1` ინტერფეისსა და მართვის ყველაზე ხშირად გამოყენებულ საბოლოო წერტილებს; ამომწურავი წყაროებია მანქანურად წაკითხვადი [`docs/openapi.yaml`](../openapi.yaml) და მარშრუტების ხე `src/app/api/`-ის ქვეშ.
 
 ---
 
@@ -490,17 +481,22 @@ POST /v1/providers/{provider}/images/generations
 
 ## Files API
 
-OpenAI-თან თავსებადი ფაილების endpoint-ი პაკეტური შეყვანის/გამოტანისა და დანიშნულების მიხედვით ფაილების ატვირთვისთვის.
+OpenAI-თან თავსებადი ფაილების endpoint პაკეტური შეყვანა/გამოტანისა და ფაილის დანიშნულების მიხედვით ატვირთვისთვის.
 
-| მეთოდი | მისამართი                | აღწერა                                                                                                               |
-| ------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/files`              | ფაილის ატვირთვა (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — მაქსიმუმ 512 MiB |
-| GET    | `/v1/files`              | ავთენტიფიცირებულ API გასაღებთან დაკავშირებული ფაილების სიის მიღება                                                   |
-| GET    | `/v1/files/[id]`         | ფაილის მეტამონაცემების მიღება                                                                                        |
-| DELETE | `/v1/files/[id]`         | ფაილის წაშლა                                                                                                         |
-| GET    | `/v1/files/[id]/content` | ფაილის დაუმუშავებელი შიგთავსის ნაკადის სახით დაბრუნება                                                               |
+| მეთოდი | გზა                      | აღწერა                                                                                                            |
+| ------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/files`              | ფაილის ატვირთვა (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — მაქს. 512 MiB |
+| GET    | `/v1/files`              | ავტორიზებული API გასაღების ფაილების სიის მიღება                                                                   |
+| GET    | `/v1/files/[id]`         | ფაილის მეტამონაცემების მიღება                                                                                     |
+| DELETE | `/v1/files/[id]`         | ფაილის წაშლა                                                                                                      |
+| GET    | `/v1/files/[id]/content` | ფაილის დაუმუშავებელი შიგთავსის ნაკადის სახით დაბრუნება                                                            |
 
-**ავთენტიფიკაცია:** Bearer API გასაღები — ფაილები თითოეული API გასაღების მიხედვით იზოლირებულია `getApiKeyRequestScope`-ის მეშვეობით.
+**ავტორიზაცია:** Bearer API გასაღები — `getApiKeyRequestScope`-ის მეშვეობით ფაილები თითოეული API გასაღების მიხედვით იზოლირებულია. გასაღებს
+მხოლოდ საკუთარი ფაილების ნახვა, ჩამოტვირთვა და წაშლა შეუძლია; მართვის პანელის სესია გასაღების გარეშე მთელ
+ინსტანციას კითხულობს; მფლობელის არმქონე ფაილზე (ანონიმური ან მართვის პანელის სესიიდან ატვირთული) წვდომა ეკრძალება ყველა
+არასესიურ გამომძახებელს. `GET /v1/files` ანონიმური გამომძახებლისგან — ასევე წარდგენილი, მაგრამ
+ვერ ამოცნობილი გასაღების შემთხვევაში — აბრუნებს `401`-ს მაშინაც კი, როცა `REQUIRE_API_KEY=false`, ნაცვლად იმისა, რომ ყველა tenant-ის
+ფაილები ჩამოთვალოს (GHSA-m3hp-hq9g-fpmv, GHSA-2jm2-mpx8-6523).
 
 ---
 
@@ -516,7 +512,10 @@ OpenAI-თან თავსებადი პაკეტური დამ�
 | DELETE | `/v1/batches/[id]`        | დასრულებული/წარუმატებელი პაკეტის წაშლა                                                                                 |
 | POST   | `/v1/batches/[id]/cancel` | მიმდინარე პაკეტის გაუქმება                                                                                             |
 
-**ავთენტიფიკაცია:** Bearer API გასაღები. პაკეტები თითოეული API გასაღების მიხედვით იზოლირებულია.
+**ავთენტიფიკაცია:** Bearer API გასაღები. პაკეტები თითოეული API გასაღების მიხედვით იზოლირებულია იმავე სამმხრივი წესით, როგორც
+ფაილები: წვდომა აქვს მხოლოდ საკუთარ გასაღებს, დაფის სესიას — ინსტანციის მასშტაბით, ხოლო მფლობელის არმქონე ჩანაწერებზე წვდომა აკრძალულია ყველა
+არასესიური გამომძახებლისთვის (მიღება, წაშლა, გაუქმება და შექმნისას `input_file_id`-ის შემოწმება).
+`GET /v1/batches` ანონიმურ გამომძახებელს აბრუნებს `401`-ს მაშინაც კი, როცა `REQUIRE_API_KEY=false`.
 
 ---
 
@@ -1572,21 +1571,21 @@ GET /.well-known/agent.json
 
 ## CLI ინსტრუმენტების მართვა
 
-მართეთ CLI ინსტრუმენტები, რომლებიც OmniRoute-თან ინტეგრირდება (antigravity, chipotle, commandCode,
-devin-cli და სხვ.). სრული სიისთვის იხილეთ [პროვაიდერის ცნობარი](./PROVIDER_REFERENCE.md).
+მართეთ CLI ინსტრუმენტები, რომლებიც ინტეგრირებულია OmniRoute-თან (antigravity, commandCode,
+devin-cli და სხვ.). სრული სიისთვის იხილეთ [პროვაიდერების ცნობარი](./PROVIDER_REFERENCE.md).
 
-| მეთოდი | გზა                                     | აღწერა                                                                                                                                                                                          |
+| მეთოდი | მისამართი                               | აღწერა                                                                                                                                                                                          |
 | ------ | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/cli-tools/all-statuses`           | ყველა CLI ინსტრუმენტის სტატუსი (დაინსტალირებული მდგომარეობა, ვერსია, ბოლო გამოჩენა)                                                                                                             |
-| GET    | `/api/cli-tools/status`                 | ერთი CLI ინსტრუმენტის სტატუსის დეტალები (`?tool=` query)                                                                                                                                        |
+| GET    | `/api/cli-tools/all-statuses`           | ყველა CLI ინსტრუმენტის სტატუსი (დაინსტალირებული მდგომარეობა, ვერსია, ბოლოს დაფიქსირების დრო)                                                                                                    |
+| GET    | `/api/cli-tools/status`                 | ერთი CLI ინსტრუმენტის სტატუსის დეტალები (`?tool=` მოთხოვნის პარამეტრი)                                                                                                                          |
 | POST   | `/api/cli-tools/apply`                  | ინსტრუმენტის გენერირებული კონფიგურაციის ჩაწერა (`dryRun` აჩვენებს წინასწარ შედეგს; კონტეინერში გაშვებისას — `422` + `containerEphemeralTarget`; `migration` მიუთითებს მოძველებულ Codex YAML-ზე) |
-| GET    | `/api/cli-tools/backups`                | CLI ინსტრუმენტების კონფიგურაციის სარეზერვო ასლების ჩამონათვალი                                                                                                                                  |
+| GET    | `/api/cli-tools/backups`                | CLI ინსტრუმენტების კონფიგურაციის სარეზერვო ასლების სია                                                                                                                                          |
 | POST   | `/api/cli-tools/backups`                | ყველა CLI ინსტრუმენტის კონფიგურაციის სარეზერვო ასლის შექმნა                                                                                                                                     |
-| POST   | `/api/cli-tools/backups`                | აღდგენა: იგივე endpoint body-ში `{tool, backupId}`-ით აღადგენს შესაბამის სარეზერვო ასლს                                                                                                         |
+| POST   | `/api/cli-tools/backups`                | აღდგენა: იგივე საბოლოო წერტილი, სადაც მოთხოვნის სხეულში `{tool, backupId}` აღადგენს შესაბამის სარეზერვო ასლს                                                                                    |
 | GET    | `/api/cli-tools/antigravity-mitm`       | Antigravity MITM პროქსის სტატუსი (`antigravity-mitm` CLI ინსტრუმენტი)                                                                                                                           |
-| POST   | `/api/cli-tools/antigravity-mitm/alias` | antigravity-mitm-ის alias-ების კონფიგურაცია                                                                                                                                                     |
+| POST   | `/api/cli-tools/antigravity-mitm/alias` | antigravity-mitm-ის ფსევდონიმების კონფიგურაცია                                                                                                                                                  |
 
-**ავტორიზაცია:** საჭიროა მართვის სესია.
+**ავთენტიფიკაცია:** საჭიროა მართვის სესია.
 
 ---
 

@@ -1,21 +1,12 @@
-# API_REFERENCE (Igbo)
+# API Reference (Igbo)
 
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
 ---
 
----
-
-title: "Ntụaka API"
-version: 3.8.51
-lastUpdated: 2026-08-31
----
-
-# Ntụaka API
-
 🌐 **Languages:** 🇺🇸 [English](../../../../reference/API_REFERENCE.md) · 🇪🇹 [am](../../../am/docs/reference/API_REFERENCE.md) · 🇸🇦 [ar](../../../ar/docs/reference/API_REFERENCE.md) · 🇦🇿 [az](../../../az/docs/reference/API_REFERENCE.md) · 🇧🇬 [bg](../../../bg/docs/reference/API_REFERENCE.md) · 🇧🇩 [bn](../../../bn/docs/reference/API_REFERENCE.md) · 🇨🇿 [cs](../../../cs/docs/reference/API_REFERENCE.md) · 🇩🇰 [da](../../../da/docs/reference/API_REFERENCE.md) · 🇩🇪 [de](../../../de/docs/reference/API_REFERENCE.md) · 🇬🇷 [el](../../../el/docs/reference/API_REFERENCE.md) · 🇪🇸 [es](../../../es/docs/reference/API_REFERENCE.md) · 🇪🇪 [et](../../../et/docs/reference/API_REFERENCE.md) · 🇮🇷 [fa](../../../fa/docs/reference/API_REFERENCE.md) · 🇫🇮 [fi](../../../fi/docs/reference/API_REFERENCE.md) · 🇫🇷 [fr](../../../fr/docs/reference/API_REFERENCE.md) · 🇮🇪 [ga](../../../ga/docs/reference/API_REFERENCE.md) · 🇮🇳 [gu](../../../gu/docs/reference/API_REFERENCE.md) · 🇳🇬 [ha](../../../ha/docs/reference/API_REFERENCE.md) · 🇮🇱 [he](../../../he/docs/reference/API_REFERENCE.md) · 🇮🇳 [hi](../../../hi/docs/reference/API_REFERENCE.md) · 🇭🇷 [hr](../../../hr/docs/reference/API_REFERENCE.md) · 🇭🇺 [hu](../../../hu/docs/reference/API_REFERENCE.md) · 🇦🇲 [hy](../../../hy/docs/reference/API_REFERENCE.md) · 🇮🇩 [id](../../../id/docs/reference/API_REFERENCE.md) · 🇮🇹 [it](../../../it/docs/reference/API_REFERENCE.md) · 🇯🇵 [ja](../../../ja/docs/reference/API_REFERENCE.md) · 🇬🇪 [ka](../../../ka/docs/reference/API_REFERENCE.md) · 🇰🇭 [km](../../../km/docs/reference/API_REFERENCE.md) · 🇮🇳 [kn](../../../kn/docs/reference/API_REFERENCE.md) · 🇰🇷 [ko](../../../ko/docs/reference/API_REFERENCE.md) · 🇱🇹 [lt](../../../lt/docs/reference/API_REFERENCE.md) · 🇱🇻 [lv](../../../lv/docs/reference/API_REFERENCE.md) · 🇮🇳 [ml](../../../ml/docs/reference/API_REFERENCE.md) · 🇮🇳 [mr](../../../mr/docs/reference/API_REFERENCE.md) · 🇲🇾 [ms](../../../ms/docs/reference/API_REFERENCE.md) · 🇲🇹 [mt](../../../mt/docs/reference/API_REFERENCE.md) · 🇲🇲 [my](../../../my/docs/reference/API_REFERENCE.md) · 🇳🇵 [ne](../../../ne/docs/reference/API_REFERENCE.md) · 🇳🇱 [nl](../../../nl/docs/reference/API_REFERENCE.md) · 🇳🇴 [no](../../../no/docs/reference/API_REFERENCE.md) · 🇮🇳 [or](../../../or/docs/reference/API_REFERENCE.md) · 🇮🇳 [pa](../../../pa/docs/reference/API_REFERENCE.md) · 🇵🇭 [phi](../../../phi/docs/reference/API_REFERENCE.md) · 🇵🇱 [pl](../../../pl/docs/reference/API_REFERENCE.md) · 🇵🇹 [pt](../../../pt/docs/reference/API_REFERENCE.md) · 🇧🇷 [pt-BR](../../../pt-BR/docs/reference/API_REFERENCE.md) · 🇷🇴 [ro](../../../ro/docs/reference/API_REFERENCE.md) · 🇷🇺 [ru](../../../ru/docs/reference/API_REFERENCE.md) · 🇱🇰 [si](../../../si/docs/reference/API_REFERENCE.md) · 🇸🇰 [sk](../../../sk/docs/reference/API_REFERENCE.md) · 🇸🇮 [sl](../../../sl/docs/reference/API_REFERENCE.md) · 🇷🇸 [sr](../../../sr/docs/reference/API_REFERENCE.md) · 🇸🇪 [sv](../../../sv/docs/reference/API_REFERENCE.md) · 🇰🇪 [sw](../../../sw/docs/reference/API_REFERENCE.md) · 🇮🇳 [ta](../../../ta/docs/reference/API_REFERENCE.md) · 🇮🇳 [te](../../../te/docs/reference/API_REFERENCE.md) · 🇹🇭 [th](../../../th/docs/reference/API_REFERENCE.md) · 🇹🇷 [tr](../../../tr/docs/reference/API_REFERENCE.md) · 🇺🇦 [uk-UA](../../../uk-UA/docs/reference/API_REFERENCE.md) · 🇵🇰 [ur](../../../ur/docs/reference/API_REFERENCE.md) · 🇺🇿 [uz](../../../uz/docs/reference/API_REFERENCE.md) · 🇻🇳 [vi](../../../vi/docs/reference/API_REFERENCE.md) · 🇳🇬 [yo](../../../yo/docs/reference/API_REFERENCE.md) · 🇨🇳 [zh-CN](../../../zh-CN/docs/reference/API_REFERENCE.md) · 🇹🇼 [zh-TW](../../../zh-TW/docs/reference/API_REFERENCE.md)
 
-Ntụaka bụ isi maka API OmniRoute. Ọ na-ekpuchi ihu ọha `/v1` na endpoint njikwa ndị a kacha eji eme ihe; [`docs/openapi.yaml`](../openapi.yaml) nke igwe nwere ike ịgụ na osisi route dị n'okpuru `src/app/api/` bụ isi mmalite zuru ezu.
+Ntụaka bụ isi maka OmniRoute API. Ọ na-ekpuchi ihu ọha `/v1` na endpoint nchịkwa ndị a na-ejikarị eme ihe; [`docs/openapi.yaml`](../openapi.yaml) nke igwe nwere ike ịgụ na osisi route dị n'okpuru `src/app/api/` bụ isi mmalite zuru ezu.
 
 ---
 
@@ -520,35 +511,43 @@ A na-agbakwunye nganiihu onye na-enye ọrụ na-akpaghị aka ma ọ bụrụ n
 
 ---
 
-## API Faịlụ
+## Files API
 
-Endpoint faịlụ dakọtara na OpenAI maka ntinye/mmepụta n'ìgwè na ibugo faịlụ dịka ebumnuche ha si dị.
+Ebe njedebe faịlụ kwekọrọ na OpenAI maka ntinye/mmepụta n'ìgwè na nbugo faịlụ dịka ebumnuche ha si dị.
 
 | Usoro  | Ụzọ                      | Nkọwa                                                                                                          |
 | ------ | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | POST   | `/v1/files`              | Bulite faịlụ (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — kacha 512 MiB |
-| GET    | `/v1/files`              | Depụta faịlụ maka API key e jiri nyochaa njirimara                                                             |
-| GET    | `/v1/files/[id]`         | Nweta metadata faịlụ                                                                                           |
+| GET    | `/v1/files`              | Depụta faịlụ maka igodo API e ji nyochaa njirimara                                                             |
+| GET    | `/v1/files/[id]`         | Nweta metadata nke faịlụ                                                                                       |
 | DELETE | `/v1/files/[id]`         | Hichapụ faịlụ                                                                                                  |
-| GET    | `/v1/files/[id]/content` | Nyefee ọdịnaya faịlụ ahụ na-agbanweghị agbanweghachi                                                           |
+| GET    | `/v1/files/[id]/content` | Zighachi ọdịnaya faịlụ ahụ kpọmkwem dịka iyi data                                                              |
 
-**Nyocha njirimara:** Bearer API key — a na-ekewapụta faịlụ n'otu n'otu dịka API key si dị site na `getApiKeyRequestScope`.
+**Nyocha njirimara:** Igodo API Bearer — a na-ekewa faịlụ n'ogo igodo API site na `getApiKeyRequestScope`. Otu igodo
+na-ahụ, na-ebudata ma na-ehichapụ naanị faịlụ nke ya; nnọkọ dashboard na-enweghị igodo na-agụ
+instance ahụ niile; a na-ajụ onye ọ bụla na-akpọ oku na-abụghị site na nnọkọ ohere ịnweta faịlụ na-enweghị onye nwe ya (nke onye amaghị aha ma ọ bụ nke e bulitere site na nnọkọ dashboard).
+`GET /v1/files` na-ajụ onye na-akpọ oku n'amaghị aha — yana igodo e nyere nke a na-enweghị ike
+ịchọpụta — site na `401` ọbụlagodi mgbe `REQUIRE_API_KEY=false`, kama idepụta faịlụ nke ndị tenant
+niile (GHSA-m3hp-hq9g-fpmv, GHSA-2jm2-mpx8-6523).
 
 ---
 
-## API Batches
+## Batches API
 
-Nhazi ọrụ n'ìgwè nke dakọtara na OpenAI.
+Nhazi batch nke dakọtara na OpenAI.
 
-| Usoro  | Ụzọ                       | Nkọwa                                                                                                   |
-| ------ | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/batches`             | Mepụta batch — `v1BatchCreateSchema` na-enyocha body (`input_file_id`, `endpoint`, `completion_window`) |
-| GET    | `/v1/batches`             | Depụta batches                                                                                          |
-| GET    | `/v1/batches/[id]`        | Nweta ọnọdụ batch + `request_counts`                                                                    |
-| DELETE | `/v1/batches/[id]`        | Hichapụ batch gwụchara/kụrụ afọ n'ala                                                                   |
-| POST   | `/v1/batches/[id]/cancel` | Kagbuo batch a ka na-arụ ọrụ                                                                            |
+| Usoro  | Ụzọ                       | Nkọwa                                                                                                         |
+| ------ | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/batches`             | Mepụta batch — a na-eji `v1BatchCreateSchema` enyocha body (`input_file_id`, `endpoint`, `completion_window`) |
+| GET    | `/v1/batches`             | Depụta batches                                                                                                |
+| GET    | `/v1/batches/[id]`        | Nweta ọnọdụ batch + `request_counts`                                                                          |
+| DELETE | `/v1/batches/[id]`        | Hichapụ batch nke mechara/daa                                                                                 |
+| POST   | `/v1/batches/[id]/cancel` | Kagbuo batch a ka na-ahazi                                                                                    |
 
-**Nyocha njirimara:** Bearer API key. A na-ekewapụta batches n'otu n'otu dịka API key si dị.
+**Nnyocha ikike:** Bearer API key. A na-ekewa batches n’otu API key n’okpuru otu iwu ụzọ atọ ahụ dịka
+faịlụ: naanị key nke onye nwe ya, nnọkọ dashboard nwere ikike n’ofe instance niile, a na-ajụkwa onye ọ bụla
+na-abụghị onye na-akpọ site na nnọkọ ịnweta ndekọ null-owner (ịnweta, ihichapụ, ịkagbu, yana nyocha `input_file_id` mgbe a na-emepụta).
+`GET /v1/batches` na-eji `401` ajụ onye na-akpọ na-enweghị njirimara ọbụna mgbe `REQUIRE_API_KEY=false`.
 
 ---
 
@@ -1611,21 +1610,21 @@ Ebe njedebe ndị naanị onye nchịkwa nwere ike iji maka njikwa ọrụ.
 
 ## Njikwa Ngwaọrụ CLI
 
-Jikwaa ngwaọrụ CLI ndị na-ejikọta na OmniRoute (antigravity, chipotle, commandCode,
-devin-cli, wdg.). Lee [Ntụaka Onye Na-eweta](./PROVIDER_REFERENCE.md) maka ndepụta zuru ezu.
+Jikwaa ngwaọrụ CLI ndị na-arụkọ ọrụ na OmniRoute (antigravity, commandCode,
+devin-cli, wdg.). Hụ [Ntụaka Ndị Na-eweta Ọrụ](./PROVIDER_REFERENCE.md) maka ndepụta zuru ezu.
 
 | Usoro | Ụzọ                                     | Nkọwa                                                                                                                                                                 |
 | ----- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | GET   | `/api/cli-tools/all-statuses`           | Ọnọdụ ngwaọrụ CLI niile (arụnyere, ụdị, oge ikpeazụ a hụrụ ya)                                                                                                        |
 | GET   | `/api/cli-tools/status`                 | Nkọwa ọnọdụ maka otu ngwaọrụ CLI (ajụjụ `?tool=`)                                                                                                                     |
-| POST  | `/api/cli-tools/apply`                  | Dee config e mepụtara maka ngwaọrụ (`dryRun` na-egosi ihe ga-apụta; `422` + `containerEphemeralTarget` mgbe ọ nọ na container; `migration` na-akọwa Codex YAML ochie) |
-| GET   | `/api/cli-tools/backups`                | Depụta nkwado ndabere config ngwaọrụ CLI                                                                                                                              |
-| POST  | `/api/cli-tools/backups`                | Mepụta nkwado ndabere nke config ngwaọrụ CLI niile                                                                                                                    |
-| POST  | `/api/cli-tools/backups`                | Weghachite: otu ebe njedebe ahụ nwere `{tool, backupId}` n'ahụ na-eweghachite nkwado ndabere ahụ                                                                      |
-| GET   | `/api/cli-tools/antigravity-mitm`       | Ọnọdụ proxy Antigravity MITM (ngwaọrụ CLI "antigravity-mitm")                                                                                                         |
-| POST  | `/api/cli-tools/antigravity-mitm/alias` | Hazie aha nnọchi antigravity-mitm                                                                                                                                     |
+| POST  | `/api/cli-tools/apply`                  | Dee nhazi emepụtara nke ngwaọrụ (`dryRun` na-egosi ihe ga-apụta; `422` + `containerEphemeralTarget` mgbe ọ dị n'ime container; `migration` na-akọwa Codex YAML ochie) |
+| GET   | `/api/cli-tools/backups`                | Depụta ndabere nhazi ngwaọrụ CLI                                                                                                                                      |
+| POST  | `/api/cli-tools/backups`                | Mepụta ndabere nke nhazi ngwaọrụ CLI niile                                                                                                                            |
+| POST  | `/api/cli-tools/backups`                | Weghachite: otu endpoint ahụ nwere `{tool, backupId}` n'ime body na-eweghachite ndabere ahụ                                                                           |
+| GET   | `/api/cli-tools/antigravity-mitm`       | Ọnọdụ proxy MITM nke Antigravity (ngwaọrụ CLI "antigravity-mitm")                                                                                                     |
+| POST  | `/api/cli-tools/antigravity-mitm/alias` | Hazie alias nke antigravity-mitm                                                                                                                                      |
 
-**Nyocha ikike:** Chọrọ nnọkọ njikwa.
+**Nyocha ikike:** Chọrọ session njikwa.
 
 ---
 
