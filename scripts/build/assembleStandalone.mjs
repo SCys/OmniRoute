@@ -109,6 +109,13 @@ export const NATIVE_ASSET_ENTRIES = [
     src: ["src", "mitm", "tproxy", "native", "build", "Release", "transparent.node"],
     dest: ["src", "mitm", "tproxy", "native", "build", "Release", "transparent.node"],
   },
+  {
+    // Rust-accelerated native compression addon. Built by build-compression-native
+    // before assembly. Non-fatal / best-effort: absent when cargo is unavailable.
+    label: "Compression native acceleration addon",
+    src: ["open-sse", "services", "compression", "native", "omniroute_compression_native.node"],
+    dest: ["open-sse", "services", "compression", "native", "omniroute_compression_native.node"],
+  },
 ];
 
 /** @type {{label:string, src:string[], dest:string[]}[]} */

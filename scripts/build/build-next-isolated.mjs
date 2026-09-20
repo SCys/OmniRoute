@@ -351,6 +351,23 @@ export async function main() {
         );
       }
 
+      // Best-effort: build Rust compression native addon before assembling standalone.
+      // Missing cargo or build failure is non-fatal: compression falls back to pure TypeScript.
+      try {
+        const { buildCompressionNative } = await import("./build-compression-native.mjs");
+        const compRes = buildCompressionNative(projectRoot);
+        console.log(
+          compRes.built
+            ? "[build-next-isolated] Built compression native addon (omniroute_compression_native.node)"
+            : `[build-next-isolated] Compression native addon skipped: ${compRes.reason}`
+        );
+      } catch (compErr) {
+        console.warn(
+          "[build-next-isolated] Non-fatal error building compression native addon:",
+          compErr?.message
+        );
+      }
+
       try {
         console.log(
           "[build-next-isolated] Assembling standalone bundle (static + public + natives + extras)..."
