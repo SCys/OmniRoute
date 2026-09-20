@@ -1,6 +1,7 @@
 import type { RtkFilterDefinition } from "./filterSchema.ts";
 import { smartTruncate } from "./smartTruncate.ts";
 import { deduplicateRepeatedLines } from "./deduplicator.ts";
+import { stripAnsiFast } from "../../native/index.ts";
 
 export interface LineFilterResult {
   text: string;
@@ -47,7 +48,7 @@ function compileBlobPattern(pattern: string): RegExp | null {
 }
 
 function stripAnsi(text: string): string {
-  return text.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "");
+  return stripAnsiFast(text);
 }
 
 function normalizeStderrPrefix(line: string): string {

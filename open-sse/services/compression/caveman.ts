@@ -13,6 +13,7 @@ import { validateCompression } from "./validation.ts";
 import { mapTextContent } from "./messageContent.ts";
 import { detectCompressionLanguage } from "./languageDetector.ts";
 import { isCodeLikeLine } from "./toolResultCompressor.ts";
+import { cleanupArtifactsFast } from "./native/index.ts";
 
 interface ChatMessage {
   role: string;
@@ -216,15 +217,7 @@ export function applyRulesToText(
 }
 
 function cleanupArtifacts(text: string): string {
-  if (!text) return "";
-  return text
-    .replace(/[ \t]{2,}/g, " ")
-    .replace(/[ \t]+([,.;:!?])/g, "$1")
-    .replace(/([.!?]){2,}/g, (m) => m[m.length - 1])
-    .replace(/[ \t]+$/gm, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/^\n+/, "")
-    .replace(/\n+$/, "");
+  return cleanupArtifactsFast(text);
 }
 
 /**

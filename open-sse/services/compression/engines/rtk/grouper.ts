@@ -11,6 +11,8 @@
  * Non-similar lines are passed through unchanged.
  */
 
+import { isNativeCompressionAvailable, getNativeCompressionAddon } from "../../native/index.ts";
+
 export interface GroupingOptions {
   /** Minimum run length to trigger grouping (default: 3). */
   threshold?: number;
@@ -65,6 +67,13 @@ export function normalizeLine(line: string): string {
  * where N is the total count of lines in that group.
  */
 export function groupSimilarLines(text: string, options: GroupingOptions = {}): GroupingResult {
+  if (isNativeCompressionAvailable()) {
+    const addon = getNativeCompressionAddon();
+    if (addon) {
+      return addon.nativeGroupSimilarLines(text, options.threshold);
+    }
+  }
+
   const threshold = Math.max(2, Math.floor(options.threshold ?? 3));
   const lines = text.split(/\r?\n/);
   const output: string[] = [];
