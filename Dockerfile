@@ -57,7 +57,8 @@ RUN set -eux; \
   npm cache clean --force
 
 # ── Builder ────────────────────────────────────────────────────────────────
-FROM base AS builder
+# ── Builder Dependencies ───────────────────────────────────────────────────
+FROM base AS builder-deps
 
 # No telemetry, anywhere. Disable Next.js's anonymous build-time telemetry
 # (it otherwise pings Vercel during `next build`). Set on the builder stage so
@@ -110,6 +111,9 @@ RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-npm-cache,targe
   && test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node \
   && node -e "require('better-sqlite3')(':memory:').close()" \
   && node -e "const wreq=require('wreq-js'); if(typeof wreq.createTransport!=='function') process.exit(1)"
+
+# ── Builder ────────────────────────────────────────────────────────────────
+FROM builder-deps AS builder
 
 # Build with Turbopack (stable in Next 16, the repo default). The v3.8.27-era
 # TurbopackInternalError panic ("entered unreachable code: there must be a path to a

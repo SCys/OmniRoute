@@ -72,6 +72,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Warm dependency layers cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: builder-deps
+          platforms: ${{ matrix.platform }}
+          outputs: type=cacheonly
+          cache-from: type=gha,scope=deps-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=deps-${{ matrix.arch }},ignore-error=true
+
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
@@ -81,11 +91,13 @@ jobs:
           platforms: ${{ matrix.platform }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           tags: ${{ steps.image.outputs.name }}
-          cache-from: type=gha,scope=docker-${{ matrix.arch }}
+          cache-from: |
+            type=gha,scope=deps-${{ matrix.arch }}
+            type=gha,scope=docker-${{ matrix.arch }}
           cache-to: type=gha,mode=min,scope=docker-${{ matrix.arch }},ignore-error=true
           build-args: |
             OMNIROUTE_BUILD_MEMORY_MB=8192
-            OMNIROUTE_USE_TURBOPACK=0
+            OMNIROUTE_USE_TURBOPACK=1
 
       - name: Export digest
         run: |
