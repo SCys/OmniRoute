@@ -56,18 +56,3 @@ export function resolveProviderAlias(aliasOrId: string | null | undefined): stri
   }
   return current;
 }
-
-/**
- * Resolves a provider alias or ID and optional model ID to canonical form.
- * Lightweight, client-safe helper that does not depend on database or server runtime.
- */
-export function resolveCanonicalProviderModel(
-  providerOrAlias: string | null | undefined,
-  modelId?: string | null | undefined
-): { provider: string | null; model: string | null } {
-  const provider = resolveProviderAlias(providerOrAlias);
-  return {
-    provider,
-    model: typeof modelId === "string" ? modelId : null,
-  };
-}
