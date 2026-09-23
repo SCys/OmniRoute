@@ -234,13 +234,35 @@ async function resetStandaloneOutput(rootDir = projectRoot, fsImpl = fs) {
   console.log("[build-next-isolated] Moved stale standalone output out of the build path");
 }
 
+export async function copyDocsToStandalone(srcDir, destDir, fsImpl = fs) {
+  if (!(await exists(srcDir))) return;
+  await fsImpl.mkdir(destDir, { recursive: true });
+  const entries = await fsImpl.readdir(srcDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === "i18n" || entry.name === "superpowers" || entry.name.startsWith(".")) {
+      continue;
+    }
+    const src = path.join(srcDir, entry.name);
+    const dest = path.join(destDir, entry.name);
+    if (entry.isDirectory()) {
+      await copyDocsToStandalone(src, dest, fsImpl);
+    } else {
+      await fsImpl.copyFile(src, dest);
+    }
+  }
+}
+
 export async function pruneStandaloneArtifacts(rootDir = projectRoot, fsImpl = fs) {
   const resolvedDistDirForPrune =
     rootDir === projectRoot
       ? distDir
       : path.join(rootDir, process.env.NEXT_DIST_DIR || ".build/next");
   const standaloneRoot = path.join(resolvedDistDirForPrune, "standalone");
-  const pruneTargets = [path.join(standaloneRoot, "_tasks")];
+  const pruneTargets = [
+    path.join(standaloneRoot, "_tasks"),
+    path.join(standaloneRoot, "docs", "i18n"),
+    path.join(standaloneRoot, "docs", "superpowers"),
+  ];
 
   for (const targetPath of pruneTargets) {
     if (!(await exists(targetPath))) continue;
@@ -248,6 +270,74 @@ export async function pruneStandaloneArtifacts(rootDir = projectRoot, fsImpl = f
     console.log(
       `[build-next-isolated] Pruned standalone artifact: ${path.relative(rootDir, targetPath)}`
     );
+  }
+
+  // Prune non-target platform binaries in onnxruntime-node
+  const onnxBinDir = path.join(
+    standaloneRoot,
+    "node_modules",
+    "onnxruntime-node",
+    "bin",
+    "napi-v6"
+  );
+  if (await exists(onnxBinDir)) {
+    const targetPlatform = process.env.OMNIROUTE_TARGET_PLATFORM || process.platform;
+    const targetArch = process.env.OMNIROUTE_TARGET_ARCH || process.arch;
+    try {
+      const osEntries = await fsImpl.readdir(onnxBinDir, { withFileTypes: true });
+      for (const osEntry of osEntries) {
+        if (!osEntry.isDirectory()) continue;
+        const osDir = path.join(onnxBinDir, osEntry.name);
+        if (osEntry.name !== targetPlatform) {
+          await fsImpl.rm(osDir, { recursive: true, force: true });
+          console.log(
+            `[build-next-isolated] Pruned onnxruntime-node cross-platform binary: ${osEntry.name}`
+          );
+        } else if (targetArch) {
+          const archEntries = await fsImpl.readdir(osDir, { withFileTypes: true });
+          for (const archEntry of archEntries) {
+            if (!archEntry.isDirectory()) continue;
+            if (archEntry.name !== targetArch) {
+              const archDir = path.join(osDir, archEntry.name);
+              await fsImpl.rm(archDir, { recursive: true, force: true });
+              console.log(
+                `[build-next-isolated] Pruned onnxruntime-node cross-arch binary: ${osEntry.name}/${archEntry.name}`
+              );
+            }
+          }
+        }
+      }
+    } catch (onnxErr) {
+      console.warn(
+        "[build-next-isolated] Non-fatal error pruning onnxruntime binaries:",
+        onnxErr?.message
+      );
+    }
+  }
+
+  // Prune web-only onnxruntime-web package if present (unused on server)
+  const onnxWebDir = path.join(standaloneRoot, "node_modules", "onnxruntime-web");
+  if (await exists(onnxWebDir)) {
+    try {
+      await fsImpl.rm(onnxWebDir, { recursive: true, force: true });
+      console.log("[build-next-isolated] Pruned onnxruntime-web (web-only wasm/js runtime)");
+    } catch {}
+  }
+
+  // Prune dev-only typescript from standalone node_modules if present
+  for (const nm of [
+    path.join(standaloneRoot, "node_modules"),
+    path.join(standaloneRoot, ".build", "next", "node_modules"),
+  ]) {
+    const tsDir = path.join(nm, "typescript");
+    if (await exists(tsDir)) {
+      try {
+        await fsImpl.rm(tsDir, { recursive: true, force: true });
+        console.log(
+          `[build-next-isolated] Pruned dev-only typescript from ${path.relative(rootDir, tsDir)}`
+        );
+      } catch {}
+    }
   }
 }
 
@@ -315,10 +405,14 @@ export async function main() {
     const standaloneDir = path.join(distDir, "standalone");
     if (result.code === 0 && (await exists(standaloneDir)) && shouldBuildStandalone()) {
       try {
-        await fs.cp(path.join(projectRoot, "docs"), path.join(standaloneDir, "docs"), {
-          recursive: true,
-        });
-        console.log("[build-next-isolated] Copied docs/ to standalone output");
+        await copyDocsToStandalone(
+          path.join(projectRoot, "docs"),
+          path.join(standaloneDir, "docs"),
+          fs
+        );
+        console.log(
+          "[build-next-isolated] Copied runtime docs/ to standalone output (excluding i18n & superpowers mirrors)"
+        );
       } catch (docsCopyErr) {
         console.warn("[build-next-isolated] Non-fatal error copying docs/:", docsCopyErr?.message);
       }
