@@ -12225,6 +12225,29 @@
     "raw": "Rå"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-assistent",
+      "intro": "Kopier kommandoer for å kjøre dem på datamaskinen der CLI-en din er installert. Dette panelet kjører ikke kommandoer eller kopierer innloggingsopplysninger.",
+      "hostNotice": "Registreringen beskriver vertsmaskinen til OmniRoute-serveren, ikke datamaskinen med denne nettleseren. Konfigurert betyr ikke at inferens er testet.",
+      "target": "CLI-verktøy",
+      "context": "Navn på eksisterende kontekst (valgfritt)",
+      "contextHint": "La stå tomt for å bruke CLI-ens aktive kontekst. Navngitte kontekster kan peke til en lokal eller ekstern server; list dem først i terminalen.",
+      "contextInvalid": "Bruk 1–64 bokstaver, sifre, punktum, bindestreker eller understreker, og start med en bokstav eller et siffer.",
+      "modelHint": "Denne CLI-en krever en modell. Skriv inn en eksisterende leverandør/modell-identifikator før du kopierer forhåndsvisningen av oppstarten.",
+      "modelInvalid": "Bruk en modellidentifikator uten mellomrom eller skalltegn, og start med en bokstav eller et siffer.",
+      "runtime": "Kjøring",
+      "runnable": "Kan kjøres",
+      "notRunnable": "Kan ikke kjøres",
+      "unknown": "Ukjent",
+      "detectionError": "Serverregistrering er utilgjengelig. Oppdater registreringen for å prøve igjen; terminalkommandoer er fortsatt tilgjengelige.",
+      "contextsStep": "Kontroller kontekster i terminalen",
+      "configureStep": "Velg en modell og konfigurer",
+      "runStep": "Forhåndsvis oppstarten",
+      "configureHint": "Denne interaktive kommandoen skriver CLI-konfigurasjonen på datamaskinen der du kjører den.",
+      "runHint": "Prøvekjøringen viser oppstartsplanen uten å starte CLI-en. Dette er ikke en inferenstest.",
+      "copyFailed": "Kunne ikke kopiere. Merk og kopier kommandoen manuelt.",
+      "empty": "Ingen kjørbare CLI-mål er tilgjengelige i denne versjonen. Bruk verktøyveiledningene nedenfor."
+    },
     "concept": {
       "code": {
         "title": "CLI-kode",

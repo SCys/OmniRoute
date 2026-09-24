@@ -12225,6 +12225,29 @@
     "raw": "Nezpracované"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Průvodce CLI",
+      "intro": "Zkopírujte příkazy a spusťte je na počítači, kde je nainstalované vaše CLI. Tento panel nespouští příkazy ani nekopíruje přihlašovací údaje.",
+      "hostNotice": "Detekce popisuje hostitele serveru OmniRoute, nikoli počítač tohoto prohlížeče. Nakonfigurováno neznamená, že byla otestována inference.",
+      "target": "Nástroj CLI",
+      "context": "Název existujícího kontextu (nepovinné)",
+      "contextHint": "Ponechte prázdné, chcete-li použít aktivní kontext CLI. Pojmenované kontexty mohou odkazovat na místní nebo vzdálený server; nejprve je vypište v terminálu.",
+      "contextInvalid": "Použijte 1–64 písmen, číslic, teček, spojovníků nebo podtržítek, počínaje písmenem nebo číslicí.",
+      "modelHint": "Toto CLI vyžaduje model. Před zkopírováním náhledu spuštění zadejte skutečný identifikátor poskytovatele/modelu.",
+      "modelInvalid": "Použijte identifikátor modelu bez mezer a znaků shellu, počínaje písmenem nebo číslicí.",
+      "runtime": "Spouštění",
+      "runnable": "Spustitelné",
+      "notRunnable": "Nelze spustit",
+      "unknown": "Neznámé",
+      "detectionError": "Detekce serveru není dostupná. Obnovte detekci a zkuste to znovu; příkazy pro terminál zůstávají dostupné.",
+      "contextsStep": "Zkontrolovat kontexty v terminálu",
+      "configureStep": "Vybrat model a nakonfigurovat",
+      "runStep": "Zobrazit náhled spuštění",
+      "configureHint": "Tento interaktivní příkaz zapíše konfiguraci CLI na počítači, na kterém ho spustíte.",
+      "runHint": "Zkušební běh zobrazí plán spuštění, aniž by spustil CLI. Nejde o test inference.",
+      "copyFailed": "Kopírování se nezdařilo. Označte a zkopírujte příkaz ručně.",
+      "empty": "V této verzi nejsou dostupné žádné spustitelné cíle CLI. Použijte průvodce nástroji níže."
+    },
     "concept": {
       "code": {
         "title": "Kód CLI",

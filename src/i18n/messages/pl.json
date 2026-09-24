@@ -12225,6 +12225,29 @@
     "raw": "Surowy"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Asystent CLI",
+      "intro": "Skopiuj polecenia i uruchom je na komputerze, na którym zainstalowano CLI. Ten panel nie wykonuje poleceń ani nie kopiuje danych uwierzytelniających.",
+      "hostNotice": "Wykrywanie opisuje host serwera OmniRoute, a nie komputer tej przeglądarki. Konfiguracja nie oznacza, że przetestowano inferencję.",
+      "target": "Narzędzie CLI",
+      "context": "Nazwa istniejącego kontekstu (opcjonalnie)",
+      "contextHint": "Pozostaw puste, aby użyć aktywnego kontekstu CLI. Nazwane konteksty mogą wskazywać serwer lokalny lub zdalny; najpierw wyświetl ich listę w terminalu.",
+      "contextInvalid": "Użyj 1–64 liter, cyfr, kropek, łączników lub podkreśleń, zaczynając od litery lub cyfry.",
+      "modelHint": "To CLI wymaga modelu. Wpisz rzeczywisty identyfikator dostawcy/modelu przed skopiowaniem podglądu uruchomienia.",
+      "modelInvalid": "Użyj identyfikatora modelu bez spacji i znaków powłoki, zaczynając od litery lub cyfry.",
+      "runtime": "Wykonanie",
+      "runnable": "Można uruchomić",
+      "notRunnable": "Nie można uruchomić",
+      "unknown": "Nieznany",
+      "detectionError": "Wykrywanie serwera niedostępne. Odśwież wykrywanie, aby spróbować ponownie; polecenia terminala pozostają dostępne.",
+      "contextsStep": "Sprawdź konteksty w terminalu",
+      "configureStep": "Wybierz model i skonfiguruj",
+      "runStep": "Podejrzyj uruchomienie",
+      "configureHint": "To interaktywne polecenie zapisuje konfigurację CLI na komputerze, na którym je wykonasz.",
+      "runHint": "Próba na sucho pokazuje plan uruchomienia bez uruchamiania CLI. Nie jest to test inferencji.",
+      "copyFailed": "Nie udało się skopiować. Zaznacz i skopiuj polecenie ręcznie.",
+      "empty": "W tej wersji nie ma dostępnych wykonywalnych celów CLI. Skorzystaj z poniższych przewodników po narzędziach."
+    },
     "concept": {
       "code": {
         "title": "Kod CLI",

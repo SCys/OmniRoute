@@ -12225,6 +12225,29 @@
     "raw": "Neobdelano"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Pomočnik CLI",
+      "intro": "Kopirajte ukaze in jih zaženite v računalniku, kjer je nameščen vaš CLI. Ta plošča ne izvaja ukazov in ne kopira poverilnic.",
+      "hostNotice": "Zaznavanje opisuje gostitelja strežnika OmniRoute, ne računalnika tega brskalnika. Konfigurirano ne pomeni, da je bilo sklepanje preizkušeno.",
+      "target": "Orodje CLI",
+      "context": "Ime obstoječega konteksta (neobvezno)",
+      "contextHint": "Pustite prazno za uporabo aktivnega konteksta CLI. Poimenovani konteksti lahko kažejo na lokalni ali oddaljeni strežnik; najprej jih izpišite v terminalu.",
+      "contextInvalid": "Uporabite 1–64 črk, števk, pik, vezajev ali podčrtajev, začnite pa s črko ali števko.",
+      "modelHint": "Ta CLI zahteva model. Pred kopiranjem predogleda zagona vnesite dejanski identifikator ponudnika/modela.",
+      "modelInvalid": "Uporabite identifikator modela brez presledkov ali znakov lupine, ki se začne s črko ali števko.",
+      "runtime": "Izvajanje",
+      "runnable": "Izvedljivo",
+      "notRunnable": "Ni izvedljivo",
+      "unknown": "Neznano",
+      "detectionError": "Zaznavanje strežnika ni na voljo. Osvežite zaznavanje in poskusite znova; terminalski ukazi ostajajo na voljo.",
+      "contextsStep": "Preverite kontekste v terminalu",
+      "configureStep": "Izberite model in konfigurirajte",
+      "runStep": "Predogled zagona",
+      "configureHint": "Ta interaktivni ukaz zapiše konfiguracijo CLI v računalnik, v katerem ga zaženete.",
+      "runHint": "Poskusni zagon prikaže načrt zagona brez zagona CLI. To ni preizkus sklepanja.",
+      "copyFailed": "Kopiranje ni uspelo. Ročno izberite in kopirajte ukaz.",
+      "empty": "V tej različici ni na voljo izvedljivih ciljev CLI. Uporabite spodnja navodila za orodja."
+    },
     "concept": {
       "code": {
         "title": "CLI za programiranje",

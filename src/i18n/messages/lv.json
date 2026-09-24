@@ -12225,6 +12225,29 @@
     "raw": "Neapstrādāts"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI palīgs",
+      "intro": "Kopējiet komandas, lai tās palaistu datorā, kurā ir instalēta jūsu CLI. Šis panelis neizpilda komandas un nekopē piekļuves datus.",
+      "hostNotice": "Noteikšana apraksta OmniRoute servera resursdatoru, nevis šīs pārlūkprogrammas datoru. Konfigurēts nenozīmē, ka modeļa secināšana ir pārbaudīta.",
+      "target": "CLI rīks",
+      "context": "Esoša konteksta nosaukums (neobligāti)",
+      "contextHint": "Atstājiet tukšu, lai izmantotu CLI aktīvo kontekstu. Nosaukti konteksti var norādīt uz lokālu vai attālu serveri; vispirms uzskaitiet tos terminālī.",
+      "contextInvalid": "Izmantojiet 1–64 burtus, ciparus, punktus, defises vai pasvītrojumus, sākot ar burtu vai ciparu.",
+      "modelHint": "Šai CLI nepieciešams modelis. Pirms palaišanas priekšskatījuma kopēšanas ievadiet reālu pakalpojumu sniedzēja/modeļa identifikatoru.",
+      "modelInvalid": "Izmantojiet modeļa identifikatoru bez atstarpēm vai čaulas speciālajām rakstzīmēm, sākot ar burtu vai ciparu.",
+      "runtime": "Izpilde",
+      "runnable": "Palaižams",
+      "notRunnable": "Nav palaižams",
+      "unknown": "Nezināms",
+      "detectionError": "Servera noteikšana nav pieejama. Atsvaidziniet noteikšanu, lai mēģinātu vēlreiz; termināļa komandas joprojām ir pieejamas.",
+      "contextsStep": "Pārbaudīt kontekstus terminālī",
+      "configureStep": "Izvēlēties modeli un konfigurēt",
+      "runStep": "Priekšskatīt palaišanu",
+      "configureHint": "Šī interaktīvā komanda ieraksta CLI konfigurāciju datorā, kurā to izpildāt.",
+      "runHint": "Izmēģinājums parāda palaišanas plānu, nepalaižot CLI. Tas nav modeļa secināšanas tests.",
+      "copyFailed": "Neizdevās kopēt. Atlasiet un kopējiet komandu manuāli.",
+      "empty": "Šajā versijā nav pieejami palaižami CLI mērķi. Izmantojiet tālāk redzamās rīku rokasgrāmatas."
+    },
     "concept": {
       "code": {
         "title": "CLI kods",

@@ -12225,6 +12225,29 @@
     "raw": "Sin formato"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Asistente de CLI",
+      "intro": "Copia los comandos para ejecutarlos en el equipo donde está instalada tu CLI. Este panel no ejecuta comandos ni copia credenciales.",
+      "hostNotice": "La detección describe el host del servidor OmniRoute, no el equipo de este navegador. Que esté configurado no significa que se haya probado la inferencia.",
+      "target": "Herramienta CLI",
+      "context": "Nombre de un contexto existente (opcional)",
+      "contextHint": "Déjalo vacío para usar el contexto activo de tu CLI. Los contextos con nombre pueden apuntar a un servidor local o remoto; enuméralos primero en tu terminal.",
+      "contextInvalid": "Usa entre 1 y 64 letras, dígitos, puntos, guiones o guiones bajos, empezando por una letra o un dígito.",
+      "modelHint": "Esta CLI requiere un modelo. Introduce un identificador real de proveedor/modelo antes de copiar la vista previa del inicio.",
+      "modelInvalid": "Usa un identificador de modelo sin espacios ni caracteres de shell, empezando por una letra o un dígito.",
+      "runtime": "Ejecución",
+      "runnable": "Ejecutable",
+      "notRunnable": "No ejecutable",
+      "unknown": "Desconocido",
+      "detectionError": "Detección del servidor no disponible. Actualiza la detección para reintentarlo; los comandos del terminal siguen disponibles.",
+      "contextsStep": "Revisar los contextos en el terminal",
+      "configureStep": "Elegir un modelo y configurar",
+      "runStep": "Ver la vista previa del inicio",
+      "configureHint": "Este comando interactivo escribe la configuración de la CLI en el equipo donde lo ejecutes.",
+      "runHint": "La simulación muestra el plan de inicio sin iniciar la CLI. No es una prueba de inferencia.",
+      "copyFailed": "No se pudo copiar. Selecciona y copia el comando manualmente.",
+      "empty": "No hay ninguna CLI ejecutable disponible en esta versión. Usa las guías de herramientas que aparecen abajo."
+    },
     "concept": {
       "code": {
         "title": "CLI de código",

@@ -12225,6 +12225,29 @@
     "raw": "Hilaw"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Katulong sa CLI",
+      "intro": "Kopyahin ang mga utos para patakbuhin sa computer kung saan naka-install ang iyong CLI. Hindi nagpapatakbo ng mga utos o kumokopya ng mga kredensiyal ang panel na ito.",
+      "hostNotice": "Inilalarawan ng pagtukoy ang host ng OmniRoute server, hindi ang computer ng browser na ito. Ang nakakonpigura ay hindi nangangahulugang nasubukan ang inference.",
+      "target": "Kasangkapang CLI",
+      "context": "Pangalan ng umiiral na konteksto (opsyonal)",
+      "contextHint": "Iwang blangko upang gamitin ang aktibong konteksto ng CLI. Maaaring tumukoy ang mga pinangalanang konteksto sa lokal o malayuang server; ilista muna ang mga ito sa terminal.",
+      "contextInvalid": "Gumamit ng 1–64 titik, numero, tuldok, gitling o salungguhit, na nagsisimula sa titik o numero.",
+      "modelHint": "Nangangailangan ng modelo ang CLI na ito. Maglagay ng totoong tagapagbigay/modelo na pagkakakilanlan bago kopyahin ang paunang pagtingin sa paglulunsad.",
+      "modelInvalid": "Gumamit ng pagkakakilanlan ng modelo na walang espasyo o karakter ng shell at nagsisimula sa titik o numero.",
+      "runtime": "Kapaligiran ng pagpapatakbo",
+      "runnable": "Maaaring patakbuhin",
+      "notRunnable": "Hindi maaaring patakbuhin",
+      "unknown": "Hindi alam",
+      "detectionError": "Hindi available ang pagtukoy sa server. I-refresh ang pagtukoy upang subukan muli; magagamit pa rin ang mga utos sa terminal.",
+      "contextsStep": "Suriin ang mga konteksto sa terminal",
+      "configureStep": "Pumili ng modelo at ikonpigura",
+      "runStep": "Silipin ang paglulunsad",
+      "configureHint": "Isinusulat ng interaktibong utos na ito ang konpigurasyon ng CLI sa computer kung saan mo ito pinapatakbo.",
+      "runHint": "Ipinapakita ng simulasyon ang plano sa paglulunsad nang hindi sinisimulan ang CLI. Hindi ito pagsubok ng inference.",
+      "copyFailed": "Hindi makopya. Piliin at manu-manong kopyahin ang utos.",
+      "empty": "Walang CLI na maaaring patakbuhin sa bersyong ito. Gamitin ang mga gabay sa kasangkapan sa ibaba."
+    },
     "concept": {
       "code": {
         "title": "Code ng CLI",

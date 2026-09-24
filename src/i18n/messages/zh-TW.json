@@ -12225,6 +12225,29 @@
     "raw": "原始"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI 助手",
+      "intro": "複製指令，在已安裝 CLI 的電腦上執行。此面板不會執行指令，也不會複製憑證。",
+      "hostNotice": "偵測結果描述的是 OmniRoute 伺服器主機，而非執行此瀏覽器的電腦。已設定不代表已測試推論。",
+      "target": "CLI 工具",
+      "context": "現有情境名稱（選填）",
+      "contextHint": "留空以使用 CLI 目前啟用的情境。具名情境可以指向本機或遠端伺服器；請先在終端機中列出它們。",
+      "contextInvalid": "使用 1–64 個字母、數字、點、連字號或底線，並以字母或數字開頭。",
+      "modelHint": "此 CLI 需要指定模型。複製啟動預覽之前，請輸入真實的提供者/模型識別碼。",
+      "modelInvalid": "模型識別碼須以字母或數字開頭，且不含空白或 shell 特殊字元。",
+      "runtime": "執行環境",
+      "runnable": "可執行",
+      "notRunnable": "不可執行",
+      "unknown": "未知",
+      "detectionError": "無法偵測伺服器。請重新整理偵測以重試；終端機指令仍可使用。",
+      "contextsStep": "檢查終端機情境",
+      "configureStep": "選擇模型並設定",
+      "runStep": "預覽啟動",
+      "configureHint": "此互動式指令會在執行該指令的電腦上寫入 CLI 設定。",
+      "runHint": "模擬執行僅顯示啟動計畫，不會啟動 CLI。這不是推論測試。",
+      "copyFailed": "無法複製。請選取指令並手動複製。",
+      "empty": "此版本沒有可執行的 CLI 目標。請使用下方的工具指南。"
+    },
     "concept": {
       "code": {
         "title": "CLI 程式碼的",

@@ -12225,6 +12225,29 @@
     "raw": "Neobrađeno"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI pomoćnik",
+      "intro": "Kopirajte naredbe i pokrenite ih na računalu na kojem je instaliran vaš CLI. Ova ploča ne izvršava naredbe niti kopira vjerodajnice.",
+      "hostNotice": "Otkrivanje opisuje računalo na kojem radi poslužitelj OmniRoute, a ne računalo ovog preglednika. Konfigurirano ne znači da je zaključivanje testirano.",
+      "target": "CLI alat",
+      "context": "Naziv postojećeg konteksta (neobavezno)",
+      "contextHint": "Ostavite prazno za upotrebu aktivnog konteksta CLI-ja. Imenovani konteksti mogu upućivati na lokalni ili udaljeni poslužitelj; prvo ih ispišite u terminalu.",
+      "contextInvalid": "Upotrijebite 1–64 slova, znamenke, točke, spojnice ili podvlake, počevši slovom ili znamenkom.",
+      "modelHint": "Ovaj CLI zahtijeva model. Unesite stvarni identifikator pružatelja/modela prije kopiranja pretpregleda pokretanja.",
+      "modelInvalid": "Upotrijebite identifikator modela bez razmaka ili znakova ljuske, počevši slovom ili znamenkom.",
+      "runtime": "Izvršavanje",
+      "runnable": "Može se pokrenuti",
+      "notRunnable": "Ne može se pokrenuti",
+      "unknown": "Nepoznato",
+      "detectionError": "Otkrivanje poslužitelja nije dostupno. Osvježite otkrivanje da biste pokušali ponovno; naredbe terminala i dalje su dostupne.",
+      "contextsStep": "Provjerite kontekste u terminalu",
+      "configureStep": "Odaberite model i konfigurirajte",
+      "runStep": "Pretpregled pokretanja",
+      "configureHint": "Ova interaktivna naredba zapisuje konfiguraciju CLI-ja na računalu na kojem je pokrenete.",
+      "runHint": "Probno pokretanje prikazuje plan pokretanja bez pokretanja CLI-ja. To nije test zaključivanja.",
+      "copyFailed": "Kopiranje nije uspjelo. Ručno odaberite i kopirajte naredbu.",
+      "empty": "U ovoj verziji nema dostupnih izvršivih CLI ciljeva. Upotrijebite vodiče za alate u nastavku."
+    },
     "concept": {
       "code": {
         "title": "CLI alati za programiranje",

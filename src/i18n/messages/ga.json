@@ -12225,6 +12225,29 @@
     "raw": "Amh"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Cúntóir CLI",
+      "intro": "Cóipeáil na horduithe lena rith ar an ríomhaire ar a bhfuil do CLI suiteáilte. Ní ritheann an painéal seo orduithe agus ní chóipeálann sé dintiúir.",
+      "hostNotice": "Déanann an brath cur síos ar óstríomhaire fhreastalaí OmniRoute, ní ar ríomhaire an bhrabhsálaí seo. Ní chiallaíonn cumraithe go ndearnadh tástáil ar an tátal.",
+      "target": "Uirlis CLI",
+      "context": "Ainm comhthéacs atá ann cheana (roghnach)",
+      "contextHint": "Fág bán é chun comhthéacs gníomhach do CLI a úsáid. Is féidir le comhthéacsanna ainmnithe tagairt a dhéanamh do fhreastalaí áitiúil nó cianda; liostaigh iad i do theirminéal ar dtús.",
+      "contextInvalid": "Úsáid 1–64 litir, digit, ponc, fleiscín nó fostríoc, ag tosú le litir nó digit.",
+      "modelHint": "Tá samhail ag teastáil ón CLI seo. Cuir isteach fíoraitheantóir soláthraí/samhla sula gcóipeálann tú réamhamharc an tseolta.",
+      "modelInvalid": "Úsáid aitheantóir samhla gan spásanna ná carachtair bhlaoisce, ag tosú le litir nó digit.",
+      "runtime": "Rith",
+      "runnable": "Inrite",
+      "notRunnable": "Ní féidir a rith",
+      "unknown": "Anaithnid",
+      "detectionError": "Níl brath an fhreastalaí ar fáil. Athnuaigh an brath chun triail eile a bhaint as; tá orduithe teirminéil fós ar fáil.",
+      "contextsStep": "Seiceáil comhthéacsanna sa teirminéal",
+      "configureStep": "Roghnaigh samhail agus cumraigh",
+      "runStep": "Réamhamharc ar an seoladh",
+      "configureHint": "Scríobhann an t-ordú idirghníomhach seo cumraíocht an CLI ar an ríomhaire ina ritheann tú é.",
+      "runHint": "Taispeánann an triail thirim an plean seolta gan an CLI a thosú. Ní tástáil tátail í.",
+      "copyFailed": "Níorbh fhéidir cóipeáil. Roghnaigh agus cóipeáil an t-ordú de láimh.",
+      "empty": "Níl aon spriocanna CLI inrite ar fáil sa leagan seo. Úsáid na treoracha uirlisí thíos."
+    },
     "concept": {
       "code": {
         "title": "Cód CLI",

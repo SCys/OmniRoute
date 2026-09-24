@@ -12225,6 +12225,29 @@
     "raw": "Sirovo"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI pomoćnik",
+      "intro": "Kopirajte komande za pokretanje na računaru na kojem je instaliran vaš CLI. Ovaj panel ne izvršava komande niti kopira pristupne podatke.",
+      "hostNotice": "Detekcija opisuje računar na kojem radi OmniRoute server, a ne računar ovog preglednika. Konfigurirano ne znači da je inferencija testirana.",
+      "target": "CLI alat",
+      "context": "Naziv postojećeg konteksta (opcionalno)",
+      "contextHint": "Ostavite prazno da koristite aktivni kontekst svog CLI-ja. Imenovani konteksti mogu upućivati na lokalni ili udaljeni server; prvo ih izlistajte u terminalu.",
+      "contextInvalid": "Koristite 1–64 slova, cifre, tačke, crtice ili donje crte, počevši slovom ili cifrom.",
+      "modelHint": "Ovaj CLI zahtijeva model. Unesite stvarni identifikator pružaoca usluga/modela prije kopiranja pregleda pokretanja.",
+      "modelInvalid": "Koristite identifikator modela bez razmaka ili znakova komandne ljuske, počevši slovom ili cifrom.",
+      "runtime": "Izvršavanje",
+      "runnable": "Može se pokrenuti",
+      "notRunnable": "Ne može se pokrenuti",
+      "unknown": "Nepoznato",
+      "detectionError": "Detekcija na serveru nije dostupna. Osvježite detekciju da pokušate ponovo; komande za terminal ostaju dostupne.",
+      "contextsStep": "Provjerite kontekste u terminalu",
+      "configureStep": "Odaberite model i konfigurirajte",
+      "runStep": "Pregledajte pokretanje",
+      "configureHint": "Ova interaktivna komanda zapisuje konfiguraciju CLI-ja na računaru na kojem je izvršite.",
+      "runHint": "Probno pokretanje prikazuje plan pokretanja bez pokretanja CLI-ja. To nije test inferencije.",
+      "copyFailed": "Kopiranje nije uspjelo. Ručno označite i kopirajte komandu.",
+      "empty": "U ovoj verziji nema dostupnih izvršivih CLI ciljeva. Koristite vodiče za alate ispod."
+    },
     "concept": {
       "code": {
         "title": "CLI Kod",

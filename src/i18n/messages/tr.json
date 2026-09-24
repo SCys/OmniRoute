@@ -12225,6 +12225,29 @@
     "raw": "Ham"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI yardımcısı",
+      "intro": "Komutları kopyalayıp CLI’nizin kurulu olduğu bilgisayarda çalıştırın. Bu panel komut çalıştırmaz veya kimlik bilgilerini kopyalamaz.",
+      "hostNotice": "Algılama, bu tarayıcının çalıştığı bilgisayarı değil, OmniRoute sunucusunun ana makinesini tanımlar. Yapılandırılmış olması, çıkarımın test edildiği anlamına gelmez.",
+      "target": "CLI aracı",
+      "context": "Mevcut bağlam adı (isteğe bağlı)",
+      "contextHint": "CLI’nizin etkin bağlamını kullanmak için boş bırakın. Adlandırılmış bağlamlar yerel veya uzak bir sunucuya işaret edebilir; önce terminalinizde bunları listeleyin.",
+      "contextInvalid": "Harf veya rakamla başlayan, 1–64 harf, rakam, nokta, kısa çizgi ya da alt çizgi kullanın.",
+      "modelHint": "Bu CLI bir model gerektirir. Başlatma önizlemesini kopyalamadan önce gerçek bir sağlayıcı/model tanımlayıcısı girin.",
+      "modelInvalid": "Boşluk veya kabuk karakterleri içermeyen, harf ya da rakamla başlayan bir model tanımlayıcısı kullanın.",
+      "runtime": "Çalıştırma",
+      "runnable": "Çalıştırılabilir",
+      "notRunnable": "Çalıştırılamaz",
+      "unknown": "Bilinmiyor",
+      "detectionError": "Sunucu algılama kullanılamıyor. Yeniden denemek için algılamayı yenileyin; terminal komutları kullanılabilir durumda kalır.",
+      "contextsStep": "Terminaldeki bağlamları kontrol edin",
+      "configureStep": "Bir model seçip yapılandırın",
+      "runStep": "Başlatmayı önizleyin",
+      "configureHint": "Bu etkileşimli komut, çalıştırdığınız bilgisayara CLI yapılandırmasını yazar.",
+      "runHint": "Deneme çalıştırması, CLI’yi başlatmadan başlatma planını gösterir. Bu bir çıkarım testi değildir.",
+      "copyFailed": "Kopyalanamadı. Komutu seçip elle kopyalayın.",
+      "empty": "Bu sürümde çalıştırılabilir CLI hedefi yok. Aşağıdaki araç kılavuzlarını kullanın."
+    },
     "concept": {
       "code": {
         "title": "CLI Kodu",

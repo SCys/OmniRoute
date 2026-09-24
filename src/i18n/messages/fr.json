@@ -12225,6 +12225,29 @@
     "raw": "Brut"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Assistant CLI",
+      "intro": "Copiez les commandes pour les exécuter sur l’ordinateur où votre CLI est installée. Ce panneau n’exécute aucune commande et ne copie aucun identifiant secret.",
+      "hostNotice": "La détection concerne l’hôte du serveur OmniRoute, pas l’ordinateur de ce navigateur. Une configuration présente ne signifie pas que l’inférence a été testée.",
+      "target": "Outil CLI",
+      "context": "Nom d’un contexte existant (facultatif)",
+      "contextHint": "Laissez vide pour utiliser le contexte actif de votre CLI. Les contextes nommés peuvent désigner un serveur local ou distant ; listez-les d’abord dans votre terminal.",
+      "contextInvalid": "Utilisez 1 à 64 lettres, chiffres, points, tirets ou tirets bas, en commençant par une lettre ou un chiffre.",
+      "modelHint": "Cette CLI nécessite un modèle. Saisissez un identifiant fournisseur/modèle réel avant de copier l’aperçu du lancement.",
+      "modelInvalid": "Utilisez un identifiant de modèle sans espaces ni caractères shell, commençant par une lettre ou un chiffre.",
+      "runtime": "Exécution",
+      "runnable": "Exécutable",
+      "notRunnable": "Non exécutable",
+      "unknown": "Inconnu",
+      "detectionError": "Détection du serveur indisponible. Actualisez la détection pour réessayer ; les commandes du terminal restent disponibles.",
+      "contextsStep": "Vérifier les contextes dans le terminal",
+      "configureStep": "Choisir un modèle et configurer",
+      "runStep": "Prévisualiser le lancement",
+      "configureHint": "Cette commande interactive écrit la configuration de la CLI sur l’ordinateur où vous l’exécutez.",
+      "runHint": "La simulation affiche le plan de lancement sans démarrer la CLI. Ce n’est pas un test d’inférence.",
+      "copyFailed": "Copie impossible. Sélectionnez et copiez la commande manuellement.",
+      "empty": "Aucune CLI exécutable n’est disponible dans cette version. Utilisez les guides des outils ci-dessous."
+    },
     "concept": {
       "code": {
         "title": "Code CLI",

@@ -12225,6 +12225,29 @@
     "raw": "Dati grezzi"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Assistente CLI",
+      "intro": "Copia i comandi da eseguire sul computer in cui è installata la CLI. Questo pannello non esegue comandi né copia credenziali.",
+      "hostNotice": "Il rilevamento riguarda l’host del server OmniRoute, non il computer di questo browser. Una configurazione presente non significa che l’inferenza sia stata testata.",
+      "target": "Strumento CLI",
+      "context": "Nome di un contesto esistente (facoltativo)",
+      "contextHint": "Lascia vuoto per usare il contesto attivo della CLI. I contesti con nome possono puntare a un server locale o remoto; elencali prima nel terminale.",
+      "contextInvalid": "Usa da 1 a 64 lettere, cifre, punti, trattini o trattini bassi, iniziando con una lettera o una cifra.",
+      "modelHint": "Questa CLI richiede un modello. Inserisci un identificatore reale di fornitore/modello prima di copiare l’anteprima di avvio.",
+      "modelInvalid": "Usa un identificatore di modello senza spazi o caratteri della shell, iniziando con una lettera o una cifra.",
+      "runtime": "Esecuzione",
+      "runnable": "Eseguibile",
+      "notRunnable": "Non eseguibile",
+      "unknown": "Sconosciuto",
+      "detectionError": "Rilevamento del server non disponibile. Aggiorna il rilevamento per riprovare; i comandi del terminale restano disponibili.",
+      "contextsStep": "Controlla i contesti nel terminale",
+      "configureStep": "Scegli un modello e configura",
+      "runStep": "Visualizza l’anteprima di avvio",
+      "configureHint": "Questo comando interattivo scrive la configurazione della CLI sul computer in cui lo esegui.",
+      "runHint": "La simulazione mostra il piano di avvio senza avviare la CLI. Non è un test di inferenza.",
+      "copyFailed": "Impossibile copiare. Seleziona e copia il comando manualmente.",
+      "empty": "Nessuna CLI eseguibile è disponibile in questa versione. Usa le guide degli strumenti qui sotto."
+    },
     "concept": {
       "code": {
         "title": "Codice CLI",

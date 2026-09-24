@@ -12225,6 +12225,29 @@
     "raw": "Gẹ́gẹ́ bí ó ṣe rí"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Olùrànlọ́wọ́ CLI",
+      "intro": "Da àwọn àṣẹ kọ fún lílò lórí kọ̀ǹpútà tí CLI rẹ wà. Pánẹ́ẹ̀lì yìí kì í ṣiṣẹ́ àwọn àṣẹ tàbí da ìwífún ìjẹ́rìísí kọ.",
+      "hostNotice": "Ìṣàwárí ń ṣàpèjúwe kọ̀ǹpútà tí ó gbà olupin OmniRoute sí, kì í ṣe kọ̀ǹpútà aṣàwákiri yìí. Tí a bá ti ṣètò rẹ̀ kò túmọ̀ sí pé a ti dán ìdáhùn àwòṣe wò.",
+      "target": "Irinṣẹ́ CLI",
+      "context": "Orúkọ àyíká tí ó wà (àṣàyàn)",
+      "contextHint": "Fi sílẹ̀ láìkọ nǹkan láti lo àyíká CLI tí ń ṣiṣẹ́. Àwọn àyíká tí a dárúkọ lè tọ́ka sí olupin agbègbè tàbí ti jíjìnnà; kọ́kọ́ wo àtòjọ wọn nínú tẹ́mínà.",
+      "contextInvalid": "Lo lẹ́tà, nọ́ńbà, àmì dọ́ọ̀tì, àmì àsopọ̀ tàbí ìlà abẹ́ 1–64, kí ó bẹ̀rẹ̀ pẹ̀lú lẹ́tà tàbí nọ́ńbà.",
+      "modelHint": "CLI yìí nílò àwòṣe. Tẹ ìdánimọ̀ olùpèsè/àwòṣe tó wà ní tòótọ́ ṣáájú dídà àwòkọ́ṣe ìbẹ̀rẹ̀ kọ.",
+      "modelInvalid": "Lo ìdánimọ̀ àwòṣe tí kò ní àlàfo tàbí àmì shell, tí ó bẹ̀rẹ̀ pẹ̀lú lẹ́tà tàbí nọ́ńbà.",
+      "runtime": "Àyíká ìṣiṣẹ́",
+      "runnable": "Ó ṣeé ṣiṣẹ́",
+      "notRunnable": "Kò ṣeé ṣiṣẹ́",
+      "unknown": "Àìmọ̀",
+      "detectionError": "Ìṣàwárí olupin kò sí. Tún ìṣàwárí ṣe láti gbìyànjú lẹ́ẹ̀kan sí i; àwọn àṣẹ tẹ́mínà ṣì wà.",
+      "contextsStep": "Ṣàyẹ̀wò àwọn àyíká tẹ́mínà",
+      "configureStep": "Yan àwòṣe kí o sì ṣètò rẹ̀",
+      "runStep": "Wo àwòkọ́ṣe ìbẹ̀rẹ̀",
+      "configureHint": "Àṣẹ ìbánisọ̀rọ̀ yìí kọ ètò CLI sórí kọ̀ǹpútà tí o ti ń ṣiṣẹ́ rẹ̀.",
+      "runHint": "Ìṣiṣẹ́ àdánwò fi ètò ìbẹ̀rẹ̀ hàn láìbẹ̀rẹ̀ CLI. Kì í ṣe àdánwò ìdáhùn àwòṣe.",
+      "copyFailed": "Kò ṣeé dà kọ. Yan àṣẹ náà kí o sì da a kọ fúnra rẹ.",
+      "empty": "Kò sí irinṣẹ́ CLI tí ó ṣeé ṣiṣẹ́ nínú ẹ̀yà yìí. Lo àwọn ìtọ́sọ́nà irinṣẹ́ tó wà nísàlẹ̀."
+    },
     "concept": {
       "code": {
         "title": "Kóòdù CLI",

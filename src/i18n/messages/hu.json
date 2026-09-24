@@ -12225,6 +12225,29 @@
     "raw": "Nyers"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-segéd",
+      "intro": "Másolja a parancsokat, és futtassa őket azon a számítógépen, amelyre a CLI telepítve van. Ez a panel nem hajt végre parancsokat és nem másol hitelesítő adatokat.",
+      "hostNotice": "Az észlelés az OmniRoute-kiszolgáló gazdagépét írja le, nem az ezt a böngészőt futtató számítógépet. A konfigurált állapot nem jelenti azt, hogy az inferenciát tesztelték.",
+      "target": "CLI-eszköz",
+      "context": "Meglévő kontextus neve (opcionális)",
+      "contextHint": "Hagyja üresen a CLI aktív kontextusának használatához. Az elnevezett kontextusok helyi vagy távoli kiszolgálóra mutathatnak; először listázza őket a terminálban.",
+      "contextInvalid": "Használjon 1–64 betűt, számjegyet, pontot, kötőjelet vagy aláhúzást, betűvel vagy számjeggyel kezdve.",
+      "modelHint": "Ehhez a CLI-hez modell szükséges. Az indítási előnézet másolása előtt adjon meg egy létező szolgáltató/modell-azonosítót.",
+      "modelInvalid": "Használjon szóközök és parancsértelmező-karakterek nélküli modellazonosítót, betűvel vagy számjeggyel kezdve.",
+      "runtime": "Futtatás",
+      "runnable": "Futtatható",
+      "notRunnable": "Nem futtatható",
+      "unknown": "Ismeretlen",
+      "detectionError": "A kiszolgáló észlelése nem érhető el. Frissítse az észlelést az újrapróbálkozáshoz; a terminálparancsok továbbra is elérhetők.",
+      "contextsStep": "Kontextusok ellenőrzése a terminálban",
+      "configureStep": "Modell kiválasztása és konfigurálás",
+      "runStep": "Indítás előnézete",
+      "configureHint": "Ez az interaktív parancs azon a számítógépen írja ki a CLI konfigurációját, amelyen futtatja.",
+      "runHint": "A próbafuttatás a CLI elindítása nélkül mutatja meg az indítási tervet. Ez nem inferenciateszt.",
+      "copyFailed": "Nem sikerült másolni. Jelölje ki és másolja a parancsot kézzel.",
+      "empty": "Ebben a verzióban nincsenek futtatható CLI-célok. Használja az alábbi eszközútmutatókat."
+    },
     "concept": {
       "code": {
         "title": "CLI kód",

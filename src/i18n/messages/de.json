@@ -12225,6 +12225,29 @@
     "raw": "Roh"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-Assistent",
+      "intro": "Kopieren Sie die Befehle, um sie auf dem Computer auszuführen, auf dem Ihre CLI installiert ist. Dieses Panel führt keine Befehle aus und kopiert keine Zugangsdaten.",
+      "hostNotice": "Die Erkennung bezieht sich auf den OmniRoute-Serverhost, nicht auf den Computer dieses Browsers. Eine vorhandene Konfiguration bedeutet nicht, dass die Inferenz getestet wurde.",
+      "target": "CLI-Werkzeug",
+      "context": "Name eines vorhandenen Kontexts (optional)",
+      "contextHint": "Leer lassen, um den aktiven Kontext Ihrer CLI zu verwenden. Benannte Kontexte können auf lokale oder entfernte Server verweisen; listen Sie sie zuerst im Terminal auf.",
+      "contextInvalid": "Verwenden Sie 1–64 Buchstaben, Ziffern, Punkte, Bindestriche oder Unterstriche, beginnend mit einem Buchstaben oder einer Ziffer.",
+      "modelHint": "Diese CLI benötigt ein Modell. Geben Sie eine gültige Anbieter/Modell-Kennung ein, bevor Sie die Startvorschau kopieren.",
+      "modelInvalid": "Verwenden Sie eine Modellkennung ohne Leerzeichen oder Shell-Zeichen, beginnend mit einem Buchstaben oder einer Ziffer.",
+      "runtime": "Ausführung",
+      "runnable": "Ausführbar",
+      "notRunnable": "Nicht ausführbar",
+      "unknown": "Unbekannt",
+      "detectionError": "Servererkennung nicht verfügbar. Aktualisieren Sie die Erkennung, um es erneut zu versuchen; Terminalbefehle bleiben verfügbar.",
+      "contextsStep": "Kontexte im Terminal prüfen",
+      "configureStep": "Modell auswählen und konfigurieren",
+      "runStep": "Startvorschau anzeigen",
+      "configureHint": "Dieser interaktive Befehl schreibt die CLI-Konfiguration auf den Computer, auf dem Sie ihn ausführen.",
+      "runHint": "Der Probelauf zeigt den Startplan, ohne die CLI zu starten. Dies ist kein Inferenztest.",
+      "copyFailed": "Kopieren fehlgeschlagen. Markieren und kopieren Sie den Befehl manuell.",
+      "empty": "In dieser Version sind keine ausführbaren CLI-Ziele verfügbar. Verwenden Sie die Werkzeuganleitungen unten."
+    },
     "concept": {
       "code": {
         "title": "CLI-Code",

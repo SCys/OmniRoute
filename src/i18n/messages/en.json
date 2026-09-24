@@ -12225,6 +12225,29 @@
     "raw": "Raw"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI companion",
+      "intro": "Copy commands to run on the computer where your CLI is installed. This panel does not execute commands or copy credentials.",
+      "hostNotice": "Detection describes the OmniRoute server host, not this browser's computer. Configured does not mean inference was tested.",
+      "target": "CLI tool",
+      "context": "Existing context name (optional)",
+      "contextHint": "Leave blank to use your CLI's active context. Named contexts can point to a local or remote server; list them in your terminal first.",
+      "contextInvalid": "Use 1–64 letters, digits, dots, hyphens or underscores, starting with a letter or digit.",
+      "modelHint": "This CLI requires a model. Enter a real provider/model identifier before copying its launch preview.",
+      "modelInvalid": "Use a model identifier without spaces or shell characters, starting with a letter or digit.",
+      "runtime": "Runtime",
+      "runnable": "Runnable",
+      "notRunnable": "Not runnable",
+      "unknown": "Unknown",
+      "detectionError": "Server detection unavailable. Refresh detection to retry; terminal commands remain available.",
+      "contextsStep": "Check terminal contexts",
+      "configureStep": "Choose a model and configure",
+      "runStep": "Preview the launch",
+      "configureHint": "This interactive command writes the CLI configuration on the computer where you run it.",
+      "runHint": "Dry-run shows the launch plan without starting the CLI. It is not an inference test.",
+      "copyFailed": "Could not copy. Select and copy the command manually.",
+      "empty": "No executable CLI targets are available in this version. Use the tool guides below."
+    },
     "concept": {
       "code": {
         "title": "CLI Code",

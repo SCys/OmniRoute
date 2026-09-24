@@ -12225,6 +12225,29 @@
     "raw": "Rå"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-assistent",
+      "intro": "Kopiera kommandon för att köra dem på datorn där din CLI är installerad. Den här panelen kör inga kommandon och kopierar inga inloggningsuppgifter.",
+      "hostNotice": "Identifieringen beskriver OmniRoute-serverns värddator, inte datorn med den här webbläsaren. Konfigurerad betyder inte att inferens har testats.",
+      "target": "CLI-verktyg",
+      "context": "Namn på befintlig kontext (valfritt)",
+      "contextHint": "Lämna tomt för att använda din CLI:s aktiva kontext. Namngivna kontexter kan peka på en lokal eller fjärransluten server; lista dem först i terminalen.",
+      "contextInvalid": "Använd 1–64 bokstäver, siffror, punkter, bindestreck eller understreck, med en bokstav eller siffra först.",
+      "modelHint": "Den här CLI:n kräver en modell. Ange en befintlig leverantör/modell-identifierare innan du kopierar förhandsvisningen av starten.",
+      "modelInvalid": "Använd en modellidentifierare utan blanksteg eller skaltecken, med en bokstav eller siffra först.",
+      "runtime": "Körning",
+      "runnable": "Körbar",
+      "notRunnable": "Inte körbar",
+      "unknown": "Okänd",
+      "detectionError": "Serveridentifiering är inte tillgänglig. Uppdatera identifieringen för att försöka igen; terminalkommandon är fortfarande tillgängliga.",
+      "contextsStep": "Kontrollera kontexter i terminalen",
+      "configureStep": "Välj en modell och konfigurera",
+      "runStep": "Förhandsvisa starten",
+      "configureHint": "Det här interaktiva kommandot skriver CLI-konfigurationen på datorn där du kör det.",
+      "runHint": "Provkörningen visar startplanen utan att starta CLI:n. Det är inte ett inferenstest.",
+      "copyFailed": "Det gick inte att kopiera. Markera och kopiera kommandot manuellt.",
+      "empty": "Inga körbara CLI-mål är tillgängliga i den här versionen. Använd verktygsguiderna nedan."
+    },
     "concept": {
       "code": {
         "title": "CLI-kod",

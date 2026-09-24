@@ -12225,6 +12225,29 @@
     "raw": "Neapdorota"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI pagalbininkas",
+      "intro": "Nukopijuokite komandas ir paleiskite jas kompiuteryje, kuriame įdiegta jūsų CLI. Šis skydelis nevykdo komandų ir nekopijuoja prisijungimo duomenų.",
+      "hostNotice": "Aptikimas apibūdina OmniRoute serverio pagrindinį kompiuterį, o ne šios naršyklės kompiuterį. Sukonfigūruota nereiškia, kad modelio išvadų generavimas buvo išbandytas.",
+      "target": "CLI įrankis",
+      "context": "Esamo konteksto pavadinimas (nebūtina)",
+      "contextHint": "Palikite tuščią, jei norite naudoti aktyvų CLI kontekstą. Pavadinti kontekstai gali nurodyti vietinį arba nuotolinį serverį; pirmiausia pateikite jų sąrašą terminale.",
+      "contextInvalid": "Naudokite 1–64 raides, skaitmenis, taškus, brūkšnelius arba pabraukimo ženklus, pradėdami raide arba skaitmeniu.",
+      "modelHint": "Šiai CLI reikia modelio. Prieš kopijuodami paleidimo peržiūrą, įveskite tikrą teikėjo/modelio identifikatorių.",
+      "modelInvalid": "Naudokite modelio identifikatorių be tarpų ar komandų interpretatoriaus specialiųjų ženklų, pradėdami raide arba skaitmeniu.",
+      "runtime": "Vykdymas",
+      "runnable": "Galima paleisti",
+      "notRunnable": "Negalima paleisti",
+      "unknown": "Nežinoma",
+      "detectionError": "Serverio aptikimas nepasiekiamas. Atnaujinkite aptikimą ir bandykite dar kartą; terminalo komandos lieka pasiekiamos.",
+      "contextsStep": "Patikrinti kontekstus terminale",
+      "configureStep": "Pasirinkti modelį ir konfigūruoti",
+      "runStep": "Peržiūrėti paleidimą",
+      "configureHint": "Ši interaktyvi komanda įrašo CLI konfigūraciją kompiuteryje, kuriame ją vykdote.",
+      "runHint": "Bandomasis paleidimas rodo paleidimo planą nepaleisdamas CLI. Tai nėra modelio išvadų generavimo testas.",
+      "copyFailed": "Nepavyko nukopijuoti. Pažymėkite ir nukopijuokite komandą rankiniu būdu.",
+      "empty": "Šioje versijoje nėra paleidžiamų CLI taikinių. Naudokite toliau pateiktus įrankių vadovus."
+    },
     "concept": {
       "code": {
         "title": "CLI kodas",

@@ -12225,6 +12225,29 @@
     "raw": "Toorandmed"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-abimees",
+      "intro": "Kopeeri käsud, et käivitada need arvutis, kuhu sinu CLI on paigaldatud. See paneel ei käivita käske ega kopeeri autentimisandmeid.",
+      "hostNotice": "Tuvastus kirjeldab OmniRoute’i serveri hosti, mitte selle brauseri arvutit. Seadistatud olek ei tähenda, et inferentsi oleks testitud.",
+      "target": "CLI-tööriist",
+      "context": "Olemasoleva konteksti nimi (valikuline)",
+      "contextHint": "CLI aktiivse konteksti kasutamiseks jäta tühjaks. Nimega kontekstid võivad viidata kohalikule või kaugserverile; loetle need esmalt terminalis.",
+      "contextInvalid": "Kasuta 1–64 tähte, numbrit, punkti, sidekriipsu või allkriipsu, alustades tähe või numbriga.",
+      "modelHint": "See CLI vajab mudelit. Enne käivitamise eelvaate kopeerimist sisesta tegelik pakkuja/mudeli identifikaator.",
+      "modelInvalid": "Kasuta mudeli identifikaatorit ilma tühikute või käsukesta erimärkideta, alustades tähe või numbriga.",
+      "runtime": "Käitus",
+      "runnable": "Käivitatav",
+      "notRunnable": "Pole käivitatav",
+      "unknown": "Teadmata",
+      "detectionError": "Serveri tuvastus pole saadaval. Uuesti proovimiseks värskenda tuvastust; terminalikäsud on endiselt saadaval.",
+      "contextsStep": "Kontrolli kontekste terminalis",
+      "configureStep": "Vali mudel ja seadista",
+      "runStep": "Vaata käivitamise eelvaadet",
+      "configureHint": "See interaktiivne käsk kirjutab CLI seadistuse arvutisse, kus sa selle käivitad.",
+      "runHint": "Proovikäivitus näitab käivitusplaani ilma CLI-d käivitamata. See pole inferentsitest.",
+      "copyFailed": "Kopeerimine ebaõnnestus. Vali ja kopeeri käsk käsitsi.",
+      "empty": "Selles versioonis pole käivitatavaid CLI-sihtmärke. Kasuta allolevaid tööriistajuhendeid."
+    },
     "concept": {
       "code": {
         "title": "CLI-kood",

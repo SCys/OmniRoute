@@ -12225,6 +12225,29 @@
     "raw": "Ruw"
   },
   "cliCommon": {
+    "companion": {
+      "title": "CLI-assistent",
+      "intro": "Kopieer opdrachten om ze uit te voeren op de computer waarop je CLI is geïnstalleerd. Dit paneel voert geen opdrachten uit en kopieert geen inloggegevens.",
+      "hostNotice": "De detectie beschrijft de host van de OmniRoute-server, niet de computer van deze browser. Geconfigureerd betekent niet dat inferentie is getest.",
+      "target": "CLI-hulpmiddel",
+      "context": "Naam van een bestaande context (optioneel)",
+      "contextHint": "Laat leeg om de actieve context van je CLI te gebruiken. Benoemde contexten kunnen naar een lokale of externe server verwijzen; toon ze eerst in je terminal.",
+      "contextInvalid": "Gebruik 1–64 letters, cijfers, punten, koppeltekens of onderstrepingstekens, beginnend met een letter of cijfer.",
+      "modelHint": "Deze CLI vereist een model. Voer een bestaande provider/model-identificatie in voordat je het startvoorbeeld kopieert.",
+      "modelInvalid": "Gebruik een modelidentificatie zonder spaties of shelltekens, beginnend met een letter of cijfer.",
+      "runtime": "Uitvoering",
+      "runnable": "Uitvoerbaar",
+      "notRunnable": "Niet uitvoerbaar",
+      "unknown": "Onbekend",
+      "detectionError": "Serverdetectie niet beschikbaar. Vernieuw de detectie om het opnieuw te proberen; terminalopdrachten blijven beschikbaar.",
+      "contextsStep": "Contexten in de terminal controleren",
+      "configureStep": "Een model kiezen en configureren",
+      "runStep": "Startvoorbeeld bekijken",
+      "configureHint": "Deze interactieve opdracht schrijft de CLI-configuratie op de computer waarop je de opdracht uitvoert.",
+      "runHint": "De proefuitvoering toont het startplan zonder de CLI te starten. Dit is geen inferentietest.",
+      "copyFailed": "Kopiëren mislukt. Selecteer en kopieer de opdracht handmatig.",
+      "empty": "In deze versie zijn geen uitvoerbare CLI-doelen beschikbaar. Gebruik de handleidingen hieronder."
+    },
     "concept": {
       "code": {
         "title": "CLI-code",

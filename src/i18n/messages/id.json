@@ -12225,6 +12225,29 @@
     "raw": "Mentah"
   },
   "cliCommon": {
+    "companion": {
+      "title": "Pendamping CLI",
+      "intro": "Salin perintah untuk dijalankan di komputer tempat CLI Anda terpasang. Panel ini tidak menjalankan perintah atau menyalin kredensial.",
+      "hostNotice": "Deteksi menjelaskan host server OmniRoute, bukan komputer browser ini. Sudah dikonfigurasi bukan berarti inferensi telah diuji.",
+      "target": "Alat CLI",
+      "context": "Nama konteks yang ada (opsional)",
+      "contextHint": "Kosongkan untuk memakai konteks aktif CLI. Konteks bernama dapat mengarah ke server lokal atau jarak jauh; lihat daftarnya di terminal terlebih dahulu.",
+      "contextInvalid": "Gunakan 1–64 huruf, angka, titik, tanda hubung, atau garis bawah, diawali huruf atau angka.",
+      "modelHint": "CLI ini memerlukan model. Masukkan pengenal penyedia/model yang valid sebelum menyalin pratinjau peluncurannya.",
+      "modelInvalid": "Gunakan pengenal model tanpa spasi atau karakter shell, diawali huruf atau angka.",
+      "runtime": "Lingkungan eksekusi",
+      "runnable": "Dapat dijalankan",
+      "notRunnable": "Tidak dapat dijalankan",
+      "unknown": "Tidak diketahui",
+      "detectionError": "Deteksi server tidak tersedia. Segarkan deteksi untuk mencoba lagi; perintah terminal tetap tersedia.",
+      "contextsStep": "Periksa konteks terminal",
+      "configureStep": "Pilih model dan konfigurasikan",
+      "runStep": "Pratinjau peluncuran",
+      "configureHint": "Perintah interaktif ini menulis konfigurasi CLI di komputer tempat Anda menjalankannya.",
+      "runHint": "Simulasi menampilkan rencana peluncuran tanpa memulai CLI. Ini bukan pengujian inferensi.",
+      "copyFailed": "Tidak dapat menyalin. Pilih dan salin perintah secara manual.",
+      "empty": "Tidak ada target CLI yang dapat dijalankan dalam versi ini. Gunakan panduan alat di bawah."
+    },
     "concept": {
       "code": {
         "title": "Kode CLI",
