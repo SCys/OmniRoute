@@ -82,7 +82,6 @@ import { obfuscateInBody } from "../services/claudeCodeObfuscation.ts";
 import { sanitizeClaudeToolSchemas } from "../translator/helpers/schemaCoercion.ts";
 import { sanitizeResponsesInputItems } from "../services/responsesInputSanitizer.ts";
 import { applySystemTransformPipeline, PROVIDER_CLAUDE } from "../services/systemTransforms.ts";
-import * as prl from "../utils/providerRequestLogging.ts";
 import {
   fixToolPairs,
   fixToolAdjacency,
@@ -137,6 +136,14 @@ import { sanitizeReasoningEffortForProvider } from "./base/reasoningEffort.ts";
 export { sanitizeReasoningEffortForProvider } from "./base/reasoningEffort.ts";
 import { mergeAbortSignals } from "./base/mergeAbortSignals.ts";
 export { mergeAbortSignals } from "./base/mergeAbortSignals.ts";
+
+function parseSerializedBody(bodyString: string): unknown {
+  try {
+    return JSON.parse(bodyString);
+  } catch {
+    return bodyString;
+  }
+}
 
 /**
  * Sanitizes a custom API path to prevent path traversal attacks.
@@ -1391,7 +1398,7 @@ export class BaseExecutor {
         applyPeerTraceHeader(finalHeaders, clientHeaders, url);
         // Rides `anthropic-usage-limit: slow` once this account accepted the offer.
         const claudeSentSlow = claudeUsageLimit.applyHeader(finalHeaders, activeCredentials);
-        const serializedBody = prl.parseBody(bodyString);
+        const serializedBody = parseSerializedBody(bodyString);
         // #4307 — Preserve the non-enumerable tool-name cloak/remap reverse map
         // (`_toolNameMap`, set on the live `transformedBody` by
         // remapToolNamesInRequest / cloakThirdPartyToolNames) that the JSON
