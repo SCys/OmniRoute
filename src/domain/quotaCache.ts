@@ -49,13 +49,9 @@ import {
   isQuotaHealthy,
 } from "./quotaCacheState";
 
-// #14359 — re-exported so existing callers (chat.ts, tests) keep importing from here.
-export {
-  EXHAUSTED_MAX_PARK_MS,
-  isQuotaHealthy,
-  markQuotaHealthy,
-  unmarkQuotaHealthy,
-} from "./quotaCacheState";
+// #14359 — re-exported so existing callers (chat.ts, tests) keep importing from here. Only
+// markQuotaHealthy has outside callers; the rest are internal and stay unexported (dead-code gate).
+export { markQuotaHealthy } from "./quotaCacheState";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
