@@ -1,7 +1,7 @@
 ---
 title: "Environment Variables Reference"
 version: 3.8.52
-lastUpdated: 2026-10-05
+lastUpdated: 2026-10-11
 ---
 
 # Environment Variables Reference
@@ -550,6 +550,10 @@ detection above).
 | `OMNIROUTE_READY_TIMEOUT_MS`  | `60000`    | `bin/cli/utils/pid.mjs`                 | Maximum time (ms) the CLI waits for the server health endpoint before printing a timeout warning. Useful for slow cold starts (e.g. Windows). Also settable via `--ready-timeout`. |
 | `OMNIROUTE_VERBOSE`            | `0`        | `bin/cli/api.mjs`                       | Set to `1` to print retry/backoff diagnostics to stderr during CLI commands.                                                       |
 | `OMNIROUTE_PLUGIN_PATH`        | _(unset)_  | `bin/cli/plugins.mjs`                   | Custom directory for CLI plugin discovery (`omniroute-cmd-*` packages). Defaults to `~/.omniroute/plugins/` when unset. CLI-only — it never reaches the server-side plugin scanner, which is pointed by `OMNIROUTE_PLUGINS_DIR` (section 2). |
+| `OMNIROUTE_NO_UPDATE_NOTIFIER` | _(unset)_ | `bin/omniroute.mjs` | Suppress the CLI update notification at process exit when set to any non-empty value. The notice remains disabled independently in CI, quiet mode, and non-text output modes. |
+| `OMNIROUTE_DOCTOR_LIVENESS_URL` | _(derived)_ | `bin/cli/commands/doctor.mjs` | Liveness URL probed by `omniroute doctor`. A programmatic `livenessUrl` option takes precedence; otherwise this value is used verbatim. Unset, the CLI derives the local dashboard's `/api/health/degradation` endpoint. |
+| `OMNIROUTE_PROVIDER_CATALOG_PATH` | `src/shared/constants/providers/` | `bin/cli/provider-catalog.mjs` | Provider catalog path used by CLI provider commands. A programmatic `catalogPath` option takes precedence. Absolute paths are used as-is; relative paths resolve from the project root. Unset, the CLI uses the provider constants directory, with the legacy `providers.ts` file as fallback. |
+| `OMNIROUTE_PROVIDER_TEST_MODEL` | _(provider default)_ | `bin/cli/provider-test.mjs` | Global fallback model for CLI provider connection tests. Precedence is configured connection model, provider-specific model override, this value, then the provider's built-in test model. |
 
 ---
 
@@ -1197,6 +1201,7 @@ desktop install.
 | `AWS_DEFAULT_REGION`                           | _(unset)_                              | `src/lib/providers/validation.ts`, `open-sse/handlers/audioSpeech.ts`              | Fallback when `AWS_REGION` is not set.                                                                      |
 | `CLOUDFLARE_ACCOUNT_ID`                        | _(unset)_                              | `open-sse/executors/cloudflare-ai.ts`                                              | Account ID for Cloudflare Workers AI.                                                                       |
 | `CLOUDFLARE_PLAYGROUND_CHROME_PATH`            | _(unset)_                              | `open-sse/executors/cloudflare-playground.ts`                                      | Full desktop Chrome binary path for the Cloudflare AI Playground executor, used when the headless fingerprint check blocks Playwright's bundled Chromium. |
+| `CODEBUDDY_SYSTEM_PROMPT_MAX_LEN`              | _(unset = no length cap)_              | `open-sse/executors/codebuddy/shared.ts`                                           | Optional length cap for caller system prompts sent to CodeBuddy (CN and International). By default only a prompt carrying a coding-agent identity marker is replaced by a neutral one (Tencent's content filter rejects those); long prompts are kept. An integer > 0 also replaces any system prompt longer than that many characters; unset, `0` or a non-integer value disables the cap. Each replacement logs which rule fired (identity marker or length). |
 | `CLOUDFLARE_API_BASE`                          | `https://api.cloudflare.com/client/v4` | `src/app/api/settings/proxy/cloudflare-deploy/route.ts`                            | Override the Cloudflare REST API base used by the proxy-pool Workers relay deployer (#4640 / 9router#1360). |
 | `NEXT_PUBLIC_CLOUDFLARE_RELAY_DEFAULT_PROJECT` | `omniroute-relay`                      | `src/app/(dashboard)/dashboard/settings/components/proxy/CloudflareRelayModal.tsx` | Default worker project name suggested in the proxy-pool "Deploy Relay" modal.                               |
 | `NEXT_PUBLIC_CLOUDFLARE_RELAY_ENABLED`         | `true`                                 | `src/app/(dashboard)/dashboard/settings/components/proxy/ProxyPoolTab.tsx`         | Set to `false` to hide the Cloudflare Workers relay option from the Proxy Pool tab.                         |
