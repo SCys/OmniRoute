@@ -83,7 +83,12 @@ test("chat pipeline applies a reasoning model/effort rule once and records route
     })
   );
   await response.json();
-  const callLog = await waitFor(() => getLatestCallLog());
+  // #15608: the call-log row is visible as detail_state = 'pending' before its artifact (which
+  // carries pipelinePayloads) is written; wait for the published detail, not just the row.
+  const callLog = await waitFor(async () => {
+    const log = await getLatestCallLog();
+    return log?.detailState === "ready" ? log : null;
+  });
 
   assert.equal(response.status, 200);
   assert.equal(fetchCalls.length, 1);

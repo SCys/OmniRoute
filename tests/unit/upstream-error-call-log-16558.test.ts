@@ -40,7 +40,10 @@ async function logFailure(args: Partial<Args>, context: Partial<Context> = {}) {
   } as Context);
   for (let attempt = 0; attempt < 200; attempt++) {
     const rows = await getCallLogs({ correlationId: traceId, limit: 1 });
-    if (rows[0]?.id) {
+    // #15608: a row that expects a detail artifact is inserted as detail_state = 'pending'
+    // before that write lands, and only then settles ('ready', or 'missing' if it failed).
+    // No-log rows start as 'none'. Wait until the row has settled, not merely exists.
+    if (rows[0]?.id && rows[0].detailState !== "pending") {
       const row = await getCallLogById(rows[0].id);
       if (row) return row;
     }

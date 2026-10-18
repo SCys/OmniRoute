@@ -564,7 +564,7 @@ test("combo fallback records only the successful target and keeps both call-log 
   const hits: string[] = [];
   globalThis.fetch = async (url) => {
     hits.push(String(url));
-    if (String(url).includes("api.openai.com"))
+    if (new URL(String(url)).hostname === "api.openai.com")
       return Response.json(
         { error: { message: "upstream unavailable" }, usage: IMAGE_USAGE },
         { status: 500 }

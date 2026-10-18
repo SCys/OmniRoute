@@ -110,7 +110,10 @@ import {
   isOpencodeRateLimited429EarlyStopEnabled,
   isOpencodeParkAndResumeEnabled,
   isOpencodePoolReselectEnabled,
+  isOpencodePublishedCatalogRoutingEnabled,
+  isOpencodeV2ClientFingerprintEnabled,
 } from "@/shared/utils/featureFlags";
+import { setPublishedCatalogRoutingGate } from "../utils/opencodePublishedCatalog.ts";
 import { isEgressBucketedLockScope } from "../config/providerErrorRules.ts";
 import {
   BURST_PARK_THRESHOLD,
@@ -188,6 +191,12 @@ export function parseEffortLevel(model: string): { baseModel: string; effort: st
   }
   return null;
 }
+
+// #16798: the published-catalog surface lookup in providerModels.ts is client-reachable and
+// cannot import the server flag resolver; this executor (always loaded with the chat
+// pipeline) hands it the OPENCODE_PUBLISHED_CATALOG_ROUTING_ENABLED reader. Unregistered
+// (client bundle) reads as off.
+setPublishedCatalogRoutingGate(isOpencodePublishedCatalogRoutingEnabled);
 
 /**
  * Resolves the registry `targetFormat` for a model, aliasing `provider` first.
@@ -274,6 +283,7 @@ export class OpencodeExecutor extends BaseExecutor {
       clientSession: this._clientSession,
       borrowed: attempt?.borrowed,
       clientToolNames: attempt?.clientToolNames ?? [],
+      v2Fingerprint: isOpencodeV2ClientFingerprintEnabled(),
     };
   }
 
@@ -1331,6 +1341,14 @@ export class OpencodeExecutor extends BaseExecutor {
       ? this.resolveEffectiveKey(credentials) || credentials.accessToken
       : undefined;
 
+    // The free tier only answers streamed requests (measured 2026-09-17: a non-streamed
+    // body answers 403 FreeTierError), so a JSON client is served by streaming upstream and
+    // rebuilding the JSON body from the event stream — the path chatCore already takes for
+    // any buffered event-stream response. Announcing the stream here keeps that buffering an
+    // expected outcome rather than a warning.
+    const gatedScope =
+      Boolean(model) && isGatedFreeTierRequest(this._surface(), this.provider, model);
+
     if (key) {
       if (this._requestFormat === "claude" || this.usesZenApiKeyAuth()) {
         headers["x-api-key"] = key;
@@ -1342,14 +1360,6 @@ export class OpencodeExecutor extends BaseExecutor {
     if (this._requestFormat === "claude") {
       headers["anthropic-version"] = "2023-06-01";
     }
-
-    // The free tier only answers streamed requests (measured 2026-09-17: a non-streamed
-    // body answers 403 FreeTierError), so a JSON client is served by streaming upstream and
-    // rebuilding the JSON body from the event stream — the path chatCore already takes for
-    // any buffered event-stream response. Announcing the stream here keeps that buffering an
-    // expected outcome rather than a warning.
-    const gatedScope =
-      Boolean(model) && isGatedFreeTierRequest(this._surface(), this.provider, model);
     if (stream || gatedScope) {
       headers["Accept"] = "text/event-stream";
     }
@@ -1359,9 +1369,12 @@ export class OpencodeExecutor extends BaseExecutor {
     // OPENCODE_SYNTHESIZE_CLI_HEADERS=false. Client-supplied headers always win;
     // User-Agent is replaced with the CLI UA unless the client already sends one that
     // looks like the OpenCode CLI. Default values match 9router's proven defaults.
+    // #16571: the OpenCode v2 client fingerprint is opt-in (default off: identity unchanged).
+    const v2Fingerprint = isOpencodeV2ClientFingerprintEnabled();
     const cliDefaults = resolveOpencodeCliDefaults(
       this.config?.id || this.provider || "opencode",
-      gatedScope
+      gatedScope,
+      v2Fingerprint
     );
 
     this._clientSession = clientSuppliedOpencodeSession(clientHeaders, body);
@@ -1372,6 +1385,7 @@ export class OpencodeExecutor extends BaseExecutor {
         keepAgentUserAgent: this._surface() === "go" && !gatedScope, // #15311
         sessionBody: projectOpencodeSessionBody(body),
         reencodeSession: gatedScope,
+        v2Fingerprint,
       });
     }
 
@@ -1472,7 +1486,8 @@ export class OpencodeExecutor extends BaseExecutor {
       this.provider,
       model,
       this._clientSession,
-      body
+      body,
+      isOpencodeV2ClientFingerprintEnabled()
     );
     modifiedBody = prepared.body;
     // OpenCode's upstream 400s a request when a single enum property carries

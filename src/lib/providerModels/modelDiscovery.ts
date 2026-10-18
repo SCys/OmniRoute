@@ -605,6 +605,23 @@ export function normalizeDiscoveredModels(
             ? ["images"]
             : undefined;
 
+    // #16929 provenance. Only a parser that genuinely reads the upstream's own
+    // capability declaration (e.g. Gemini supportedGenerationMethods) stamps
+    // "declared" explicitly on the record. A bare supportedEndpoints array is NOT
+    // proof of declaration: OpenAI/OpenRouter/Ollama/codex/compatible parsers fill it
+    // from heuristics or fixed defaults, so it stays unmarked (= defaulted, never
+    // gating). Id/type modality inference applies only when no array was supplied.
+    // "defaulted" is left off the row so chat rows keep the tip's exact shape.
+    const endpointCapabilitySource: SyncedAvailableModel["endpointCapabilitySource"] =
+      record.endpointCapabilitySource === "operator" ||
+      record.endpointCapabilitySource === "declared" ||
+      record.endpointCapabilitySource === "inferred"
+        ? record.endpointCapabilitySource
+        : !Array.isArray(record.supportedEndpoints) &&
+            (modality.isEmbedding || modality.isRerank || modality.isImage)
+          ? "inferred"
+          : undefined;
+
     const apiFormat =
       toNonEmptyString(record.apiFormat) ||
       (modality.isEmbedding
@@ -689,6 +706,7 @@ export function normalizeDiscoveredModels(
         ? { upstreamProtocol: toNonEmptyString(record.upstreamProtocol)! }
         : {}),
       ...(supportedEndpoints && supportedEndpoints.length > 0 ? { supportedEndpoints } : {}),
+      ...(endpointCapabilitySource ? { endpointCapabilitySource } : {}),
       ...(supportedThinkingEfforts !== undefined ? { supportedThinkingEfforts } : {}),
       ...(defaultThinkingEffort !== undefined ? { defaultThinkingEffort } : {}),
       ...(typeof inputTokenLimit === "number" ? { inputTokenLimit } : {}),

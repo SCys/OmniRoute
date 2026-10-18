@@ -8,7 +8,8 @@ import assert from "node:assert/strict";
 
 const memory = await import("../../open-sse/utils/proxyRefusalMemory.ts");
 const { noteProxyOutcome } = await import("../../src/sse/handlers/proxyOutcomeMemory.ts");
-const { egressBucketedLockProviders } = await import("../../open-sse/config/providerErrorRules.ts");
+const { egressBucketedLockProviders, setProviderErrorRuleFlagReader } =
+  await import("../../open-sse/config/providerErrorRules.ts");
 
 const PROXY = { type: "http", host: "10.4.0.1", port: 8080 };
 const KEY = memory.proxyEgressKey(PROXY);
@@ -35,6 +36,21 @@ test("a refusal from a provider outside the scope writes nothing", () => {
     noteProxyOutcome(provider, { proxy: PROXY, upstreamStatus: 429 });
   }
   assert.equal(memory.__proxyRefusalMemorySizeForTesting(), 0);
+});
+
+test("#16797: with OPENCODE_ZEN_EGRESS_IP_LOCK_ENABLED on, an opencode-zen refusal sets the member aside", () => {
+  // The flag store is injected by accountFallback.ts at runtime; this unit wires a reader
+  // that reports only this flag on, so no database is opened here.
+  setProviderErrorRuleFlagReader((key) => key === "OPENCODE_ZEN_EGRESS_IP_LOCK_ENABLED");
+  try {
+    noteProxyOutcome("opencode-zen", { proxy: PROXY, upstreamStatus: 429 });
+    assert.equal(memory.isProxyAvoided(KEY), true);
+  } finally {
+    setProviderErrorRuleFlagReader(null);
+  }
+  memory.__resetProxyRefusalMemoryForTesting();
+  noteProxyOutcome("opencode-zen", { proxy: PROXY, upstreamStatus: 429 });
+  assert.equal(memory.__proxyRefusalMemorySizeForTesting(), 0, "flag off again: nothing written");
 });
 
 test("no received status, no proxy or no proxyInfo writes nothing", () => {

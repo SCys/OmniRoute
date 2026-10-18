@@ -1,4 +1,5 @@
 import { hasQoderCallerTools } from "@omniroute/open-sse/services/qoderCapabilities";
+import { getRequestedModelEndpointMismatch } from "@/lib/providerModels/modelEndpointGuard";
 import { randomUUID } from "crypto";
 import { resolveChatRequestBody } from "./requestBody";
 import { getComboCredentialAvailability } from "./comboCredentialAvailability.ts";
@@ -118,7 +119,10 @@ import {
 import { buildModalityBridgeHeader } from "@/lib/guardrails/modalityBridge/bridgeStats";
 import type { VideoBridgeLogRedactionEntry } from "@/lib/guardrails/videoBridge";
 import { reanchorVideoBridgeRedaction } from "@/lib/guardrails/videoBridge";
-import { resolveConversationId } from "@omniroute/open-sse/services/conversationTracker.ts";
+import {
+  resolveClientSessionId,
+  resolveConversationId,
+} from "@omniroute/open-sse/services/conversationTracker.ts";
 import {
   classifyProviderBreakerResult,
   isAntigravityMissingProjectError,
@@ -747,6 +751,20 @@ async function handleChatImplementation(
     );
   }
 
+  // A trusted endpoint-tag mismatch is a local client error, not a provider or
+  // connection health failure. Exact combo names are exempt in the resolver.
+  const endpointMismatch = await getRequestedModelEndpointMismatch(modelStr, "chat");
+  if (endpointMismatch) {
+    return logHandlerRejection(errorResponse(HTTP_STATUS.BAD_REQUEST, endpointMismatch), {
+      path: new URL(request.url).pathname,
+      model: modelStr,
+      requestBody: body ?? null,
+      apiKeyId: null,
+      apiKeyName: null,
+      correlationId: reqId,
+    });
+  }
+
   // T04: client-provided external session header has priority over generated fingerprint.
   const externalSessionId = extractExternalSessionId(request.headers);
   const sessionId = externalSessionId || generateStableSessionId(body);
@@ -948,6 +966,7 @@ async function handleChatImplementation(
       model: modelStr,
       apiKeyId: apiKeyInfo?.id ?? null,
       clientSessionIdHeader: clientConversationHeader,
+      clientSessionId: resolveClientSessionId(request.headers, body),
       correlationId: reqId,
     }));
   } catch (error) {
@@ -2149,6 +2168,7 @@ async function handleSingleModelChat(
             previousResponseResumed: runtimeOptions.previousResponseResumed,
             fallbackAttempts: runtimeOptions.fallbackAttempts,
             forcedConnectionId: hasForcedConnection ? forcedConnectionId : null, // #14116
+            allowedConnections: effectiveAllowedConnections,
           },
           runtimeOptions
         );

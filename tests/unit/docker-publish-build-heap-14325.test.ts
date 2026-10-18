@@ -35,8 +35,11 @@ const buildYml = readFileSync(
 // ubuntu-24.04 / ubuntu-24.04-arm boxes docker-publish.yml's `build` job uses)
 // fits a 12288 MB webpack heap for this exact `npm run build`/`build:release`
 // invocation.
-test("build.yml's known-good heap budget is 12288 MB", () => {
-  assert.match(buildYml, /OMNIROUTE_BUILD_MEMORY_MB:\s*"12288"/);
+// #16938 lowered build.yml's hosted webpack build to 10240 MB ("hosted artifact builds run with
+// less memory than the opt-in 64 GB CI build slot", #16169). The docker-publish override below
+// still has to clear the Dockerfile's 6144 MB default, which is the regression this file guards.
+test("build.yml's known-good hosted webpack heap budget is 10240 MB", () => {
+  assert.match(buildYml, /OMNIROUTE_BUILD_MEMORY_MB:\s*"10240"/);
 });
 
 test("every docker-publish.yml build-push-action step raises the V8 heap ceiling past the Dockerfile's 6144 MB default", () => {
@@ -61,8 +64,8 @@ test("every docker-publish.yml build-push-action step raises the V8 heap ceiling
     [],
     `build-args block(s) at index ${JSON.stringify(missing)} never override OMNIROUTE_BUILD_MEMORY_MB, ` +
       `so those docker/build-push-action steps build with the Dockerfile's default ` +
-      `ARG OMNIROUTE_BUILD_MEMORY_MB=6144 heap ceiling instead of the 12288 MB that build.yml already ` +
-      `proves fits the same runner class — this is why every Docker publish on release/v3.8.51 since ` +
+      `ARG OMNIROUTE_BUILD_MEMORY_MB=6144 heap ceiling instead of a budget the hosted runner class is ` +
+      `known to fit (build.yml) — this is why every Docker publish on release/v3.8.51 since ` +
       `2026-09-18 16:58 UTC has died with "JavaScript heap out of memory" inside the webpack production pass`
   );
 });
