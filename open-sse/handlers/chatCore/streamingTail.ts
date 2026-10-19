@@ -61,6 +61,7 @@ import { extractFacts } from "@/lib/memory/extraction";
 import { calculateCost } from "@/lib/usage/costCalculator";
 import { appendRequestLog, trackPendingRequest } from "@/lib/usageDb";
 import { isFeatureFlagEnabled } from "@/shared/utils/featureFlags.ts";
+import { isEmptyStreamSiblingRecoveryEnabled } from "../../services/streamRecovery.ts";
 import { getProviderCredentials } from "@/sse/services/auth";
 import { resolveCredentialGate } from "@/lib/streamingCredentialTransform";
 
@@ -183,6 +184,12 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     provider,
     model,
     log,
+    // #16438 opt-in: briefly probe Claude/Codex streams for usable output after the first
+    // lifecycle event so an empty turn can be retried on a sibling connection.
+    contentProbeMs:
+      (provider === "claude" || provider === "codex") && isEmptyStreamSiblingRecoveryEnabled()
+        ? 1000
+        : undefined,
   });
   // A stall is an upstream issue, not an account fault — the executor loop
   // already ended at headers, so this bounded retry is the only recovery left.

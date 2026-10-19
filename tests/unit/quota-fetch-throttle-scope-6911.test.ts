@@ -9,14 +9,51 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { fetchDeepseekQuota, invalidateDeepseekQuotaCache } from "../../open-sse/services/deepseekQuotaFetcher.ts";
-import { fetchBailianQuota, invalidateBailianQuotaCache } from "../../open-sse/services/bailianQuotaFetcher.ts";
-import { fetchOpencodeQuota, invalidateOpencodeQuotaCache } from "../../open-sse/services/opencodeQuotaFetcher.ts";
-import { fetchCrofUsage, invalidateCrofUsageCache } from "../../open-sse/services/crofUsageFetcher.ts";
+import {
+  fetchDeepseekQuota,
+  invalidateDeepseekQuotaCache,
+} from "../../open-sse/services/deepseekQuotaFetcher.ts";
+import {
+  fetchBailianQuota,
+  invalidateBailianQuotaCache,
+} from "../../open-sse/services/bailianQuotaFetcher.ts";
+import {
+  fetchOpencodeQuota,
+  invalidateOpencodeQuotaCache,
+} from "../../open-sse/services/opencodeQuotaFetcher.ts";
+import {
+  fetchCrofUsage,
+  invalidateCrofUsageCache,
+} from "../../open-sse/services/crofUsageFetcher.ts";
 import { resetQuotaFetchThrottle } from "../../open-sse/services/quotaFetchThrottle.ts";
+import {
+  connectionProxyTestOverride,
+  fetchWithConnectionProxy,
+} from "../../open-sse/services/connectionProxyFetch.ts";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = process.env.OMNIROUTE_QUOTA_FETCH_MIN_INTERVAL_MS;
+
+// Since #15885 every fetcher calls fetchWithConnectionProxy() between the throttle's acquire()
+// and the upstream fetch. The first call of the process pays one-time costs inside that window:
+// it lazily imports the proxy transport and the error helpers, then imports the DB settings
+// module and opens SQLite with every migration to look up the connection's proxy (3-5 s on the
+// 2026-10-18 tip). The second call, released 200 ms later, waits on the same imports, so both
+// fetches left together (spread 20-50 ms) and the first test of this file failed whatever the
+// throttle did. This file measures the throttle, not that start-up: answer "no proxy assigned"
+// without the database, as the proxy suites do, and pay the lazy imports once before any timing.
+test.before(async () => {
+  connectionProxyTestOverride.resolveProxyForConnection = async () => null;
+  const fetchBeforeWarmup = globalThis.fetch;
+  await fetchWithConnectionProxy("warmup-6911", "https://warmup.invalid/", undefined, {
+    fetchFn: (async () => new Response("{}", { status: 200 })) as typeof fetch,
+  });
+  globalThis.fetch = fetchBeforeWarmup; // importing the transport installs its interceptor
+});
+
+test.after(() => {
+  connectionProxyTestOverride.resolveProxyForConnection = null;
+});
 
 test.beforeEach(() => {
   process.env.OMNIROUTE_QUOTA_FETCH_MIN_INTERVAL_MS = "200";
@@ -122,10 +159,7 @@ test("#6911 fetchOpencodeQuota is spaced by the shared quota-fetch throttle", as
 
 test("#6911 fetchCrofUsage is spaced by the shared quota-fetch throttle", async () => {
   await assertSpacedByThrottle("crof", crofBody, (idA, idB) =>
-    Promise.all([
-      fetchCrofUsage(idA, { apiKey: "sk-a" }),
-      fetchCrofUsage(idB, { apiKey: "sk-b" }),
-    ])
+    Promise.all([fetchCrofUsage(idA, { apiKey: "sk-a" }), fetchCrofUsage(idB, { apiKey: "sk-b" })])
   );
 });
 

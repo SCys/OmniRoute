@@ -1405,7 +1405,7 @@ export class OpencodeExecutor extends BaseExecutor {
    */
   private applyDeepSeekJsonSchemaFallback<T>(model: string, body: T): T {
     if (
-      model !== "deepseek-v4-flash-free" ||
+      (model !== "deepseek-v4-flash-free" && model !== "deepseek-v4.1-flash-free") ||
       (this.provider !== "opencode" && this.provider !== "opencode-zen")
     ) {
       return body;

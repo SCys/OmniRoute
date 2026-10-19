@@ -69,3 +69,22 @@ test("every docker-publish.yml build-push-action step raises the V8 heap ceiling
       `2026-09-18 16:58 UTC has died with "JavaScript heap out of memory" inside the webpack production pass`
   );
 });
+
+// Both values are measured, on purpose different: build.yml's native webpack build fits
+// 10240 MB on the hosted runner (run 39151150605), and the same webpack build inside
+// BuildKit publishes at 12288 MB (runs 38904652365, 38907575198, 39010473398). BuildKit
+// adds overhead around the same build, so the Docker heap must never fall below the
+// native floor.
+test("every docker-publish.yml heap override is at or above build.yml's native webpack floor", () => {
+  const floor = Number(buildYml.match(/OMNIROUTE_BUILD_MEMORY_MB:\s*"(\d+)"/)?.[1]);
+  assert.ok(Number.isFinite(floor) && floor > 0, "build.yml declares OMNIROUTE_BUILD_MEMORY_MB");
+  const dockerHeaps = [...workflow.matchAll(/OMNIROUTE_BUILD_MEMORY_MB=(\d+)/g)].map((m) =>
+    Number(m[1])
+  );
+  assert.ok(
+    dockerHeaps.length >= 4,
+    `expected >= 4 docker heap overrides, found ${dockerHeaps.length}`
+  );
+  const below = dockerHeaps.filter((mb) => mb < floor);
+  assert.deepEqual(below, [], `docker heap below the native floor of ${floor} MB`);
+});

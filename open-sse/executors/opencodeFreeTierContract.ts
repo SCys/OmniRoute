@@ -116,12 +116,12 @@ interface OpencodeFreeCatalog {
 /**
  * Legacy free ids kept only as the unsynced-catalog fallback (see the block above).
  *
- * `deepseek-v4-flash-free` appears in both the noauth and the zen registry; the rotating
- * `-free` ids are covered by the suffix rule alongside this set.
+ * `deepseek-v4.1-flash-free` replaced the delisted `deepseek-v4-flash-free` in the zen
+ * registry; the rotating `-free` ids are covered by the suffix rule alongside this set.
  */
 const OPENCODE_LEGACY_FREE_MODELS = new Set([
   "big-pickle",
-  "deepseek-v4-flash-free",
+  "deepseek-v4.1-flash-free",
   "mimo-v2.5-free",
   "hy3-free",
   "nemotron-3-ultra-free",

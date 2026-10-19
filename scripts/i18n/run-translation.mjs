@@ -417,6 +417,7 @@ const SYSTEM_PROMPT = (englishName, native) =>
 // retried, and a doc whose chunk never validates fails instead of being written.
 
 const THINK_BLOCK = /<think>[\s\S]*?<\/think>\s*/g;
+const LEADING_THINK_BLOCKS = /^\s*(?:<think>[\s\S]*?<\/think>\s*)+/;
 const WRAPPING_FENCE = /^```(?:markdown|md)?[ \t]*\n([\s\S]*?)\n```[ \t]*$/;
 const META_PROSE = [
   /\bI'll /g,
@@ -430,12 +431,71 @@ const META_PROSE = [
 const countMatches = (re, text) => (text.match(re) || []).length;
 const countLines = (re, text) => text.split("\n").filter((l) => re.test(l)).length;
 
-export function validateTranslatedChunk(source, output) {
-  let text = output.replace(THINK_BLOCK, "").trim();
-  const unwrapped = !/^\s*```/.test(source) && text.match(WRAPPING_FENCE);
-  if (unwrapped) text = unwrapped[1].trim();
+// Protect only exact, source-owned code examples. Counts matter: seeing one
+// example in the source must not authorize extra copies or arbitrary reasoning.
+const THINK_LITERAL = /<think>[\s\S]*?<\/think>|<\/?think>/g;
+const BACKTICK_CODE =
+  /^ {0,3}(?<fence>`{3,})(?!`)[^`\n]*\n[\s\S]*?^ {0,3}\k<fence>`*[ \t]*(?=\n|$)/;
+const TILDE_CODE = /^ {0,3}(?<tilde>~{3,})(?!~)[^\n]*\n[\s\S]*?^ {0,3}\k<tilde>~*[ \t]*(?=\n|$)/;
+const INLINE_CODE =
+  /(?<![\\`])(?:\\\\)*(?<span>`+)(?!`)(?:(?!\r?\n[ \t]*\r?\n)[\s\S])*?(?<!`)\k<span>(?!`)/;
+const CODE_LITERAL = new RegExp(
+  [BACKTICK_CODE.source, TILDE_CODE.source, INLINE_CODE.source].join("|"),
+  "gm"
+);
+const mapThinkCode = (text, visit) =>
+  text.replace(CODE_LITERAL, (code) => code.replace(THINK_LITERAL, visit));
+
+function protectThinkCode(source, output) {
+  const remaining = new Map();
+  mapThinkCode(source, (literal) => {
+    remaining.set(literal, (remaining.get(literal) || 0) + 1);
+    return literal;
+  });
+  let prefix = "\0omniroute-think-literal:";
+  while (source.includes(prefix) || output.includes(prefix)) prefix += ":";
+  const replacements = new Map();
   const problems = [];
-  if (/<\/?think>/.test(text)) problems.push("leaked <think> tag");
+  const text = mapThinkCode(output, (literal) => {
+    const available = remaining.get(literal) || 0;
+    if (available === 0) {
+      problems.push("unexpected <think> code literal");
+      return literal;
+    }
+    remaining.set(literal, available - 1);
+    const token = `${prefix}${replacements.size}\0`;
+    replacements.set(token, literal);
+    return token;
+  });
+  if ([...remaining.values()].some((count) => count > 0)) {
+    problems.push("missing source <think> code literal");
+  }
+  return {
+    text,
+    problems,
+    restore(value) {
+      for (const [token, literal] of replacements) value = value.replaceAll(token, () => literal);
+      return value;
+    },
+  };
+}
+
+function unwrapTranslationFence(source, text) {
+  const unwrapped = !/^\s*```/.test(source) && text.match(WRAPPING_FENCE);
+  return unwrapped ? unwrapped[1].trim() : text;
+}
+
+export function validateTranslatedChunk(source, output) {
+  const candidate = unwrapTranslationFence(source, output.replace(LEADING_THINK_BLOCKS, "").trim());
+  const protectedOutput = protectThinkCode(source, candidate);
+  let text = protectedOutput.text.replace(THINK_BLOCK, "").trim();
+  text = unwrapTranslationFence(source, text);
+  text = protectedOutput.restore(text);
+  // Recheck after stripping/unwrapping: an outer leaked block can consume a
+  // protected example, and a wrapping fence must not turn a bare tag into code.
+  const checked = protectThinkCode(source, text);
+  const problems = [...new Set([...protectedOutput.problems, ...checked.problems])];
+  if (/<\/?think>/.test(checked.text)) problems.push("leaked <think> tag");
   const fences = [countLines(/^\s*```/, source), countLines(/^\s*```/, text)];
   if (fences[0] !== fences[1]) problems.push(`code fences ${fences[1]}/${fences[0]}`);
   const rows = [countLines(/^\s*\|/, source), countLines(/^\s*\|/, text)];

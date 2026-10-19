@@ -17,7 +17,7 @@ Objective feature comparison vs popular open-source AI routers.
 | **Free/no-auth catalog entries**                   |                   **155**                   |      n/a       |    passthrough    |     n/a     |
 | **Self-hostable**                                  |                     ✅                      |       ✅       |        ❌         |   ⚠ paid    |
 | **OAuth catalog entries**                          |                   **23**                    |    partial     |        ❌         |     ❌      |
-| **Auto-fallback combos**                           |              **19 strategies**              | priority-based |    tier-based     |  weighted   |
+| **Auto-fallback combos**                           |              **20 strategies**              | priority-based |    tier-based     |  weighted   |
 | **Fusion (parallel panel + judge synthesis)**      |                     ✅                      |       ❌       |        ❌         |     ❌      |
 | **Tier 1/2/3 fallback (subscription→cheap→free)**  |                   ✅ + UI                   |     manual     |        n/a        |   manual    |
 | **Token compression**                              | 12-engine stack (RTK + Caveman + LLMLingua) |      none      |       none        |    none     |
@@ -34,7 +34,7 @@ Objective feature comparison vs popular open-source AI routers.
 | **CLI with system tray (no Electron)**             |                     ✅                      |       ❌       |        n/a        |     n/a     |
 | **CLI machine-ID auto-auth**                       |                     ✅                      |       ❌       |        n/a        |     n/a     |
 | **Dashboard**                                      |                 Next.js 16                  |     basic      |    proprietary    | proprietary |
-| **i18n**                                           |               **42 locales**                |       ❌       |        ❌         |      ⚠      |
+| **i18n**                                           |               **67 locales**                |       ❌       |        ❌         |      ⚠      |
 | **Public agent skills (SKILL.md)**                 |                    ✅ 45                    |       ❌       |        ❌         |     ❌      |
 | **Tunnel support (Cloudflared, Tailscale, Ngrok)** |                     ✅                      |       ❌       |        n/a        |     n/a     |
 | **License**                                        |                     MIT                     |      MIT       |    proprietary    | proprietary |

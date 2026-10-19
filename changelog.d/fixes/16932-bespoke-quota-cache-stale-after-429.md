@@ -1,1 +1,0 @@
-- **fix(quota):** bespoke quota providers now refetch usage after an upstream 429 instead of serving a cached snapshot for up to a minute ([#16932](https://github.com/diegosouzapw/OmniRoute/pull/16932)) — thanks @maxmad64bis

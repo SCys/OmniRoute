@@ -1,4 +1,4 @@
-import { EMULATED_TOOL_CALLING_NOAUTH_PROVIDERS } from "./emulatedNoAuthAllowlist";
+import { getAutoRoutableEmulatedNoAuthProviders } from "./emulatedNoAuthAllowlist";
 import { AutoComboConfig } from "./engine";
 import { MODE_PACKS } from "./modePacks";
 import { DEFAULT_WEIGHTS, reliabilityFactor, ScoringWeights } from "./scoring";
@@ -357,7 +357,8 @@ function isChatAutoComboNoAuthProvider(
   bypassAllowlist: boolean
 ): boolean {
   if (providerDef.noAuth !== true) return false;
-  if (!bypassAllowlist && !EMULATED_TOOL_CALLING_NOAUTH_PROVIDERS.has(providerDef.id)) return false;
+  if (!bypassAllowlist && !getAutoRoutableEmulatedNoAuthProviders().has(providerDef.id))
+    return false;
   if (!bypassAllowlist && !isNoAuthProviderReadyForAutoRouting(providerDef.id)) return false;
   if (!Array.isArray(providerDef.serviceKinds) || providerDef.serviceKinds.length === 0)
     return true;

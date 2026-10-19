@@ -172,6 +172,22 @@ export function isDisableThinkingLevelVariantsEnabled(): boolean {
 }
 
 /**
+ * Catalog mirror refinements (claude/ discovery + functional-gateway mirrors).
+ * Opt-in; an unreadable flag store keeps the historical mirror behavior (fail-safe off).
+ */
+export function isCatalogMirrorRefinementsEnabled(): boolean {
+  try {
+    return isFeatureFlagEnabled("CATALOG_MIRROR_REFINEMENTS_ENABLED");
+  } catch (error) {
+    console.error(
+      "[featureFlags] Failed to resolve CATALOG_MIRROR_REFINEMENTS_ENABLED, defaulting to disabled:",
+      error instanceof Error ? error.message : error
+    );
+    return false;
+  }
+}
+
+/**
  * models.dev effort-tier fallback (#15944). Fail closed: an unreadable flag store keeps the
  * previous catalog/resolver behavior (no synced fallback, empty list = unknown).
  */

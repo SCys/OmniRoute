@@ -258,3 +258,75 @@ test("a throwing readiness probe keeps the provider out instead of breaking the 
     readinessBoot.registerNoAuthAutoRoutingReadiness();
   }
 });
+
+// #17036 — AUTO_COMBO_KEYLESS_TRANSPORT_GATE (default off): with the flag on, the
+// browser-backed and local-CLI keyless transports leave the pool. The gate keys off the
+// catalog flags (`browserBacked` / `isLocalCli`), never off an id list.
+async function withTransportGate<T>(value: string | undefined, fn: () => Promise<T>): Promise<T> {
+  const original = process.env.AUTO_COMBO_KEYLESS_TRANSPORT_GATE;
+  if (value === undefined) delete process.env.AUTO_COMBO_KEYLESS_TRANSPORT_GATE;
+  else process.env.AUTO_COMBO_KEYLESS_TRANSPORT_GATE = value;
+  try {
+    return await fn();
+  } finally {
+    if (original === undefined) delete process.env.AUTO_COMBO_KEYLESS_TRANSPORT_GATE;
+    else process.env.AUTO_COMBO_KEYLESS_TRANSPORT_GATE = original;
+  }
+}
+
+test("transport gate (flag on): every browser-backed / local-CLI keyless transport leaves the pool", async () => {
+  const { NOAUTH_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
+  const flagged = Object.values(NOAUTH_PROVIDERS).filter(
+    (p) =>
+      ("browserBacked" in p && p.browserBacked === true) ||
+      ("isLocalCli" in p && p.isLocalCli === true)
+  );
+  assert.ok(flagged.length > 0, "expected at least one transport-gated no-auth catalog entry");
+  assert.ok(flagged.some((p) => p.id === "cloudflare-playground"));
+  assert.ok(flagged.some((p) => p.id === "duckduckgo-web"));
+
+  const combo = await withTransportGate("true", () =>
+    virtualFactory.createVirtualAutoCombo(undefined)
+  );
+  const poolProviders = new Set(combo.models.map((m: { providerId: string }) => m.providerId));
+  for (const entry of flagged) {
+    assert.equal(
+      poolProviders.has(entry.id),
+      false,
+      `"${entry.id}" is transport-gated and must not be auto-routed to with the flag on. ` +
+        `Pool: ${JSON.stringify([...poolProviders])}`
+    );
+  }
+  assert.ok(poolProviders.has("uncloseai"), "plain-HTTP keyless providers stay in the pool");
+});
+
+test("transport gate (default off): the browser-backed keyless providers stay in the pool", async () => {
+  const combo = await withTransportGate(undefined, () =>
+    virtualFactory.createVirtualAutoCombo(undefined)
+  );
+  const poolProviders = new Set(combo.models.map((m: { providerId: string }) => m.providerId));
+  for (const providerId of ["cloudflare-playground", "duckduckgo-web", "uncloseai"]) {
+    assert.ok(poolProviders.has(providerId), `"${providerId}" must stay in the default pool`);
+  }
+});
+
+test("transport gate flag reader is off by default and fails closed", async () => {
+  const allowlist = await import("../../open-sse/services/autoCombo/emulatedNoAuthAllowlist.ts");
+  await withTransportGate(undefined, async () => {
+    assert.equal(allowlist.isKeylessTransportGateEnabled(), false);
+  });
+  await withTransportGate("true", async () => {
+    assert.equal(allowlist.isKeylessTransportGateEnabled(), true);
+  });
+  const ungated = allowlist.getEmulatedToolCallingNoAuthProviders();
+  const gated = allowlist.getEmulatedToolCallingNoAuthProviders({ transportGate: true });
+  assert.deepEqual(
+    [...allowlist.EMULATED_TOOL_CALLING_NOAUTH_PROVIDERS].sort(),
+    [...ungated].sort()
+  );
+  assert.ok(
+    [...gated].every((id) => ungated.has(id)),
+    "the gate only ever removes members"
+  );
+  assert.ok(!gated.has("cloudflare-playground") && ungated.has("cloudflare-playground"));
+});

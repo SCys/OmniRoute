@@ -1,1 +1,0 @@
-- **fix(providers):** reassemble fragmented tool-call arguments in the Devin Desktop executor ([#16674](https://github.com/diegosouzapw/OmniRoute/pull/16674)) — thanks @wusaki0723

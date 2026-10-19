@@ -1,6 +1,7 @@
 import { CORS_HEADERS } from "./cors.ts";
 import { unwrapClinepassEnvelope } from "./clinepassEnvelope.ts";
 import { extractJsonErrorFields } from "./tencentEnvelope.ts";
+import { classifyProviderSafetyError, isPublicProviderSafetyCode } from "./providerSafety.ts";
 import {
   redactSensitiveErrorText,
   sanitizeErrorMessage,
@@ -365,7 +366,9 @@ function isSafePublicErrorIdentifier(value: string): boolean {
   if (!PUBLIC_ERROR_IDENTIFIER.test(value)) return false;
   if (/^[1-5]\d{2}$/.test(value)) return true;
   if (/^HTTP_[1-5]\d{2}$/i.test(value)) return true;
-  return SAFE_PUBLIC_ERROR_IDENTIFIERS.has(value.toLowerCase());
+  return (
+    SAFE_PUBLIC_ERROR_IDENTIFIERS.has(value.toLowerCase()) || isPublicProviderSafetyCode(value)
+  );
 }
 
 /** Project an internal classification onto the bounded client-visible identifier vocabulary. */
@@ -847,6 +850,17 @@ export async function parseUpstreamError(response: Response, provider: string | 
     responseBody = { _rawText: message };
   }
 
+  // Code-only Responses failures still belong to the request, not account health.
+  const safety = classifyProviderSafetyError({
+    status: response.status,
+    code: errorCode,
+    type: errorType,
+    message,
+  });
+  if (safety) {
+    errorCode = safety.code;
+    errorType = "invalid_request_error";
+  }
   const messageStr = message;
 
   const retryAfterHeader = response.headers?.get?.("retry-after");

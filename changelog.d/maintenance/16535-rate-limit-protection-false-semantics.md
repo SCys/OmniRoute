@@ -1,1 +1,0 @@
-- **docs(resilience):** clarify `rateLimitProtection: false` semantics under the rate-limit auto-enable safety net, and identify `POST /api/rate-limits` as the supported write path ([#16535](https://github.com/diegosouzapw/OmniRoute/issues/16535)) — thanks @pedrohx26

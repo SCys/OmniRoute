@@ -1,1 +1,0 @@
-- **perf(db):** speed up call-log artifact lookups with a partial path index ([#16350](https://github.com/diegosouzapw/OmniRoute/pull/16350)) — thanks @maxmad64bis

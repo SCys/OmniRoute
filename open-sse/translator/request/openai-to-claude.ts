@@ -437,6 +437,9 @@ export function openaiToClaudeRequest(
   if (body.tools && Array.isArray(body.tools)) {
     const translatedTools: ClaudeTool[] = body.tools
       .map((tool) => {
+        // `tools` is not validated entry by entry: a null (or non-object) entry is dropped, as
+        // an entry without a name already is, instead of failing the whole request.
+        if (!tool || typeof tool !== "object") return null;
         // Function-shaped tools arrive in two flavors from real clients:
         //   (a) openai-spec: { type: "function", function: { name, ... } }
         //   (b) bare/loose:  { function: { name, ... } }   (no parent `type`)

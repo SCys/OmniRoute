@@ -313,6 +313,18 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "caution",
   },
   {
+    key: "EMPTY_STREAM_SIBLING_RECOVERY_ENABLED",
+    label: "Empty Stream Sibling Recovery",
+    description:
+      "Claude/Codex streaming: after the first lifecycle event, briefly probe (up to 1s / 64 KiB) for usable output; a stream that ends with no content becomes an empty_content failure that spends the existing bounded retry on another eligible connection (no cooldown, no model lockout), and round-robin combos stop retrying once the client disconnects. Also treats refusal, pause_turn and model_context_window_exceeded as legitimate empty terminals inside the probe. Off by default: readiness, empty-content handling and combo retries stay exactly as before.",
+    descriptionI18nKey: "featureFlagEmptyStreamSiblingRecoveryEnabledDescription",
+    category: "network",
+    defaultValue: "false",
+    type: "boolean",
+    requiresRestart: false,
+    warningLevel: "caution",
+  },
+  {
     key: "STREAM_LATE_OUTPUT_PROBE_ENABLED",
     label: "Stream Late Output Probe",
     description:
@@ -1055,6 +1067,19 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "caution",
   },
 
+  {
+    key: "CATALOG_MIRROR_REFINEMENTS_ENABLED",
+    label: "Catalog Mirror Refinements",
+    description:
+      "Refine the claude/ discovery and functional-gateway mirrors on /v1/models. Off by default: both mirror passes behave exactly as before. On: claude/ discovery mirrors also cover listed reasoning-effort variants (-low/-medium/-high/-xhigh), skip built-in auto/* ids the request path cannot materialize and skip an alias already listed; functional-gateway mirrors skip combos and OmniRoute-synthesized ids (claude/, no-think/), take the owner from owned_by, never use the owner as its own gateway, skip gateways disabled in blockedProviders and models outside a gateway's authoritative live catalog.",
+    descriptionI18nKey: "featureFlagCatalogMirrorRefinementsEnabledDescription",
+    category: "runtime",
+    defaultValue: "false",
+    type: "boolean",
+    requiresRestart: false,
+    warningLevel: "info",
+  },
+
   // ──────────────── CLI (5) ────────────────
   {
     key: "CLI_COMPAT_ALL",
@@ -1227,6 +1252,42 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     description:
       "Let auto/* requests (resolveModelOrError and the auto-routing wrapper) build the candidate pool with resolved model capabilities (vision, reasoning, thinking) and observed quality scores, read in one bulk pass like the /v1/models catalog. Off by default: request-time snapshot weights stay exactly as before (capabilities resolve on demand and do not feed the weights). On: those signals feed the snapshot weights, so candidate weights, and therefore selection, can change.",
     descriptionI18nKey: "featureFlagAutoRequestResolvedCapabilitiesDescription",
+    category: "runtime",
+    defaultValue: "false",
+    type: "boolean",
+    requiresRestart: false,
+    warningLevel: "caution",
+  },
+  {
+    key: "AUTO_COMBO_KEYLESS_TRANSPORT_GATE",
+    label: "Auto-Combo: Keyless Transport Gate",
+    description:
+      "Hold keyless (no-auth) providers whose transport needs a local browser (browserBacked) or a locally installed CLI (isLocalCli) out of the auto/* candidate pool, so a hung member cannot stall an auto request until the per-target timeout (#17036). Off by default: every no-auth provider with emulated tool calling stays in the pool exactly as before. Direct <alias>/<model> calls work either way.",
+    descriptionI18nKey: "featureFlagAutoComboKeylessTransportGateDescription",
+    category: "runtime",
+    defaultValue: "false",
+    type: "boolean",
+    requiresRestart: false,
+    warningLevel: "caution",
+  },
+  {
+    key: "CODEBUDDY_CN_INLINE_REASONING",
+    label: "CodeBuddy CN: Inline Reasoning Replay",
+    description:
+      "For codebuddy-cn thinking models (the DeepSeek-V4 / Kimi-K2 families that need reasoning replay), inline each replayed assistant reasoning_content as a visible <thought> block at the front of the message content, so it survives a gateway that drops the reasoning_content field (#13632). Off by default: codebuddy-cn requests are sent unchanged; the reasoning_content field itself is always kept.",
+    descriptionI18nKey: "featureFlagCodebuddyCnInlineReasoningDescription",
+    category: "runtime",
+    defaultValue: "false",
+    type: "boolean",
+    requiresRestart: false,
+    warningLevel: "caution",
+  },
+  {
+    key: "PROVIDER_SAFETY_STOPS_TERMINAL",
+    label: "Provider Safety Stops: Terminal",
+    description:
+      "Keep an explicit provider safety stop (misalignment_policy_violation, content_policy_violation, or the exact legacy 'blocked by our safety systems' rejection labelled provider_safety_rejection) as a terminal, request-scoped refusal: its code is preserved through HTTP, Responses, WebSocket and completed-stream errors, and a combo stops at it instead of retrying other targets, cancelling admitted siblings (#17049). Off by default: these errors keep their existing handling and combo routing is unchanged.",
+    descriptionI18nKey: "featureFlagProviderSafetyStopsTerminalDescription",
     category: "runtime",
     defaultValue: "false",
     type: "boolean",

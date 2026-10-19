@@ -1,1 +1,0 @@
-- **fix(combo):** an unknown pre-dispatch skip reason is logged and the request keeps routing instead of failing ([#16925](https://github.com/diegosouzapw/OmniRoute/pull/16925)) — thanks @maxmad64bis

@@ -8,13 +8,8 @@ import {
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
-import {
-  chromium,
-  type Browser,
-  type BrowserContext,
-  type Locator,
-  type Page,
-} from "playwright-core";
+import type { Browser, BrowserContext, Locator, Page } from "playwright-core";
+import { loadPlaywrightCore } from "../../../../utils/optionalPlaywrightCore.ts";
 import {
   atomicWriteFile,
   CHATGPT_CONNECTOR_NAME,
@@ -1821,6 +1816,7 @@ export class ChatGptBrowserWorker {
         `Configured Chrome executable does not exist: ${this.config.chromeExecutablePath}`
       );
     }
+    const { chromium } = await loadPlaywrightCore();
     this.browser = this.config.cdpEndpoint
       ? await chromium.connectOverCDP(this.config.cdpEndpoint, cdpConnectOptions())
       : await chromium.launch({
@@ -1880,6 +1876,7 @@ export class ChatGptBrowserWorker {
           `Configured Chrome executable does not exist: ${this.config.chromeExecutablePath}`
         );
       }
+      const { chromium } = await loadPlaywrightCore();
       const browser = this.config.cdpEndpoint
         ? await chromium.connectOverCDP(this.config.cdpEndpoint, cdpConnectOptions())
         : await chromium.launch({

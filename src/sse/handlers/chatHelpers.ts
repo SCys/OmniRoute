@@ -955,6 +955,7 @@ export const STREAM_EARLY_EOF_MAX_RETRIES = 1;
 const RETRYABLE_STREAM_EMPTY_CODES: ReadonlySet<string> = new Set([
   "STREAM_EARLY_EOF",
   "empty_response",
+  "empty_content",
 ]);
 
 export function shouldRetryStreamEarlyEof(

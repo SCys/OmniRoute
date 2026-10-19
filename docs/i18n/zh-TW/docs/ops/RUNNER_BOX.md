@@ -4,18 +4,39 @@
 
 ---
 
-自架集區（所有八個執行器皆為 `self-hosted, omni-release`；其中兩個為 `omni-build`）在 **.113** 主機上執行。
-測量日期為 2026-08-28（v3.8.50 事後檢討，第三部分）：
+自架集區執行於 **.113** 主機（`tomni-proxmox-113`）。自 2026-10-18 起，每個
+OmniRoute runner 都只有**一個角色**、一個標籤，以及依其工作負載實測結果配置的記憶體／CPU
+預算。Turbopack 執行槽會取得建置所需的資源；其他執行槽則依其實測峰值配置。
+只有當 Turbopack 建置、Release-Green webpack 建置與 lint 工作同時執行時，該主機才會超額配置；
+主機的 swap（16 GB）會吸收超出的用量，而且由於提取要求的 Build 會在代管 runner 上執行，
+Turbopack 執行槽大多數時間都處於閒置狀態：
 
-| 資源      | 數值                                                                                                                     | 對排程的意義                                                                                                                                |
-| --------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| RAM / CPU | **31 GB / 32 核心**（本文件初次撰寫時為 16 GB）                                                                          | 一個 `next-build` 的峰值約為 **~14 GB** → 同時執行 2 個高負載建置會使主機飽和，3 個則會使其停擺（2026-08-28 06:42Z：負載 56，兩個工作遺失） |
-| swap      | 15 GB                                                                                                                    | 它靠交換空間撐過了 v3.8.50 發佈；壓力會顯示在 `/proc/pressure/memory` 中                                                                    |
-| `/tmp`    | **12 GB tmpfs = RAM**                                                                                                    | 放在那裡的任何內容都會占用記憶體；殘留項目會在 3 小時後清除                                                                                 |
-| 磁碟      | 188 GB                                                                                                                   | 8 個執行器的 `_work` 簽出項目在沒有上限的情況下會達到約 70 GB                                                                               |
-| 執行器    | **6 個監聽器**：4 個 OmniRoute（1 個 `omni-build` + 1 個僅限 `omni-release` + 2 個 `omni-light`）+ OmniHeuris + OmniMind | 全部共用上述記憶體；`omniroute-113-3/-4/-7/-8` 已停用（`systemctl enable --now` 可重新啟用其中一個）                                        |
+| runner               | 標籤             | 角色                                                                                                                                        | `MemoryHigh` / `MemoryMax` | `CPUQuota` |
+| -------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ---------- |
+| `omniroute-113-5`    | `omni-build`     | Turbopack 建置：`ci.yml` `Build`（僅限 push/dispatch）、Docker amd64、`npm-publish`、`nightly-v4-build`、`preview-artifact`、每夜 a11y 建置 | 56 GB / 60 GB（swap 0）    | 1600 %     |
+| `omniroute-113-6`    | `omni-release`   | Release-Green（`release-green` + `main-green`）、webpack 建置                                                                               | 20 GB / 24 GB（swap 4 GB） | 800 %      |
+| `omniroute-113-2`    | `omni-light`     | 每夜工作（Schemathesis、promptfoo、garak、k6、a11y 啟動）以及 `quality.yml` `lint-guard`                                                    | 12 GB / 16 GB（swap 4 GB） | 600 %      |
+| `omniroute-113`      | `omni-light`     | 與上方相同的集區                                                                                                                            | 8 GB / 12 GB               | 400 %      |
+| OmniHeuris, OmniMind | （各自的儲存庫） | 僅執行 Dependabot（各自峰值為 155 MB，2026-10-18）                                                                                          | 4 GB / 6 GB                | 各 200 %   |
 
-## 安裝清理程式（一次性，在該主機上執行）
+2026-10-18 實測結果：
+
+| 資源      | 數值                      | 對排程的意義                                                                                                                                                                                                                                                                                                                              |
+| --------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RAM / CPU | **78 GB / 32 核心**       | 未設上限的 Turbopack 生產建置峰值為 49 GB（`tests/unit/ci-build-bundler-webpack.test.ts`）；在 Next 16.3.8 上，僅編譯階段就會占用約 40 GB（`next-build` 的 RSS 為 36 GB，另有 17 個 loader worker、各占 3 GB，實測於 2026-10-18）；webpack 建置約為 14–16 GB。一個 Turbopack 加上一個 webpack 建置可以同時容納；兩個 Turbopack 建置則不行 |
+| swap      | 16 GB                     | `omniroute-113-5` 執行時會關閉 swap（`MemorySwapMax=0`），因此失控的建置會在達到上限時被終止，而不會讓整台主機開始換頁                                                                                                                                                                                                                    |
+| `/tmp`    | **12 GB tmpfs = RAM**     | 任何存放在此處的內容都會占用記憶體；殘留項目會在 3 小時後清除                                                                                                                                                                                                                                                                             |
+| CPU       | 在 32 核心上觀察到負載 60 | 設定配額之前，一個 Turbopack 建置（約 1166 % CPU）加上同一台主機上的 coverage 測試套件，會使其他 listener 的 heartbeat 無法獲得資源（`The self-hosted runner lost communication`，#16853）                                                                                                                                                |
+| runner    | **6 個 listener**         | 4 個 OmniRoute + OmniHeuris + OmniMind；`omniroute-113-3/-4/-7/-8` 已停用（`systemctl enable --now` 可重新啟用其中一個）                                                                                                                                                                                                                  |
+
+這些限制位於各 unit 的 `/etc/systemd/system/actions.runner.<…>.service.d/override.conf`
+中（先前的值保留為 `override.conf.bak-20261018`），並透過
+`systemctl set-property --runtime … MemoryHigh=… MemoryMax=… CPUQuota=…` 即時套用——無須重新啟動，因此
+不會影響任何正在執行的工作。標籤則透過 runners API 變更
+（`gh api -X DELETE repos/<repo>/actions/runners/<id>/labels/<label>` /
+`gh api -X POST repos/<repo>/actions/runners/<id>/labels -f 'labels[]=<label>'`），同樣會即時生效。
+
+## 安裝清理程式（一次性，在主機上執行）
 
 ```bash
 scp scripts/ops/runner-janitor.sh root@192.168.0.113:/opt/omniroute-ops/runner-janitor.sh
@@ -24,17 +45,27 @@ ssh root@192.168.0.113 'chmod +x /opt/omniroute-ops/runner-janitor.sh; apt-get i
 */30 * * * * MAX_ACTIVE_RUNNERS=6 /opt/omniroute-ops/runner-janitor.sh >> /var/log/runner-janitor.log 2>&1
 ```
 
-需要 `lsof`：清理程式會先取得一次開啟中檔案的快照，以確認路徑處於閒置狀態，才會將其移除；若沒有此工具，它不會移除任何內容，並會明確說明
-（結束碼 1）。任何變更都應先使用 `--dry-run` 測試——它會精確列出將執行的操作，
-且不會變更任何內容。
+必須安裝 `lsof`：清理程式會先擷取一次開啟中檔案的快照，以確認路徑處於閒置狀態，之後才會將其移除；若沒有此工具，它不會移除任何項目，並會回報原因
+（結束碼 1）。任何變更都應先使用 `--dry-run` 試跑——它會準確顯示將執行的操作，
+但不會變更任何內容。
 
-每次執行時會進行以下操作：清除我們自己的殘留項目（`runner-*`、`omniroute-*`、
-`next-build*`、`e2e-build.tar.gz`），在 **tmpfs 上超過 3 小時**或磁碟上的
-`_work/_temp` 中超過 24 小時即清除；終止執行超過 75 分鐘的 `next-build`（沒有任何工作會執行這麼久——
-2026-08-27 有一個工作在 GitHub 已宣告其遺失後仍執行了 70 分鐘）；清除所屬單元為
-**已停止**之執行器中超過 48 小時的簽出項目；在磁碟使用率 ≥ 85%、記憶體 PSI
-`full/avg60` ≥ 10%，以及監聽器數量超過 `MAX_ACTIVE_RUNNERS` 時發出警示（並分別列出
-omniroute/其他的數量）。結束碼 1 = 需要處理；請查看日誌。
+每次執行時會進行以下操作：清除我們自己留下的項目（`runner-*`、`omniroute-*`、
+`next-build*`、`e2e-build.tar.gz`），在 **tmpfs 上超過 3 小時**，以及磁碟上的
+`_work/_temp` 中超過 24 小時後清除；終止執行超過 75 分鐘的 `next-build`
+（沒有任何工作會執行那麼久——在 2026-08-27，有一個工作在 GitHub 已判定其遺失後仍執行了 70 分鐘）；
+清除其單元為**已停止**之 runner 的 48 小時前 checkout；並在磁碟使用率 ≥ 85 %、
+記憶體 PSI `full/avg60` ≥ 10 %，以及監聽程式數量超過 `MAX_ACTIVE_RUNNERS` 時發出警示
+（並分別列出 omniroute／其他項目的數量）。結束碼 1 = 需要處理；請查看記錄。
+
+75 分鐘規則無法攔截 GitHub 已經放棄其工作的建置。當
+`Runner.Listener` 無法續約工作時，`_diag/Runner_*.log` 會顯示
+`POST request to …/renewjob timed out after 100 seconds`；API 會在上次成功續約後約十分鐘，
+將工作回報為 `completed`（失敗），而 `next-build` 仍會在未連結至任何工作的情況下持續執行
+（2026-10-18：#17066 的建置工作於 19:43 失敗，但五分鐘後其建置仍占用 40 GB）。
+請在最新的 `_diag/Worker_*.log` 中確認 ref，然後依 PID 僅對建置處理程序樹傳送 SIGTERM——
+包括 `next-build`、`npm run build`、`build-next-isolated.mjs` 與 `_work` worker。
+絕對不要觸碰 `Runner.Listener`、`RunnerService.js` 或 `Runner.Worker`：worker 會將工作回報為已取消，
+而 listener 會自行重新上線。
 
 ## Runner 單元：KillMode
 
@@ -45,46 +76,53 @@ CPU。每個 OmniRoute 單元都帶有一個置入式設定
 其中設定 `KillMode=mixed`：先向監聽器傳送 SIGTERM，並在
 `TimeoutStop` 時對整個 cgroup 傳送 SIGKILL。此設定會在單元下次重新啟動時生效——**一次只重新啟動一個 runner，而且僅能在閒置時進行**，並將閒置檢查與重新啟動放在同一個命令中。
 
-## 操作規則
+## 運作規則
 
-- **重型建置上限：一次一個——透過標籤強制執行（自 2026-08-29 起）。** 每個執行完整 `next build` 的工作
-  都以 `[self-hosted, omni-build]` 為目標，而且只有
-  **`omniroute-113-5`** 帶有該標籤（透過 runners API 新增——無須
-  重新註冊）：`ci.yml` 的 `Build`、`npm-publish.yml` 的 `publish`、兩個
-  `nightly-release-green` 驗證，以及 `docker-publish.yml` 的 **amd64**（託管式
-  7 GB runner 在此程式碼樹上發生 ResourceExhausted——#11976）。arm64 Docker 分支仍在
-  `ubuntu-24.04-arm` 上使用 webpack（沒有 ARM 主機）。Docker amd64 也使用 webpack：
-  在此程式碼樹上，即使有 31 GB，Turbopack 仍於 BuildKit 內發生 panic（`TurbopackInternalError:
-there must be a path to a root`，執行 33253576569）；同一程式碼樹的 arm64 webpack
-  建置則在託管式 ARM runner 上成功。`docker-publish` amd64 與 `ci.yml` 的 `Build`
-  共用 `heavy-build-main` 並行群組（`cancel-in-progress: false`），因此會在唯一的執行槽上排隊。
-  Docker Engine 必須位於 `omniroute-113-5`（`docker info` 是發布工作的第一個步驟）。
-  先前的上限是兩個，但對 31 GB 而言是錯誤的：在
-  2026-08-29 17:26 UTC，兩個並行的 `next-build`（15.4 GB + 17.2 GB RSS）使該主機
-  僅剩 5 GB 可用空間，並用了 4 GB swap，核心因 OOM 而終止其中一個程序——systemd
-  將該終止事件記在_另一個_ runner 的單元上，`runsvc.sh` 以 SIGKILL 終止該監聽器，而
-  其上的工作則以「The runner has received a shutdown signal」失敗（與
-  託管式 runner 發生 OOM 時的文字相同）。`omniroute-113-6` 僅保留 `omni-release`。
-  來自 `main` 合併、PR 與每夜作業的重型建置現在會在單一執行槽上依序執行；排隊就是代價。
-  當 Proxmox VM 增加更多 RAM（48–64 GB）時，第二個執行槽便可恢復：
-  `gh api -X POST repos/<repo>/actions/runners/<id of omniroute-113-6>/labels -f 'labels[]=omni-build'`。
-- **輕量池：`omni-light`（2026-08-29，#11965）。** `omniroute-113` 與 `omniroute-113-2` 帶有
-  `omni-light`，供只需要後端 `next build`（約 5–6 GB）、但不需要完整建置的工作使用：
-  每夜 Schemathesis、promptfoo、garak 與 axe-a11y 工作。它們曾在託管式 7 GB runner 上執行，並在
-  `release/v3.8.51` 上於無人監看時失敗。該主機的最壞情況是 2 個重型 + 2 個輕量 ≈
-  30 + 12 GB——超過 31 GB RAM，但仍在 16 GB swap 的範圍內；真正能增加餘裕的修正方式，是為
-  Proxmox VM（`tomni-proxmox-113`）增加更多 RAM，如此便可將標籤上限改為 3 個重型 + 2 個輕量。
-- **刻意減少監聽器數量。** 2026-08-29 停用了四個 OmniRoute 單元——由於只有
-  `ci.yml` 的 `Build` 與每夜作業會使用該主機，8 個監聽器都處於閒置狀態，而每增加一個都可能成為
-  消耗 14 GB 的租戶。清理程序的上限是 6（cron 中的 `MAX_ACTIVE_RUNNERS=6`）：它會計算
+- **一次只能執行一個 Turbopack 建置作業——透過標籤強制執行。** 每個執行完整 Turbopack
+  `next build` 的作業都以 `[self-hosted, omni-build]` 為目標，而且只有 **`omniroute-113-5`** 帶有該
+  標籤：`ci.yml` `Build`、`npm-publish.yml` `publish`、`nightly-v4-build`、`preview-artifact`、
+  每晚的 a11y 建置 (#16853)，以及 `docker-publish.yml` **amd64**（BuildKit 內的 webpack——
+  Turbopack 曾在該處發生 panic，執行編號 33253576569）。arm64 Docker 階段仍使用 `ubuntu-24.04-arm`。
+  `docker-publish` amd64 與 `ci.yml` `Build` 共用 `heavy-build-main` 並行群組
+  (`cancel-in-progress: false`)。Docker Engine 必須位於 `omniroute-113-5`。第二個 Turbopack
+  執行槽無法容納於 78 GB 中（2 × 33–37 GB，再加上主機其餘部分的用量）；第二個執行槽只適合
+  webpack 建置。
+- **提取要求的建置使用託管執行器（2026-10-18）。** `ci.yml` `Build` 只有在
+  `push` 和 `workflow_dispatch` 時才會到達 `omni-build`；每個 `pull_request`（同來源或 fork）及
+  `merge_group` Build 都會在 `ubuntu-latest` 上使用 webpack 執行。當每個同來源 PR 都被導向該執行槽時，一個 Turbopack
+  Build 會占用它 29–58 分鐘，18 個 Build 最長排隊達 18 小時，而發行線本身的 push Build
+  在 40 個作業中僅有一次取得該執行槽。使用託管執行器時，相同的 PR Build 與該 PR 的其他
+  作業一起執行只需 8–12 分鐘。`npm-publish` 發布時所採用的打包器 Turbopack，仍會在發行線上透過
+  預設分支每晚的 a11y 建置（UTC 04:41）、每個到達該執行槽的 push 或 dispatch Build，
+  以及 `npm-publish` 本身進行驗證。`tests/unit/build/heavy-build-queue.test.ts`
+  固定驗證這四項條件的閘門。
+- **絕不可將 Turbopack 執行槽的容量設為低於實測需求。** 在 2026-10-18 18:06，該執行槽
+  從 56G/60G 降至 40G/44G，以便為 `omni-release` 騰出空間。編譯階段在整段執行期間都維持於
+  `MemoryHigh`（記憶體 PSI `full` 為 30–43 %），而共用該 cgroup 的 `Runner.Listener`
+  無法續租其作業。當天即恢復為擁有者於 2026-10-17 設定的 56G/60G。
+  低於該值時，建置不會直接失敗；它會反覆換頁抖動，最終導致作業遺失。
+- **Release-Green 擁有自己的執行槽（2026-10-18）。** 在此之前，兩項 Release-Green 驗證都在
+  `omni-build` 上執行：每次 push（約 10 次/小時；一天內 100 次 push 執行中有 97 次在作業途中取消），
+  以及每天三次約 2 小時的完整掃描（05:29 的掃描等待該執行槽達 6 小時）——單一建置
+  執行槽的需求量超出容量數倍，同來源 PR Build 也必須等待數小時。
+  `release-green` 和 `main-green` 現在以 `omni-release`（僅限 `omniroute-113-6`）為目標，並設定
+  `OMNIROUTE_USE_TURBOPACK=0`；已開始的執行也不再因較新的 push 而取消（待處理的
+  執行槽仍會合併這波大量請求）。`tests/unit/build/runner-capacity-routing.test.ts`
+  固定驗證路由、webpack 切換，以及 `omni-release` 上不會有任何項目使用 Turbopack 建置。
+- **輕量集區：`omni-light`。** `omniroute-113` 和 `omniroute-113-2` 執行需要
+  僅後端 `next build`（約 5–6 GB；webpack）的每晚作業，以及 `quality.yml` `lint-guard`。`omniroute-113`
+  在 2026-10-18 之前一直設定為 `MemoryHigh=4G`——promptfoo 建置在那裡花了 54 分鐘不斷回收記憶體
+  才勉強完成；8 GB 可消除節流。
+- **刻意減少監聽器。** 四個 OmniRoute 單元已於 2026-08-29 停用——每個額外的
+  監聽器都會成為上述記憶體預算的另一個租戶。清理程式的上限是 6（cron 中的 `MAX_ACTIVE_RUNNERS=6`）：它會計算
   主機上的每個 `Runner.Listener`，而 OmniHeuris + OmniMind 會在我們的四個之外再增加兩個。
-- **任何 runner 忙碌時，絕不可手動清理 `/tmp` 或 `_work`。** 先檢查後刪除且兩者之間存在間隔，
-  正是導致一個進行中的 Build 工作在 2026-08-27 遺失其
-  `_work` 的原因。清理程序會在同一個步驟中完成檢查與移除；
+- **任何 runner 忙碌時，絕不可手動清理 `/tmp` 或 `_work`。** 先檢查再刪除且兩者之間存在時間差，
+  正是某個執行中的 Build 作業在 2026-08-27 遺失其
+  `_work` 的原因。清理程式會在單一步驟中完成檢查與移除；
   交給它處理即可。
-- 在工作執行途中停止 runner 會取消該工作（已在實際環境中觀察到）：只有在其監聽器沒有
-  `Runner.Worker` 子程序時才能執行 `systemctl stop`——而且必須在同一個命令中完成。
-- 工作流程不得將成品暫存在 `/tmp`（它位於 RAM 中）。請下載至
-  `$RUNNER_TEMP`（位於磁碟上，每個 runner 各自獨立）——1.3 GB 的 `next-build` 成品需要 27–32
-  分鐘才能寫入 tmpfs，而從磁碟上傳只需 2 分鐘。
-- `.15` VPS 僅用於驗收環境——絕不執行 CI runner。
+- 在作業執行途中停止 runner 會取消該作業（已在實際環境觀察到）：只有在其 listener 沒有
+  `Runner.Worker` 子程序時才能執行 `systemctl stop`——而且必須在單一命令中完成。
+- 工作流程不得將產物放在 `/tmp` 中（它位於 RAM）。應下載至
+  `$RUNNER_TEMP`（位於磁碟上，每個 runner 各自獨立）——1.3 GB 的 `next-build` 產物需要 27–32
+  分鐘才能寫入 tmpfs，但從磁碟上傳只需 2 分鐘。
+- `.15` VPS 僅供驗收測試使用——絕不執行 CI runner。

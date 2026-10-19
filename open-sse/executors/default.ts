@@ -68,6 +68,7 @@ import { resolveAlibabaProviderBaseUrl } from "@/shared/constants/alibabaProvide
 import { xiaomiAlternateUrl, xiaomiMimoChatUrl } from "./default/xiaomiTokenPlan.ts";
 import { usesCcWireImage } from "../services/ccWireImageBuiltins.ts";
 import { applyRegistryBodyRepairs } from "../utils/strictChatHistory.ts";
+import { withWorkbuddyHeaders, sanitizeWorkbuddyBody } from "../utils/workbuddyGateway.ts";
 
 const NVIDIA_TOOL_CALL_ID_PATTERN = /^[A-Za-z0-9]{9}$/;
 const PERPLEXITY_AGENT_DEFAULT_MAX_OUTPUT_TOKENS = 4096;
@@ -711,6 +712,10 @@ export class DefaultExecutor extends BaseExecutor {
 
     normalizeAnthropicHeaderVariants(headers);
 
+    if (this.provider === "workbuddy") {
+      withWorkbuddyHeaders(headers, body);
+    }
+
     return headers;
   }
 
@@ -1057,6 +1062,10 @@ export class DefaultExecutor extends BaseExecutor {
     }
 
     applyRegistryToolNameLengthAliases(this.provider, withDefaults);
+
+    if (this.provider === "workbuddy") {
+      withDefaults = sanitizeWorkbuddyBody(withDefaults);
+    }
 
     return applyRegistryBodyRepairs(this.provider, withDefaults);
   }
