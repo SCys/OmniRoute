@@ -15,7 +15,7 @@ hosted, the Turbopack slot is idle most of the time:
 | -------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ---------- |
 | `omniroute-113-5`    | `omni-build`   | Turbopack builds: `ci.yml` `Build` (push/dispatch only), Docker amd64, `npm-publish`, `nightly-v4-build`, `preview-artifact`, the nightly a11y build | 56 GB / 60 GB (swap 0)     | 1600 %     |
 | `omniroute-113-6`    | `omni-release` | Release-Green (`release-green` + `main-green`), webpack build                                                                                        | 20 GB / 24 GB (swap 4 GB)  | 800 %      |
-| `omniroute-113-2`    | `omni-light`   | nightlies (Schemathesis, promptfoo, garak, k6, a11y boot) and `quality.yml` `lint-guard`                                                             | 12 GB / 16 GB (swap 4 GB)  | 600 %      |
+| `omniroute-113-2`    | `omni-light`   | nightlies (Schemathesis, promptfoo, garak, k6) and `quality.yml` `lint-guard`                                                                        | 12 GB / 16 GB (swap 4 GB)  | 600 %      |
 | `omniroute-113`      | `omni-light`   | same pool as above                                                                                                                                   | 8 GB / 12 GB               | 400 %      |
 | OmniHeuris, OmniMind | (their repos)  | Dependabot only (peak 155 MB each, 2026-10-18)                                                                                                       | 4 GB / 6 GB                | 200 % each |
 

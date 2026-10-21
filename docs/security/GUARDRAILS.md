@@ -51,7 +51,6 @@ shared `handleChat` pre-call guardrail chain **before** Claude-to-OpenAI
 translation; nested `Read` tool-result images must be described or handled
 before that translation lifts them into OpenAI `image_url` content (#17069).
 
-
 Intercepts image-bearing requests aimed at **non-vision models** and either
 reroutes the whole request to a vision-capable model or replaces the image
 parts with text descriptions produced by a configurable vision model before
@@ -97,10 +96,10 @@ Flow:
 
 #### Mode selector (`modalityBridgeVisionMode`)
 
-| Mode       | Default | Behavior                                                                                                                                                                                                                                                |
-| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auto`     | ✔       | Legacy heuristic, untouched (#6640/#7204): non-combo/`auto/` models reroute to the best vision model unless the original model already has usable credentials (then describe); combo targets always describe.                                           |
-| `describe` |         | Always describe — the reroute block is skipped entirely; the user's chosen model always answers.                                                                                                                                                        |
+| Mode       | Default | Behavior                                                                                                                                                                                                                                                            |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auto`     | ✔       | Legacy heuristic, untouched (#6640/#7204): non-combo/`auto/` models reroute to the best vision model unless the original model already has usable credentials (then describe); combo targets always describe.                                                       |
+| `describe` |         | Always describe — the reroute block is skipped entirely; the user's chosen model always answers.                                                                                                                                                                    |
 | `reroute`  |         | Force reroute: the keep-credentialed-model guard is bypassed. The reroute-**target** credential guard still applies — when no usable vision target exists, the bridge blocks with a clear error rather than describing or sending raw images to a text-only target. |
 
 Forced modes short-circuit **before** the auto heuristic runs; `auto` behavior
@@ -951,9 +950,9 @@ deliberately when the behavior changes.
   transform applies (when `PII_RESPONSE_SANITIZATION` is on). A credential
   echoed back in a streamed response is not redacted.
 - **Disable channels vs. the middleware (by design):** the middleware evaluates
-  prompt injection with its own call to `evaluatePromptInjection()`, which
-  ignores the body-only disable list the middleware passes it. `block` mode is a mandatory boundary that
-  caller-controlled disables cannot bypass, on chat-family routes included
+  prompt injection with its own call to `evaluatePromptInjection()`, without
+  passing any caller-controlled disable list. `block` mode is a mandatory
+  boundary that caller-controlled disables cannot bypass, including on chat-family routes
   ([#16413](https://github.com/diegosouzapw/OmniRoute/issues/16413)). Disabling
   `prompt-injection` only skips the registry guardrail.
 

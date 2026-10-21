@@ -5,34 +5,35 @@
 ---
 
 Şirket içinde barındırılan havuz **.113** makinesinde (`tomni-proxmox-113`) çalışır. 2026-10-18 tarihinden bu yana her
-OmniRoute runner'ının **tek bir rolü**, tek bir etiketi ve iş yükü için ölçülen değerlere göre boyutlandırılmış
-bir bellek/CPU bütçesi vardır. Turbopack slotuna derlemenin ihtiyaç duyduğu kaynaklar verilir; diğer slotlar ise
-ölçülen tepe değerlerine göre boyutlandırılmıştır. Makinede yalnızca bir Turbopack derlemesi, bir Release-Green
-webpack derlemesi ve bir lint işiyle aynı zamana denk geldiğinde aşırı tahsis oluşur; ana makine takası (16 GB)
-bunu karşılar ve pull request Build'leri barındırılan runner'larda çalıştığından Turbopack slotu çoğu zaman boştadır:
+OmniRoute runner'ının **tek bir rolü**, tek bir etiketi ve iş yükünün ölçülen gereksinimlerine göre
+boyutlandırılmış bir bellek/CPU bütçesi vardır. Turbopack yuvası, derlemenin ihtiyaç duyduğu kaynakları alır;
+diğer yuvalar ise ölçülen tepe değerlerine göre boyutlandırılmıştır. Makine yalnızca bir Turbopack derlemesi,
+bir Release-Green webpack derlemesi ve bir lint işiyle aynı zamana denk geldiğinde kapasitesinin üzerinde
+kaynak tahsis eder; ana makinenin swap alanı (16 GB) bunu karşılar ve pull-request derlemeleri barındırılan
+runner'larda çalıştığı için Turbopack yuvası çoğu zaman boştadır:
 
 | runner               | etiket           | rol                                                                                                                                                           | `MemoryHigh` / `MemoryMax` | `CPUQuota`     |
 | -------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------- |
-| `omniroute-113-5`    | `omni-build`     | Turbopack derlemeleri: `ci.yml` `Build` (yalnızca push/dispatch), Docker amd64, `npm-publish`, `nightly-v4-build`, `preview-artifact`, gecelik a11y derlemesi | 56 GB / 60 GB (takas 0)    | 1600 %         |
-| `omniroute-113-6`    | `omni-release`   | Release-Green (`release-green` + `main-green`), webpack derlemesi                                                                                             | 20 GB / 24 GB (takas 4 GB) | 800 %          |
-| `omniroute-113-2`    | `omni-light`     | gecelik işler (Schemathesis, promptfoo, garak, k6, a11y başlatma) ve `quality.yml` `lint-guard`                                                               | 12 GB / 16 GB (takas 4 GB) | 600 %          |
+| `omniroute-113-5`    | `omni-build`     | Turbopack derlemeleri: `ci.yml` `Build` (yalnızca push/dispatch), Docker amd64, `npm-publish`, `nightly-v4-build`, `preview-artifact`, gecelik a11y derlemesi | 56 GB / 60 GB (swap 0)     | 1600 %         |
+| `omniroute-113-6`    | `omni-release`   | Release-Green (`release-green` + `main-green`), webpack derlemesi                                                                                             | 20 GB / 24 GB (swap 4 GB)  | 800 %          |
+| `omniroute-113-2`    | `omni-light`     | gecelik işler (Schemathesis, promptfoo, garak, k6) ve `quality.yml` `lint-guard`                                                                              | 12 GB / 16 GB (swap 4 GB)  | 600 %          |
 | `omniroute-113`      | `omni-light`     | yukarıdakiyle aynı havuz                                                                                                                                      | 8 GB / 12 GB               | 400 %          |
-| OmniHeuris, OmniMind | (kendi repoları) | yalnızca Dependabot (her biri için tepe değer 155 MB, 2026-10-18)                                                                                             | 4 GB / 6 GB                | her biri 200 % |
+| OmniHeuris, OmniMind | (kendi repoları) | yalnızca Dependabot (her biri için tepe değeri 155 MB, 2026-10-18)                                                                                            | 4 GB / 6 GB                | her biri 200 % |
 
 2026-10-18 tarihinde ölçüldü:
 
-| kaynak     | değer                         | zamanlama açısından anlamı                                                                                                                                                                                                                                                                                                                                                                                            |
-| ---------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| RAM / CPU  | **78 GB / 32 çekirdek**       | bir Turbopack production derlemesi sınırsızken 49 GB tepe değerine ulaştı (`tests/unit/ci-build-bundler-webpack.test.ts`); Next 16.3.8'de yalnızca compile aşaması ~40 GB tutuyor (`next-build` içinde 36 GB RSS ve 3 GB kullanan 17 loader worker'ı, 2026-10-18 tarihinde ölçüldü); bir webpack derlemesi ~14–16 GB kullanıyor. Bir Turbopack + bir webpack derlemesi birlikte sığar; iki Turbopack derlemesi sığmaz |
-| takas      | 16 GB                         | `omniroute-113-5`, takas kapalıyken (`MemorySwapMax=0`) çalışır; böylece kontrolden çıkan bir derleme makineyi takasa sokmak yerine üst sınırında sonlandırılır                                                                                                                                                                                                                                                       |
-| `/tmp`     | **12 GB tmpfs = RAM**         | burada tutulan her şey bellek kullanır; geride kalanlar 3 saat sonra temizlenir                                                                                                                                                                                                                                                                                                                                       |
-| CPU        | 32 çekirdekte 60 yük gözlendi | kotalardan önce, aynı makinedeki bir Turbopack derlemesi (~1166 % CPU) ile bir coverage paketi diğer dinleyicilerin yaşam sinyallerini engelledi (`The self-hosted runner lost communication`, #16853)                                                                                                                                                                                                                |
-| runner'lar | **6 dinleyici**               | 4 OmniRoute + OmniHeuris + OmniMind; `omniroute-113-3/-4/-7/-8` devre dışıdır (`systemctl enable --now` bunlardan birini yeniden devreye alır)                                                                                                                                                                                                                                                                        |
+| kaynak     | değer                            | zamanlama açısından anlamı                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RAM / CPU  | **78 GB / 32 çekirdek**          | bir Turbopack üretim derlemesi, sınırlandırılmadığında 49 GB tepe değerine ulaştı (`tests/unit/ci-build-bundler-webpack.test.ts`); Next 16.3.8'de yalnızca derleme aşaması ~40 GB kullanıyor (`next-build` içinde 36 GB RSS ve 3 GB kullanan 17 loader worker, 2026-10-18 tarihinde ölçüldü); bir webpack derlemesi ~14–16 GB kullanıyor. Bir Turbopack + bir webpack derlemesi birlikte sığar; iki Turbopack derlemesi sığmaz |
+| swap       | 16 GB                            | `omniroute-113-5`, swap kapalıyken (`MemorySwapMax=0`) çalışır; böylece kontrolden çıkan bir derleme, makineyi swap kullanmaya zorlamak yerine üst sınırında sonlandırılır                                                                                                                                                                                                                                                     |
+| `/tmp`     | **12 GB tmpfs = RAM**            | burada tutulan her şey bellek kullanır; kalan dosyalar 3 saat sonra temizlenir                                                                                                                                                                                                                                                                                                                                                 |
+| CPU        | 32 çekirdekte 60 yük gözlemlendi | kotalardan önce, bir Turbopack derlemesi (~1166 % CPU) ile aynı makinedeki bir coverage paketi, diğer listener'ların heartbeat sinyallerini kaynak yetersizliğine uğrattı (`The self-hosted runner lost communication`, #16853)                                                                                                                                                                                                |
+| runner'lar | **6 listener**                   | 4 OmniRoute + OmniHeuris + OmniMind; `omniroute-113-3/-4/-7/-8` devre dışıdır (`systemctl enable --now` bunlardan birini yeniden etkinleştirir)                                                                                                                                                                                                                                                                                |
 
-Sınırlar, her bir unit'in `/etc/systemd/system/actions.runner.<…>.service.d/override.conf`
-dosyasında bulunur (önceki değerler `override.conf.bak-20261018` olarak tutulur) ve
-`systemctl set-property --runtime … MemoryHigh=… MemoryMax=… CPUQuota=…` ile canlı olarak uygulandı — yeniden başlatma yapılmadığından
-çalışan hiçbir işe dokunulmadı. Etiketler de runners API aracılığıyla
+Sınırlar, her unit'in `/etc/systemd/system/actions.runner.<…>.service.d/override.conf` dosyasında
+bulunur (önceki değerler `override.conf.bak-20261018` olarak saklanmıştır) ve
+`systemctl set-property --runtime … MemoryHigh=… MemoryMax=… CPUQuota=…` ile canlı olarak uygulanmıştır — yeniden başlatma yapılmadığından
+çalışan hiçbir işe dokunulmamıştır. Etiketler de runners API'si aracılığıyla
 (`gh api -X DELETE repos/<repo>/actions/runners/<id>/labels/<label>` /
 `gh api -X POST repos/<repo>/actions/runners/<id>/labels -f 'labels[]=<label>'`) canlı olarak değiştirilir.
 
@@ -41,82 +42,143 @@ dosyasında bulunur (önceki değerler `override.conf.bak-20261018` olarak tutul
 ```bash
 scp scripts/ops/runner-janitor.sh root@192.168.0.113:/opt/omniroute-ops/runner-janitor.sh
 ssh root@192.168.0.113 'chmod +x /opt/omniroute-ops/runner-janitor.sh; apt-get install -y lsof'
-# cron (root): her 30 dakikada bir, /var/log/runner-janitor.log dosyasına kaydet
+# cron (root): her 30 dakikada bir, günlüğü /var/log/runner-janitor.log dosyasına yaz
 */30 * * * * MAX_ACTIVE_RUNNERS=6 /opt/omniroute-ops/runner-janitor.sh >> /var/log/runner-janitor.log 2>&1
 ```
 
-`lsof` gereklidir: temizleyici, bir yolu kaldırmadan önce açık dosyaların tek bir anlık görüntüsünü alarak yolun kullanılmadığını doğrular; bu araç olmadan hiçbir şeyi kaldırmaz ve bunu bildirir (çıkış kodu 1). Her türlü değişikliği önce `--dry-run` ile deneyin — tam olarak ne yapacağını gösterir ve hiçbir şeye dokunmaz.
+`lsof` gereklidir: temizleyici, bir yolu kaldırmadan önce açık dosyaların tek bir
+anlık görüntüsüyle yolun boşta olduğunu doğrular; bu araç olmadan hiçbir şeyi
+kaldırmaz, bunu bildirir ve 1 koduyla çıkar. Herhangi bir değişikliği önce
+`--dry-run` ile deneyin — tam olarak ne yapacağını yazdırır ve hiçbir şeye dokunmaz.
 
-Her çalıştırmada yaptıkları: bize ait artıkları (`runner-*`, `omniroute-*`, `next-build*`, `e2e-build.tar.gz`) **tmpfs üzerinde 3 saat**, disk üzerindeki `_work/_temp` konumunda ise 24 saat sonra temizler; 75 dakikadan eski bir `next-build` sürecini sonlandırır (hiçbir iş bu kadar uzun sürmez — 2026-08-27 tarihinde GitHub işi kayıp ilan ettikten sonra bir süreç 70 dakika daha çalıştı); birimi **durdurulmuş** çalıştırıcıların 48 saatlik çalışma kopyalarını temizler; disk kullanımı ≥ %85, bellek PSI değeri `full/avg60` ≥ %10 olduğunda ve dinleyici sayısı `MAX_ACTIVE_RUNNERS` değerini aştığında uyarı verir (omniroute/diğer dağılımıyla birlikte). Çıkış kodu 1 = müdahale gerekiyor; günlüğü okuyun.
+Her çalıştırmada yaptıkları: **tmpfs üzerinde 3 saat**, diskteki `_work/_temp`
+üzerinde ise 24 saat sonra kendi artıklarımızı (`runner-*`, `omniroute-*`,
+`next-build*`, `e2e-build.tar.gz`) temizler; 75 dakikadan eski bir `next-build`
+sürecini sonlandırır (hiçbir iş bu kadar uzun sürmez — 2026-08-27 tarihinde bir
+iş, GitHub işi kayıp ilan ettikten sonra 70 dakika çalışmıştı); birimi
+**durdurulmuş** runner'lara ait 48 saatlik checkout'ları temizler; disk kullanımı
+≥ %85, bellek PSI `full/avg60` ≥ %10 olduğunda ve dinleyici sayısı
+`MAX_ACTIVE_RUNNERS` değerini aştığında (omniroute/diğer dağılımıyla birlikte)
+uyarı verir. Çıkış kodu 1 = müdahale gerekiyor; günlüğü okuyun.
 
-75 dakika kuralı, GitHub'ın işinden zaten vazgeçtiği bir derlemeyi yakalamaz. `Runner.Listener` işini yenileyemediğinde `_diag/Runner_*.log`, `POST request to …/renewjob timed out after 100 seconds` mesajını gösterir; API, son başarılı yenilemeden yaklaşık on dakika sonra işi `completed` (başarısız) olarak bildirir ve `next-build`, bağlı bir iş olmadan çalışmaya devam eder (2026-10-18: #17066 derlemesi 19:43'te başarısız oldu ve derleme beş dakika sonra hâlâ 40 GB alan tutuyordu). En yeni `_diag/Worker_*.log` dosyasında ref'i doğrulayın, ardından yalnızca derleme ağacına PID üzerinden SIGTERM gönderin — `next-build`, `npm run build`, `build-next-isolated.mjs` ve `_work` işçileri. `Runner.Listener`, `RunnerService.js` veya `Runner.Worker` süreçlerine asla dokunmayın: işçi, işi iptal edilmiş olarak bildirir ve dinleyici kendiliğinden tekrar çevrimiçi olur.
+75 dakika kuralı, GitHub'ın zaten vazgeçtiği bir işe ait derlemeyi yakalamaz.
+`Runner.Listener` işini yenileyemediğinde `_diag/Runner_*.log` içinde
+`POST request to …/renewjob timed out after 100 seconds` görünür; API, son başarılı
+yenilemeden yaklaşık on dakika sonra işi `completed` (başarısız) olarak bildirir ve
+`next-build`, bağlı bir iş olmadan çalışmaya devam eder (2026-10-18: #17066
+derlemesi 19:43'te başarısız olmuştu ve derleme beş dakika sonra hâlâ 40 GB yer
+tutuyordu). En yeni `_diag/Worker_*.log` içindeki ref'i doğrulayın, ardından yalnızca
+derleme ağacına PID üzerinden SIGTERM gönderin — `next-build`, `npm run build`,
+`build-next-isolated.mjs` ve `_work` worker'ları. `Runner.Listener`,
+`RunnerService.js` veya `Runner.Worker` süreçlerine asla dokunmayın: worker, işi
+iptal edilmiş olarak bildirir ve dinleyici kendiliğinden yeniden çevrimiçi olur.
 
 ## Runner birimleri: KillMode
 
-Runner'ın varsayılan `KillMode=process` ayarı, bir birim durdurulduğunda veya yeniden
-başlatıldığında `Runner.Worker → npm → next-build` sürecini çalışır durumda bırakır —
-yetim kalan bir derleme, bağlı bir iş olmadan RAM ve CPU tüketmeye devam eder. Her
-OmniRoute birimi, `KillMode=mixed` ayarına sahip bir drop-in
+Runner'ın varsayılan `KillMode=process` ayarı, bir birim durdurulduğunda veya
+yeniden başlatıldığında `Runner.Worker → npm → next-build` süreçlerini çalışır
+durumda bırakır — yetim bir derleme, bağlı bir iş olmadan RAM ve CPU tüketmeye
+devam eder. Her OmniRoute birimi, `KillMode=mixed` ayarını içeren bir ek
+yapılandırmaya
 (`/etc/systemd/system/actions.runner.diegosouzapw-OmniRoute.<name>.service.d/10-killmode.conf`)
-taşır: önce dinleyiciye SIGTERM, `TimeoutStop` anında ise tüm cgroup'a SIGKILL gönderilir.
-Bu ayar, birimin bir sonraki yeniden başlatılmasında etkili olur — boşta olma kontrolü
-ve yeniden başlatma aynı komutta olacak şekilde, **yalnızca boşta olduğunda ve her
-seferinde bir runner'ı** yeniden başlatın.
+sahiptir: önce dinleyiciye SIGTERM, `TimeoutStop` anında ise tüm cgroup'a SIGKILL
+gönderilir. Bu ayar, birimin bir sonraki yeniden başlatılmasında etkinleşir —
+boşta olma denetimiyle yeniden başlatmayı aynı komutta gerçekleştirerek,
+**yalnızca boşta olduğunda ve tek seferde bir runner'ı** yeniden başlatın.
 
 ## İşletim kuralları
 
-- **Aynı anda yalnızca bir Turbopack derlemesi — etiketle zorunlu tutulur.** Tam bir Turbopack
-  `next build` çalıştıran her iş `[self-hosted, omni-build]` hedefler ve bu etiketi yalnızca
-  **`omniroute-113-5`** taşır: `ci.yml` `Build`, `npm-publish.yml` `publish`, `nightly-v4-build`,
-  `preview-artifact`, gecelik a11y derlemesi (#16853) ve `docker-publish.yml` **amd64** (BuildKit
-  içinde webpack — Turbopack burada panikledi, çalıştırma 33253576569). arm64 Docker ayağı
-  `ubuntu-24.04-arm` üzerinde kalır. `docker-publish` amd64, `ci.yml` `Build` ile
-  `heavy-build-main` eşzamanlılık grubunu paylaşır (`cancel-in-progress: false`). Docker Engine,
-  `omniroute-113-5` üzerinde olmalıdır. İkinci bir Turbopack yuvası 78 GB'a sığmaz (2 × 33–37 GB
-  artı makinenin geri kalanı); ikinci yuva yalnızca webpack derlemeleri için güvenlidir.
-- **Pull request derlemeleri barındırılan çalıştırıcılarda çalışır (2026-10-18).** `ci.yml` `Build`,
-  yalnızca `push` ve `workflow_dispatch` için `omni-build` hedefine ulaşır; her `pull_request`
-  (aynı depodan veya fork'tan) ve `merge_group` derlemesi webpack ile `ubuntu-latest` üzerinde
-  çalışır. Aynı depodan gelen her PR yuvaya yönlendirildiğinde, bir Turbopack derlemesi yuvayı
-  29–58 dk tuttu, 18 derleme 18 saate kadar kuyrukta bekledi ve sürüm hattının kendi push
-  derlemesi 40 iş içinde yuvayı yalnızca bir kez alabildi. Barındırılan çalıştırıcıda aynı PR
-  derlemesi, PR'ın diğer işlerinin yanında 8–12 dk sürer. `npm-publish` tarafından yayımlanan
-  paketleyici Turbopack; varsayılan dalın gecelik a11y derlemesiyle (04:41 UTC), yuvaya ulaşan
-  her push veya dispatch derlemesiyle ve `npm-publish` işleminin kendisiyle sürüm hattında
-  sınanmaya devam eder. `tests/unit/build/heavy-build-queue.test.ts` dört koşullu geçidi sabitler.
-- **Turbopack yuvasını asla ölçülen ihtiyacının altına boyutlandırmayın.** 2026-10-18 saat 18:06'da
-  `omni-release` için yer açmak amacıyla yuva 56G/60G'den 40G/44G'ye düşürüldü. Derleme aşaması
-  tüm çalışması boyunca `MemoryHigh` sınırında kaldı (bellek PSI `full` %30–43) ve aynı cgroup'u
-  paylaşan `Runner.Listener` işini yenileyemedi. Sahibinin 2026-10-17 tarihli 56G/60G ayarı aynı
-  gün geri yüklendi. Bu değerin altında derleme başarısız olmaz; sürekli bellek takasıyla
-  boğuşur ve iş kaybolur.
-- **Release-Green'in kendi yuvası vardır (2026-10-18).** O zamana kadar her iki Release-Green
-  doğrulaması da `omni-build` üzerinde çalışıyordu: her push'ta (saatte ~10; bir günde 100 push
-  çalıştırmasının 97'si çalışma ortasında iptal edildi) ve günde üç kez yapılan ~2 saatlik tam
-  taramalarda (05:29 taraması yuva için 6 saat bekledi) — tek derleme yuvasına kapasitesinin
-  birkaç katı yük bindiriliyor ve aynı depodan gelen PR derlemeleri saatlerce bekliyordu.
-  `release-green` ve `main-green` artık `OMNIROUTE_USE_TURBOPACK=0` ile `omni-release` hedefini
-  (yalnızca `omniroute-113-6`) kullanır ve başlatılmış bir çalıştırma artık daha yeni bir push
-  nedeniyle iptal edilmez (bekleyen yuva, iş fırtınasını yine tek çalıştırmaya indirger).
-  `tests/unit/build/runner-capacity-routing.test.ts` yönlendirmeyi, webpack geçişini ve
+- **Aynı anda yalnızca bir Turbopack derlemesi — etiketle zorunlu kılınır.** Tam bir Turbopack
+  `next build` çalıştıran her iş `[self-hosted, omni-build]` etiketlerini hedefler ve bu etiketi
+  yalnızca **`omniroute-113-5`** taşır: `ci.yml` içindeki `Build`, `npm-publish.yml` içindeki
+  `publish`, `nightly-v4-build`, `preview-artifact`, gecelik a11y derlemesi (#16853) ve
+  `docker-publish.yml` içindeki **amd64** (BuildKit içinde webpack — Turbopack burada panikledi,
+  çalışma 33253576569). arm64 Docker aşaması `ubuntu-24.04-arm` üzerinde kalır.
+  `docker-publish` amd64, `ci.yml` içindeki `Build` ile `heavy-build-main` eşzamanlılık grubunu
+  paylaşır (`cancel-in-progress: false`). Docker Engine, `omniroute-113-5` üzerinde bulunmalıdır.
+  İkinci bir Turbopack yuvası 78 GB'a sığmaz (2 × 33–37 GB ve makinenin geri kalan yükü);
+  ikinci yuva yalnızca webpack derlemeleri için güvenlidir.
+- **Pull request derlemeleri barındırılan çalıştırıcılarda çalışır (2026-10-18).** `ci.yml`
+  içindeki `Build`, `omni-build` hedefine yalnızca `push` ve `workflow_dispatch` için ulaşır;
+  her `pull_request` (aynı kaynaklı veya fork) ve `merge_group` derlemesi webpack ile
+  `ubuntu-latest` üzerinde çalışır. Aynı kaynaklı her PR yuvaya yönlendirildiğinde bir Turbopack
+  derlemesi yuvayı 29–58 dakika boyunca meşgul tuttu, 18 derleme 18 saate kadar kuyrukta bekledi
+  ve sürüm hattının kendi push derlemesi 40 iş içinde yuvayı yalnızca bir kez alabildi.
+  Barındırılan çalıştırıcıda aynı PR derlemesi, PR'ın diğer işlerinin yanında 8–12 dakika sürer.
+  `npm-publish` tarafından yayımlanan paketleyici Turbopack; varsayılan dalın gecelik a11y
+  derlemesi (04:41 UTC), yuvaya ulaşan her push veya dispatch derlemesi ve `npm-publish`
+  tarafından kullanılmaya devam eder. `tests/unit/build/heavy-build-queue.test.ts`,
+  dört koşullu geçidi sabitler.
+- **Turbopack yuvasını asla ölçülen gereksiniminin altında boyutlandırmayın.** 2026-10-18 saat
+  18:06'da `omni-release` için yer açmak amacıyla yuva 56G/60G'den 40G/44G'ye düşürüldü.
+  Derleme aşaması tüm çalışma boyunca `MemoryHigh` sınırında kaldı (bellek PSI `full` %30–43)
+  ve aynı cgroup'u paylaşan `Runner.Listener` iş atamasını yenileyemedi. Sahibinin
+  2026-10-17 tarihli 56G/60G ayarı aynı gün geri yüklendi. Bu değerin altında derleme
+  başarısız olmaz; kaynakları tüketerek sürünür ve iş kaybedilir.
+- **Release-Green'in kendine ait bir yuvası vardır (2026-10-18).** O zamana kadar her iki
+  Release-Green doğrulaması da `omni-build` üzerinde çalışıyordu: her push'ta (saatte yaklaşık
+  10; bir günde 100 push çalışmasından 97'si çalışma sırasında iptal edildi) ve günde üç kez,
+  yaklaşık 2 saatlik tam tarama olarak (05:29 taraması yuva için 6 saat bekledi) — tek derleme
+  yuvasına kapasitesinin birkaç katı yük bindirildi ve aynı kaynaklı PR derlemeleri saatlerce
+  bekledi. `release-green` ve `main-green` artık `OMNIROUTE_USE_TURBOPACK=0` ile
+  `omni-release` hedefini (yalnızca `omniroute-113-6`) kullanır ve başlatılmış bir çalışma artık
+  daha yeni bir push tarafından iptal edilmez (bekleyen yuva yine de yoğun akışı birleştirir).
+  `tests/unit/build/runner-capacity-routing.test.ts`; yönlendirmeyi, webpack geçişini ve
   `omni-release` üzerindeki hiçbir şeyin Turbopack ile derlenmediğini sabitler.
 - **Hafif havuz: `omni-light`.** `omniroute-113` ve `omniroute-113-2`, yalnızca arka uç için
-  `next build` (~5–6 GB; webpack) gerektiren gecelik işleri ve `quality.yml` `lint-guard` işini
-  çalıştırır. `omniroute-113`, 2026-10-18'e kadar `MemoryHigh=4G` ayarına sahipti — promptfoo
-  derlemesi orada 54 dakika boyunca bellek geri kazanımıyla ilerlemeye çalıştı; 8 GB,
-  kısıtlamayı ortadan kaldırır.
-- **Dinleyici sayısı kasıtlı olarak daha azdır.** Dört OmniRoute birimi 2026-08-29'da devre dışı
-  bırakıldı — her ek dinleyici, yukarıdaki bellek bütçesi için başka bir kiracıdır. Temizleyicinin
-  üst sınırı 6'dır (cron içindeki `MAX_ACTIVE_RUNNERS=6`): makinedeki her `Runner.Listener`
-  sürecini sayar; OmniHeuris ve OmniMind, bizim dört sürecimize iki tane daha ekler.
-- **Herhangi bir çalıştırıcı meşgulken `/tmp` veya `_work` dizinlerini asla elle temizlemeyin.**
-  Kontrol ile silme arasında boşluk bırakan bir kontrol-et-sonra-sil işlemi, çalışan bir Build
-  işinin 2026-08-27'de `_work` dizinini kaybetmesine neden oldu. Temizleyici, kontrolü ve
-  kaldırmayı tek adımda gerçekleştirir; işi ona bırakın.
+  `next build` gerektiren gecelik işleri (~5–6 GB; webpack) ve `quality.yml` içindeki
+  `lint-guard` işini çalıştırır. `omniroute-113`, 2026-10-18'e kadar `MemoryHigh=4G` ayarına
+  sahipti — promptfoo derlemesi burada 54 dakika boyunca bellek geri kazanımıyla ilerlemeye
+  çalıştı; 8 GB, kısıtlamayı ortadan kaldırır.
+- **Bilerek daha az dinleyici kullanılır.** Dört OmniRoute birimi 2026-08-29 tarihinde devre
+  dışı bırakıldı — her ek dinleyici, yukarıdaki bellek bütçesini paylaşan başka bir kiracıdır.
+  Temizlik görevlisinin üst sınırı 6'dır (cron içindeki `MAX_ACTIVE_RUNNERS=6`): makinedeki her
+  `Runner.Listener` sürecini sayar; OmniHeuris ve OmniMind, bizim dört sürecimize iki tane daha
+  ekler.
+- **Herhangi bir çalıştırıcı meşgulken `/tmp` veya `_work` dizinini asla elle temizlemeyin.**
+  Kontrol ile silme arasında boşluk bırakan bir kontrol-et-sonra-sil işlemi, 2026-08-27
+  tarihinde çalışan bir Build işinin `_work` dizinini kaybetmesine neden oldu. Temizlik
+  görevlisi kontrolü ve kaldırmayı tek adımda gerçekleştirir; işi ona bırakın.
 - Bir çalıştırıcıyı işin ortasında durdurmak işi iptal eder (canlı olarak gözlemlendi):
-  `systemctl stop` komutunu yalnızca dinleyicinin bir `Runner.Worker` alt süreci olmadığında
-  çalıştırın — ve bunu tek komutta yapın.
-- İş akışları artefaktları `/tmp` içinde bekletmemelidir (burası RAM'dir). `$RUNNER_TEMP`
-  konumuna indirin (disk üzerinde, çalıştırıcı başına ayrı) — 1,3 GB'lık `next-build`
-  artefaktının tmpfs'e inmesi 27–32 dakika, diskten yüklenmesi ise 2 dakika sürdü.
-- `.15` VPS yalnızca homologasyon içindir — üzerinde asla CI çalıştırıcıları çalışmaz.
+  `systemctl stop` yalnızca dinleyicisinin bir `Runner.Worker` alt süreci yokken kullanılmalıdır
+  — ve bunu tek komutla yapın.
+- İş akışları artefaktları `/tmp` içine koymamalıdır (burası RAM'dir). İndirmeleri
+  `$RUNNER_TEMP` dizinine (disk üzerinde, çalıştırıcı başına) yapın — 1,3 GB'lık `next-build`
+  artefaktının tmpfs üzerine yazılması 27–32 dakika, diskten yüklenmesi ise 2 dakika sürdü.
+- `.15` VPS yalnızca homologasyon içindir — üzerinde hiçbir zaman CI çalıştırıcısı çalışmaz.
+
+## Barındırılan hat (GitHub tarafından barındırılan çalıştırıcılar)
+
+Hesap **Pro** planındadır: **eşzamanlı 40 barındırılan iş**; bu kapasite tüm PR kontrolleri,
+her push ile tetiklenen iş akışı ve CodeQL'in varsayılan kurulumu tarafından paylaşılır.
+2026-10-18 tarihinde, birleştirme kampanyası sırasında (`release/v3.8.52` üzerinde saatte
+~10 birleştirme) ölçülen değerler: **24 saatte oluşturulan 2.500 iş akışı çalıştırması**,
+6 saatte dala 44 push ve PR kontrolleri saatlerce beklerken **kuyruğa alınan 106 barındırılan
+iş**; PR'ler bu kontroller olmadan birleştirildi. Dala yapılan her push'ta dokuz iş akışı
+tetiklendi:
+
+| `release/v*` dalına yapılan her push için   | barındırılan işler | yoğunluk sırasındaki sonuç                                               | 2026-10-18'den beri                                                                     |
+| ------------------------------------------- | -----------------: | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `ci.yml` (tam matris)                       |        en fazla 30 | sonraki push tarafından iptal edildi; bir günde 24 çalıştırmanın 24'ü    | `release/**` push'larında başlatılmıyor (PR çalıştırması + Release-Green)               |
+| `quality.yml`                               |                 ~6 | iptal edildi; 23 çalıştırmanın 23'ü                                      | `release/**` push'larında başlatılmıyor                                                 |
+| `Release-Green` `--quick`                   |                  0 | `omni-build` üzerinde çalıştı; 100 çalıştırmanın 97'si iptal edildi      | `omni-release` yuvası, hiçbir zaman iptal edilmez, bekleyen çalıştırmalar birleştirilir |
+| `Lock released branch`, `OpenSSF Scorecard` |                  2 | her push için kuyruğa alınan bir çalıştırma                              | ref başına bir çalıştırma (`tests/unit/build/hosted-lane-concurrency.test.ts`)          |
+| `Release acceptance` (gölge rapor)          |                  1 | her push için barındırılan bir `npm ci`, hiçbir zaman iptal edilmedi     | değişmedi — `paths:` filtresi için aday                                                 |
+| `Publish to Docker Hub` → `Deploy to VPS`   |                  2 | her push'ta iptal edildi; amd64 ayağı `omni-build` üzerinde rekabet eder | değişmedi — sahibin dağıtım kanalı                                                      |
+| CodeQL varsayılan kurulumu (`dynamic`)      |                  4 | push başına `javascript-typescript`, `actions`, `c-cpp`, `python`        | değişmedi — Settings → Code security; `c-cpp`/`python` burada hiçbir şeyi taramıyor     |
+
+`tests/unit/build/push-storm-diet.test.ts`, `ci.yml` ve `quality.yml` dosyalarının yalnızca
+`main` için olan push tetikleyicisini sabitler. Yan etki: Codecov artık her sürüm push'ı için
+temel yükleme almıyor (adım yalnızca bilgilendirme amaçlıdır ve `continue-on-error`
+kullanır); depo içi kapsam geçidi ve PR yorumu bundan etkilenmez.
+
+**Daha fazla şirket içinde barındırılan kapasite, barındırılan kuyruğu düzeltmez.** Devbox
+(`devbox-vm-06-dev002`, 24 vCPU / 54 GB) bir çalıştırıcı barındırabilir; ancak aracı oturumları
+zaten yükünü 20–26 aralığında tutuyor, aracı kapsayıcısında Docker daemon'ı yok ve doygunluğa
+ulaşan hat barındırılan hattır. Aynı anda `.113` kutusunda 71 GB boş alan vardı ve yükü
+5–8 arasındaydı; buradaki kısıt CPU değil, yukarıda belirtilen dinleyici başına bellek
+bütçesidir (en fazla 6 dinleyici). Kalan seçenekler süreçle ilgilidir: kampanya PR'lerini
+Mergify kuyruğu üzerinden birleştirin (`label=queue`; toplu işler, PR başına bir çalıştırma
+artı push başına bir çalıştırma yerine tek bir `merge_group` CI çalıştırmasını paylaşır),
+CodeQL varsayılan kurulum dillerini azaltın ve `release-acceptance.yml` dosyasını okuduğu
+dosyalara göre filtreleyin.

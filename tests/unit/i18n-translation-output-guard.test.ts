@@ -75,8 +75,8 @@ test("rejects dropped table rows (refresh-5: es PROVIDER_REFERENCE lost 23 rows)
     .filter((l) => !l.startsWith("| `b`"))
     .join("\n");
   const r = validateTranslatedChunk(SOURCE, dropped);
-  assert.equal(r.problems.length, 1);
-  assert.match(r.problems[0], /table rows 3\/4/);
+  // The dropped row also takes its inline code with it, so both guards fire.
+  assert.deepEqual(r.problems, ["table rows 3/4", "inline code changed: `b`"]);
 });
 
 test("rejects a changed code-fence count", () => {
@@ -229,4 +229,62 @@ test("separate paragraphs cannot authorize an incomplete think tag as inline cod
 test("preserves a multiline inline example within one paragraph", () => {
   const source = "Example: `<think>\n...\n</think>`.";
   assert.deepEqual(validateTranslatedChunk(source, source), { text: source, problems: [] });
+});
+
+// Inline code is a literal (2026-10-18/19 resync, #17117 / #17122): in every pass some locales
+// translated the text between backticks — the runner's own error message, `MemoryHigh=4G`,
+// `[Free]`, `// evidence:` — or broke a backtick so every later span on the line paired wrong.
+// The hash-based drift check cannot see either, so the chunk guard compares the spans.
+const SPAN_SOURCE = [
+  "| CPU | load 60 | starved the listeners' heartbeats (`The self-hosted runner lost communication`, #16853) |",
+  "",
+  "Gemini rejects tool declarations that contain `$schema` or",
+  "`additionalProperties`, answering `400 INVALID_ARGUMENT`.",
+].join("\n");
+
+test("rejects a translated inline code span (the runner error literal)", () => {
+  const out = [
+    "| CPU | carga 60 | travou os heartbeats (`O runner self-hosted perdeu a comunicação`, #16853) |",
+    "",
+    "O Gemini rejeita declarações que contêm `$schema` ou",
+    "`additionalProperties`, respondendo `400 INVALID_ARGUMENT`.",
+  ].join("\n");
+  const r = validateTranslatedChunk(SPAN_SOURCE, out);
+  assert.equal(r.problems.length, 1, r.problems.join("; "));
+  assert.match(r.problems[0], /inline code changed: `The self-hosted runner lost communication`/);
+});
+
+test("rejects a dropped backtick that re-pairs the following spans (hy mirror)", () => {
+  const out = [
+    "| CPU | 60 | (`The self-hosted runner lost communication`, #16853) |",
+    "",
+    "Gemini-ն մերժում է, եթե պարունակում են `$schema` կամ",
+    "`additionalProperties՝ պատասխանելով `400 INVALID_ARGUMENT`։",
+  ].join("\n");
+  const r = validateTranslatedChunk(SPAN_SOURCE, out);
+  assert.equal(r.problems.length, 1, r.problems.join("; "));
+  assert.match(r.problems[0], /inline code changed: .*`additionalProperties`/);
+});
+
+test("accepts a span that wraps across a line break and spans the translator added", () => {
+  const out = [
+    "| CPU | 60 | heartbeats (`The self-hosted runner lost",
+    "communication`, #16853) |",
+    "",
+    "O Gemini rejeita `tool declarations` com `$schema` ou `additionalProperties`,",
+    "respondendo `400 INVALID_ARGUMENT`.",
+  ].join("\n");
+  // The wrapped row is no longer a table row, so compare spans only.
+  assert.ok(
+    !validateTranslatedChunk(SPAN_SOURCE, out).problems.some((p) => p.startsWith("inline code")),
+    "a span split by a soft line break is the same span; an added span is not a loss"
+  );
+});
+
+test("inline code inside fenced blocks is not compared (prose comments may be translated)", () => {
+  const source = ["```bash", "# `npm ci` first", "npm ci", "```", "Run `npm ci`."].join("\n");
+  const out = ["```bash", "# primeiro `npm ci` antes", "npm ci", "```", "Rode `npm ci`."].join(
+    "\n"
+  );
+  assert.deepEqual(validateTranslatedChunk(source, out).problems, []);
 });

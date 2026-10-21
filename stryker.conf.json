@@ -470,6 +470,7 @@
       "tests/unit/rate-limit-long-body-retry-lockout.test.ts",
       "tests/unit/rate-limit-manager.test.ts",
       "tests/unit/rate-limit-queue-timeout-lockout.test.ts",
+      "tests/unit/repro-16227-wire-lockout.test.ts",
       "tests/unit/repro-7503-no-choices.test.ts",
       "tests/unit/repro-9486.test.ts",
       "tests/unit/repro-9630-combo-false-503.test.ts",

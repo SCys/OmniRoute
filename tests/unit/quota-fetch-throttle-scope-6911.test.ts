@@ -31,6 +31,17 @@ import {
   fetchWithConnectionProxy,
 } from "../../open-sse/services/connectionProxyFetch.ts";
 
+// Timing margins (2026-10-18). The throttle spaces each acquire() by the interval plus up to
+// 120 ms of jitter, but this file measures at the mocked fetch, so whatever the process does
+// between acquire() and fetch is inside the window. On a loaded runner a 30-50 ms scheduling
+// hiccup on the first call alone shrank a 200 ms spacing to 168 ms (seen with the JON-562 heap
+// snapshot suite running in parallel). A wider interval keeps 100 ms of slack while an
+// unthrottled pair still lands within a few ms of each other, and a cache hit that waited on
+// the throttle would still take at least the full interval.
+const MIN_INTERVAL_MS = 400;
+const MIN_SPREAD_MS = 300;
+const MAX_CACHE_HIT_MS = 150;
+
 const originalFetch = globalThis.fetch;
 const originalEnv = process.env.OMNIROUTE_QUOTA_FETCH_MIN_INTERVAL_MS;
 
@@ -56,7 +67,7 @@ test.after(() => {
 });
 
 test.beforeEach(() => {
-  process.env.OMNIROUTE_QUOTA_FETCH_MIN_INTERVAL_MS = "200";
+  process.env.OMNIROUTE_QUOTA_FETCH_MIN_INTERVAL_MS = String(MIN_INTERVAL_MS);
   resetQuotaFetchThrottle();
 });
 
@@ -125,8 +136,8 @@ async function assertSpacedByThrottle(
   assert.equal(callStarts.length, 2, `${label}: expected 2 upstream calls`);
   const spread = Math.abs(callStarts[1] - callStarts[0]);
   assert.ok(
-    spread >= 180,
-    `${label}: calls were NOT spaced by the shared throttle (spread=${spread}ms, expected >=180ms)`
+    spread >= MIN_SPREAD_MS,
+    `${label}: calls were NOT spaced by the shared throttle (spread=${spread}ms, expected >=${MIN_SPREAD_MS}ms)`
   );
 }
 
@@ -184,7 +195,7 @@ test("#6911 cache hits are never delayed by the shared quota-fetch throttle", as
   assert.equal(calls, 1, "second call should be served from cache, not hit the network");
   assert.ok(second !== null);
   assert.ok(
-    secondElapsed < 50,
+    secondElapsed < MAX_CACHE_HIT_MS,
     `cache-hit path should not be delayed by the throttle (took ${secondElapsed}ms, t0=${t0})`
   );
 
@@ -216,7 +227,7 @@ test("#6911 fetchBailianQuota China-region retry fetch is also throttled", async
   assert.equal(callStarts.length, 2, "expected primary + China-region retry fetch");
   const spread = Math.abs(callStarts[1] - callStarts[0]);
   assert.ok(
-    spread >= 180,
+    spread >= MIN_SPREAD_MS,
     `China-region retry fetch was NOT spaced by the shared throttle (spread=${spread}ms)`
   );
 

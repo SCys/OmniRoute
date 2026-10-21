@@ -2984,16 +2984,6 @@
       "count": 1
     }
   },
-  "tests/unit/combo-fingerprint-expansion.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/combo-health-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
   "tests/unit/combo-pipeline.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1

@@ -724,6 +724,8 @@ process.env[`${PROVIDER_ID}_USER_AGENT`]
 | `KIRO_USER_AGENT`                | `AWS-SDK-JS/3.0.0 kiro-ide/1.0.0`             | When Kiro IDE updates                                                                            |
 | `KIRO_OAUTH_CLIENT_ID`           | `kiro-cli`                                    | Override the Kiro social device-code `clientId` (public id)                                      |
 | `KIRO_VERIFY_FULL_CRC`           | `false`                                       | Opt-in: full per-frame message CRC validation on the Kiro event stream (debug corrupted streams) |
+| `KIRO_CREDIT_PRICE_USD`          | `0.02`                                        | USD per Kiro credit; converts `meteringEvent` credits into the exact per-request cost            |
+| `KIRO_REQUIRE_CREDITS`           | `false`                                       | Fail a Kiro response that reports no credit metering instead of recording it unbilled            |
 | `QODER_USER_AGENT`               | `Qoder-Cli`                                   | When Qoder CLI updates                                                                           |
 | `CURSOR_USER_AGENT`              | `Cursor/3.3`                                  | When Cursor updates                                                                              |
 
@@ -1684,6 +1686,7 @@ that should be able to run the docs translator.
 | `OMNIROUTE_TRANSLATION_API_URL`     | _(unset)_ | `scripts/i18n/run-translation.mjs` | OpenAI-compatible base URL for the translation backend.                   |
 | `OMNIROUTE_TRANSLATION_API_KEY`     | _(unset)_ | `scripts/i18n/run-translation.mjs` | Bearer token for the translation backend (never logged).                  |
 | `OMNIROUTE_TRANSLATION_MODEL`       | _(unset)_ | `scripts/i18n/run-translation.mjs` | Model id, e.g. `gpt-4o-mini` or `cx/gpt-5.4-mini`.                        |
+| `OMNIROUTE_TRANSLATION_FALLBACK_MODELS` | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Optional comma-separated model chain tried in order when the primary model fails (429 quota, 401/402, 5xx, timeout, network); a malformed request (400/413/422) is not retried elsewhere. |
 | `OMNIROUTE_TRANSLATION_TIMEOUT_MS`  | `60000`   | `scripts/i18n/run-translation.mjs` | Per-request timeout in milliseconds.                                      |
 | `OMNIROUTE_TRANSLATION_REASONING_EFFORT` | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Optional reasoning control, sent as-is to the backend when set.  |
 | `OMNIROUTE_TRANSLATION_CONCURRENCY` | `4`       | `scripts/i18n/run-translation.mjs` | Parallel translation requests when running over multiple files / locales. |
