@@ -162,19 +162,63 @@ test("getTransientBuildPaths only moves _tasks when explicitly enabled", () => {
   );
 });
 
-test("pruneStandaloneArtifacts removes traced _tasks from standalone output", async () => {
+test("pruneStandaloneArtifacts removes traced _tasks, redundant docs, and cross-platform native binaries", async () => {
   await withTempDir(async (tempDir) => {
-    // Layer 1 moved the Next distDir default to .build/next.
-    const tracedTaskFile = path.join(tempDir, ".build", "next", "standalone", "_tasks", "plan.md");
-    await fs.mkdir(path.dirname(tracedTaskFile), { recursive: true });
-    await fs.writeFile(tracedTaskFile, "transient planning artifact");
+    const standaloneDir = path.join(tempDir, ".build", "next", "standalone");
+    const tracedTaskFile = path.join(standaloneDir, "_tasks", "plan.md");
+    const docsI18nFile = path.join(standaloneDir, "docs", "i18n", "zh", "README.md");
+    const onnxWinFile = path.join(
+      standaloneDir,
+      "node_modules",
+      "onnxruntime-node",
+      "bin",
+      "napi-v6",
+      "win32",
+      "x64",
+      "onnxruntime.dll"
+    );
+    const onnxWebFile = path.join(
+      standaloneDir,
+      "node_modules",
+      "onnxruntime-web",
+      "dist",
+      "ort.wasm"
+    );
+    const tsFile = path.join(standaloneDir, "node_modules", "typescript", "lib", "typescript.js");
 
-    await pruneStandaloneArtifacts(tempDir);
+    for (const f of [tracedTaskFile, docsI18nFile, onnxWinFile, onnxWebFile, tsFile]) {
+      await fs.mkdir(path.dirname(f), { recursive: true });
+      await fs.writeFile(f, "test payload");
+    }
 
+    // Set target platform/arch to linux/x64
+    const prevPlatform = process.env.OMNIROUTE_TARGET_PLATFORM;
+    const prevArch = process.env.OMNIROUTE_TARGET_ARCH;
+    process.env.OMNIROUTE_TARGET_PLATFORM = "linux";
+    process.env.OMNIROUTE_TARGET_ARCH = "x64";
+
+    try {
+      await pruneStandaloneArtifacts(tempDir);
+    } finally {
+      if (prevPlatform !== undefined) process.env.OMNIROUTE_TARGET_PLATFORM = prevPlatform;
+      else delete process.env.OMNIROUTE_TARGET_PLATFORM;
+      if (prevArch !== undefined) process.env.OMNIROUTE_TARGET_ARCH = prevArch;
+      else delete process.env.OMNIROUTE_TARGET_ARCH;
+    }
+
+    assert.equal(fsSync.existsSync(path.join(standaloneDir, "_tasks")), false);
+    assert.equal(fsSync.existsSync(path.join(standaloneDir, "docs", "i18n")), false);
     assert.equal(
-      fsSync.existsSync(path.join(tempDir, ".build", "next", "standalone", "_tasks")),
+      fsSync.existsSync(
+        path.join(standaloneDir, "node_modules", "onnxruntime-node", "bin", "napi-v6", "win32")
+      ),
       false
     );
+    assert.equal(
+      fsSync.existsSync(path.join(standaloneDir, "node_modules", "onnxruntime-web")),
+      false
+    );
+    assert.equal(fsSync.existsSync(path.join(standaloneDir, "node_modules", "typescript")), false);
   });
 });
 
