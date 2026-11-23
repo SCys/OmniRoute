@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate napi_derive;
 
-use aho_corasick::{AhoCorasick, MatchKind};
 use once_cell::sync::Lazy;
 use regex::Regex;
 
@@ -182,70 +181,7 @@ pub fn native_group_similar_lines(text: String, threshold: Option<u32>) -> Nativ
   }
 }
 
-// ──────────────── 4. Aho-Corasick Multi-Pattern Replacement ────────────────
-
-fn is_word_char(c: char) -> bool {
-  c.is_alphanumeric() || c == '_'
-}
-
-/// Replace multiple patterns simultaneously using Aho-Corasick automaton.
-/// Respects word boundaries if enforce_word_boundaries is true.
-#[napi]
-pub fn native_aho_corasick_replace(
-  text: String,
-  patterns: Vec<String>,
-  replacements: Vec<String>,
-  enforce_word_boundaries: bool,
-) -> String {
-  if patterns.is_empty() || patterns.len() != replacements.len() {
-    return text;
-  }
-
-  let ac = match AhoCorasick::builder()
-    .ascii_case_insensitive(true)
-    .match_kind(MatchKind::LeftmostLongest)
-    .build(&patterns)
-  {
-    Ok(ac) => ac,
-    Err(_) => return text,
-  };
-
-  let mut result = String::with_capacity(text.len());
-  let mut last_idx = 0;
-
-  for mat in ac.find_iter(&text) {
-    let start = mat.start();
-    let end = mat.end();
-
-    if enforce_word_boundaries {
-      // Check left boundary
-      if start > 0 {
-        if let Some(prev_char) = text[..start].chars().last() {
-          if is_word_char(prev_char) {
-            continue;
-          }
-        }
-      }
-      // Check right boundary
-      if end < text.len() {
-        if let Some(next_char) = text[end..].chars().next() {
-          if is_word_char(next_char) {
-            continue;
-          }
-        }
-      }
-    }
-
-    result.push_str(&text[last_idx..start]);
-    result.push_str(&replacements[mat.pattern()]);
-    last_idx = end;
-  }
-
-  result.push_str(&text[last_idx..]);
-  result
-}
-
-// ──────────────── 5. Fast Cleanup Artifacts ────────────────
+// ──────────────── 4. Fast Cleanup Artifacts ────────────────
 
 static RE_MULTI_SPACE: Lazy<Regex> = Lazy::new(|| Regex::new(r"[ \t]{2,}").unwrap());
 static RE_SPACE_PUNCT: Lazy<Regex> = Lazy::new(|| Regex::new(r"[ \t]+([,.;:!?])").unwrap());

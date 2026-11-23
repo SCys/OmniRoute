@@ -11,13 +11,33 @@ interface NativeAddon {
   nativeStripAnsi(text: string): string;
   nativeDeduplicateLines(text: string, threshold?: number): { text: string; collapsed: number };
   nativeGroupSimilarLines(text: string, threshold?: number): { text: string; grouped: number };
-  nativeAhoCorasickReplace(
-    text: string,
-    patterns: string[],
-    replacements: string[],
-    enforceWordBoundaries: boolean
-  ): string;
   nativeCleanupArtifacts(text: string): string;
+}
+
+/** Paths of a built addon, relative to `open-sse/services/compression/native/`. */
+const ADDON_REL_PATHS: string[][] = [
+  ["omniroute_compression_native.node"],
+  ["target", "release", "libomniroute_compression_native.so"],
+  ["target", "release", "libomniroute_compression_native.dylib"],
+  ["target", "release", "omniroute_compression_native.dll"],
+];
+
+/**
+ * Candidate addon paths, in priority order:
+ *  - module-relative — dev / source runs, where this file sits next to `native/`;
+ *  - cwd-absolute — the standalone/Docker bundle, where this module is compiled
+ *    into `.next/server/...` (so the module-relative path misses) but
+ *    `assembleStandalone` copies the addon to
+ *    `<standalone-root>/open-sse/services/compression/native/...` and the server
+ *    runs with cwd = the standalone root. Same strategy as the tproxy addon
+ *    loader (`src/mitm/tproxy/transparentSocket.ts`).
+ */
+export function nativeAddonCandidates(moduleDir: string, cwd: string): string[] {
+  const cwdBase = path.join(cwd, "open-sse", "services", "compression", "native");
+  return ADDON_REL_PATHS.flatMap((relative) => [
+    path.join(moduleDir, ...relative),
+    path.join(cwdBase, ...relative),
+  ]);
 }
 
 let nativeModule: NativeAddon | null = null;
@@ -33,12 +53,7 @@ function tryLoadNativeAddon(): void {
 
   try {
     const require = createRequire(import.meta.url);
-    const possiblePaths = [
-      path.join(__dirname, "omniroute_compression_native.node"),
-      path.join(__dirname, "target", "release", "libomniroute_compression_native.so"),
-      path.join(__dirname, "target", "release", "libomniroute_compression_native.dylib"),
-      path.join(__dirname, "target", "release", "omniroute_compression_native.dll"),
-    ];
+    const possiblePaths = nativeAddonCandidates(__dirname, process.cwd());
 
     for (const binaryPath of possiblePaths) {
       if (existsSync(binaryPath)) {
@@ -133,108 +148,7 @@ export function deduplicateRepeatedLinesFast(
   return { text: output.join("\n"), collapsed };
 }
 
-// ──────────────── 3. Group Similar Lines ────────────────
-
-function normalizeLineFallback(line: string): string {
-  let s = line;
-  s = s.replace(/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/g, "<N>");
-  s = s.replace(/\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\]/g, "[<N>]");
-  s = s.replace(/\b[0-9a-fA-F]{6,40}\b/g, "<N>");
-  s = s.replace(/\bv?\d+\.\d+\.\d+(?:\.\d+)*\b/g, "<N>");
-  s = s.replace(/\b\d+\b/g, "<N>");
-  s = s.replace(/\s+/g, " ");
-  return s.trim();
-}
-
-export function groupSimilarLinesFast(
-  text: string,
-  options: { threshold?: number } = {}
-): { text: string; grouped: number } {
-  const addon = getNativeCompressionAddon();
-  if (addon) {
-    return addon.nativeGroupSimilarLines(text, options.threshold);
-  }
-
-  // Complete TypeScript Fallback matching RTK R5 grouper.ts
-  const threshold = Math.max(2, Math.floor(options.threshold ?? 3));
-  const lines = text.split(/\r?\n/);
-  if (lines.length === 0 || (lines.length === 1 && lines[0] === "")) {
-    return { text: "", grouped: 0 };
-  }
-
-  const output: string[] = [];
-  let grouped = 0;
-
-  let index = 0;
-  while (index < lines.length) {
-    const line = lines[index];
-    const normalised = normalizeLineFallback(line);
-
-    let runLength = 1;
-    if (normalised) {
-      while (
-        index + runLength < lines.length &&
-        normalizeLineFallback(lines[index + runLength]) === normalised
-      ) {
-        runLength++;
-      }
-    }
-
-    if (runLength >= threshold && normalised) {
-      output.push(`${line} [rtk:grouped ×${runLength}]`);
-      grouped += runLength - 1;
-      index += runLength;
-    } else {
-      output.push(line);
-      index++;
-    }
-  }
-
-  return { text: output.join("\n"), grouped };
-}
-
-// ──────────────── 4. Multi-Pattern Keyword Replacement ────────────────
-
-function escapeRegExp(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-export function ahoCorasickReplaceFast(
-  text: string,
-  patterns: string[],
-  replacements: string[],
-  wordBoundaries = true
-): string {
-  const addon = getNativeCompressionAddon();
-  if (addon) {
-    return addon.nativeAhoCorasickReplace(text, patterns, replacements, wordBoundaries);
-  }
-
-  if (patterns.length === 0 || patterns.length !== replacements.length) {
-    return text;
-  }
-
-  // High-performance single-pass regex fallback with dictionary map
-  // Sort patterns by length descending so longer phrases match before shorter subphrases
-  const indexed = patterns.map((p, i) => ({ pattern: p, replacement: replacements[i] }));
-  indexed.sort((a, b) => b.pattern.length - a.pattern.length);
-
-  const lookup = new Map<string, string>();
-  for (const item of indexed) {
-    lookup.set(item.pattern.toLowerCase(), item.replacement);
-  }
-
-  const patternGroup = indexed.map((item) => escapeRegExp(item.pattern)).join("|");
-  const regex = wordBoundaries
-    ? new RegExp(`\\b(?:${patternGroup})\\b`, "gi")
-    : new RegExp(`(?:${patternGroup})`, "gi");
-
-  return text.replace(regex, (matched) => {
-    return lookup.get(matched.toLowerCase()) ?? "";
-  });
-}
-
-// ──────────────── 5. Fast Cleanup Artifacts ────────────────
+// ──────────────── 3. Fast Cleanup Artifacts ────────────────
 
 export function cleanupArtifactsFast(text: string): string {
   if (!text) return "";

@@ -4,8 +4,6 @@
  * Compares latency and throughput across:
  * 1. ANSI stripping (10KB and 200KB log output)
  * 2. Line deduplication (1,000 lines and 10,000 lines)
- * 3. Log line similarity grouping (1,000 lines)
- * 4. Multi-pattern keyword replacement (Caveman style across 50KB prose)
  */
 import { performance } from "node:perf_hooks";
 import { getNativeCompressionAddon } from "../../open-sse/services/compression/native/index.ts";
@@ -97,59 +95,6 @@ async function main() {
   );
   console.log(
     `- 10,000 lines: JS = ${jsDedup10kMs.toFixed(3)}ms | Rust = ${rustDedup10kMs.toFixed(3)}ms  => ${(jsDedup10kMs / rustDedup10kMs).toFixed(1)}x speedup\n`
-  );
-
-  // ── Benchmark 3: Multi-pattern Replacement (Caveman) ───────────────────
-  console.log("## 3. Multi-Pattern Keyword Replacement (Caveman / Aho-Corasick)");
-  const sampleProse = `
-    I would like you to make sure to check the system configuration.
-    Could you please explain why the service failed?
-    It seems like there is a problem with the database connection.
-    Basically, I am trying to resolve this error as well as update the schema.
-    Furthermore, remember to keep in mind that this is important.
-  `.repeat(100); // ~50KB
-
-  const patterns = [
-    "i would like you to",
-    "make sure to",
-    "could you please",
-    "it seems like",
-    "basically",
-    "i am trying to",
-    "as well as",
-    "furthermore",
-    "remember to",
-    "keep in mind that",
-  ];
-  const replacements = [
-    "",
-    "ensure",
-    "why",
-    "it seems",
-    "",
-    "aiming to",
-    "and",
-    "also",
-    "",
-    "note",
-  ];
-
-  const jsMultiReplace = (text: string) => {
-    let res = text;
-    for (let i = 0; i < patterns.length; i++) {
-      res = res.replace(new RegExp(`\\b${patterns[i]}\\b`, "gi"), replacements[i]);
-    }
-    return res;
-  };
-
-  const jsCavemanMs = timeIt(() => jsMultiReplace(sampleProse), 30);
-  const rustCavemanMs = timeIt(
-    () => native.nativeAhoCorasickReplace(sampleProse, patterns, replacements, true),
-    30
-  );
-
-  console.log(
-    `- 50KB text (10 rules): JS = ${jsCavemanMs.toFixed(3)}ms | Rust = ${rustCavemanMs.toFixed(3)}ms  => ${(jsCavemanMs / rustCavemanMs).toFixed(1)}x speedup\n`
   );
 }
 

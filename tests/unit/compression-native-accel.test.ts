@@ -1,13 +1,13 @@
 import { test, describe, beforeEach, afterEach } from "node:test";
+import path from "node:path";
 import assert from "node:assert/strict";
 import {
   isNativeCompressionAvailable,
   stripAnsiFast,
   deduplicateRepeatedLinesFast,
-  groupSimilarLinesFast,
-  ahoCorasickReplaceFast,
   cleanupArtifactsFast,
   getNativeCompressionAddon,
+  nativeAddonCandidates,
   setNativeCompressionEnabledForTest,
 } from "../../open-sse/services/compression/native/index.ts";
 
@@ -21,18 +21,26 @@ describe("Native compression acceleration & complete dual-path fallback", () => 
   });
 
   test("native addon availability and environment killswitch", () => {
-    assert.equal(isNativeCompressionAvailable(), true);
-    const addon = getNativeCompressionAddon();
-    assert.ok(addon);
-    assert.equal(addon?.nativePing(), "pong");
+    // The addon is optional: it is absent on a clean checkout (only built with
+    // `npm run build` on a machine that has cargo), and compression then falls back
+    // to the TypeScript path. Assert the wiring, not the presence of the binary.
+    const builtLocally = isNativeCompressionAvailable();
+    if (builtLocally) {
+      const addon = getNativeCompressionAddon();
+      assert.ok(addon);
+      assert.equal(addon?.nativePing(), "pong");
+    } else {
+      assert.equal(getNativeCompressionAddon(), null);
+    }
 
-    // Test programatic disable
+    // Programmatic killswitch: unavailable while forced off.
     setNativeCompressionEnabledForTest(false);
     assert.equal(isNativeCompressionAvailable(), false);
     assert.equal(getNativeCompressionAddon(), null);
 
+    // Re-enabling reloads the addon; the outcome matches the on-disk binary.
     setNativeCompressionEnabledForTest(true);
-    assert.equal(isNativeCompressionAvailable(), true);
+    assert.equal(isNativeCompressionAvailable(), builtLocally);
   });
 
   test("ANSI stripping: native and fallback yield identical results", () => {
@@ -72,41 +80,6 @@ describe("Native compression acceleration & complete dual-path fallback", () => 
     }
   });
 
-  test("line similarity grouping: native and fallback yield identical results", () => {
-    const sample = [
-      "2024-01-15T10:30:00Z INFO session a1b2c3d4e5f6 request processed in 42 ms v1.0.0",
-      "2024-01-15T10:30:01Z INFO session b2c3d4e5f6a1 request processed in 55 ms v1.0.0",
-      "2024-01-15T10:30:02Z INFO session c3d4e5f6a1b2 request processed in 60 ms v1.0.0",
-      "different unique event line",
-    ].join("\n");
-
-    setNativeCompressionEnabledForTest(true);
-    const nativeRes = groupSimilarLinesFast(sample, { threshold: 3 });
-
-    setNativeCompressionEnabledForTest(false);
-    const fallbackRes = groupSimilarLinesFast(sample, { threshold: 3 });
-
-    assert.equal(nativeRes.grouped, 2);
-    assert.deepEqual(nativeRes, fallbackRes);
-  });
-
-  test("Aho-Corasick multi-pattern replacement: native and fallback equivalence", () => {
-    const text = "I would like you to please make sure to check the code and remember to test";
-    const patterns = ["i would like you to", "please", "make sure to", "remember to"];
-    const replacements = ["", "", "ensure to", "always"];
-
-    setNativeCompressionEnabledForTest(true);
-    const nativeReplaced = ahoCorasickReplaceFast(text, patterns, replacements, true);
-
-    setNativeCompressionEnabledForTest(false);
-    const fallbackReplaced = ahoCorasickReplaceFast(text, patterns, replacements, true);
-
-    assert.ok(nativeReplaced.includes("ensure to"));
-    assert.ok(nativeReplaced.includes("always"));
-    assert.ok(!nativeReplaced.toLowerCase().includes("please"));
-    assert.equal(nativeReplaced.trim(), fallbackReplaced.trim());
-  });
-
   test("cleanup artifacts: native and fallback yield identical results", () => {
     const dirty = "Here is   too much   spacing  ,  and punctuation??\n\n\n\nNext line   ";
 
@@ -121,5 +94,25 @@ describe("Native compression acceleration & complete dual-path fallback", () => 
     assert.ok(!nativeCleaned.includes(" ,"));
     assert.ok(!nativeCleaned.includes("??"));
     assert.ok(!nativeCleaned.includes("\n\n\n"));
+  });
+
+  test("addon candidates cover both the module dir and the standalone cwd root", () => {
+    const moduleDir = path.join("/app", ".build", "next", "server", "chunks");
+    const cwd = "/app";
+    const candidates = nativeAddonCandidates(moduleDir, cwd);
+    const nativeDir = path.join(cwd, "open-sse", "services", "compression", "native");
+
+    // The Docker/standalone bundle compiles this module into .next/server/... — the
+    // addon only resolves through the cwd-relative candidate (assembleStandalone
+    // copies it to <standalone-root>/open-sse/services/compression/native/).
+    assert.ok(candidates.includes(path.join(nativeDir, "omniroute_compression_native.node")));
+    assert.ok(
+      candidates.includes(
+        path.join(nativeDir, "target", "release", "libomniroute_compression_native.so")
+      )
+    );
+    // Source runs resolve module-relative first.
+    assert.equal(candidates[0], path.join(moduleDir, "omniroute_compression_native.node"));
+    assert.equal(candidates.length, 8);
   });
 });

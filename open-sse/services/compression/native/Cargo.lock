@@ -119,7 +119,6 @@ dependencies = [
 name = "omniroute_compression_native"
 version = "0.1.0"
 dependencies = [
- "aho-corasick",
  "napi",
  "napi-build",
  "napi-derive",
